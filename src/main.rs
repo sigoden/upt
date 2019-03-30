@@ -28,6 +28,6 @@ fn solve_cmd() -> Result<String, UptError> {
     let bin_vender = lookup_vender(bin)?;
     let task = bin_vender.parse(remind_args)?;
     let os_vender = detect_os_vender()?;
-    let exe_args = os_vender.eval(task);
-    Ok(exe_args.join(""))
+    let cmd = os_vender.eval(task);
+    Ok(cmd)
 }

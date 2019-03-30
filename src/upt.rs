@@ -1,30 +1,43 @@
-// macro_rules! foo {
-//     () => {}
-// }
+use crate::{Vender};
+use crate::parser::Parser;
+pub struct Upt {
+    install: Parser,
+    uninstall: Parser,
+    upgrade: Parser,
+    search: Parser,
+    show: Parser,
+    upgrade_index: Parser,
+    update_all: Parser,
+    list_upgradable: Parser,
+    list_installed: Parser,
+}
 
-// use std::str::FromStr;
-
-// foo!(upt => [
-//     Install: "install -y? $", // [Subcommand<install>, ]
-//     Uninstall: "remove -y? $",
-//     Upgrade: "upgrade -y? $",
-//     Search: "search $",
-//     Show: "search $",
-//     UpdateIndex: "update",
-//     UpgradeAll: "upgrade",
-//     ListUpgradable: "list --upgradable",
-//     ListInstalled: "list --installed",
-// ]);
-
-// foo!(pacman => [
-//     Uninstall: "-R -s --noconfirm? $",
-//     Search: "-Q -s --noconfirm? $",
-//     Show: "-Q -i --noconfirm? $",
-//     UpdateIndex: "-S -y -y",
-//     UpgradeAll: "-S -y -u",
-//     ListUpgradable: "-Q -u",
-//     ListInstalled: "-Q -e",
-//     Install: "-S $",
-//     Upgrade: "-S $",
-// ]);
-
+impl Vender for Upt {
+    fn parser_install(&self) -> &Parser {
+        &self.install
+    }
+    fn parser_uninstall(&self) -> &Parser {
+        &self.uninstall
+    }
+    fn parser_upgrade(&self) -> &Parser {
+        &self.upgrade
+    }
+    fn parser_search(&self) -> &Parser {
+        &self.search
+    }
+    fn parser_show(&self) -> &Parser {
+        &self.show
+    }
+    fn parser_update_index(&self) -> &Parser {
+        &self.upgrade_index
+    }
+    fn parser_upgrade_all(&self) -> &Parser {
+        &self.update_all
+    }
+    fn parser_list_upgradable(&self) -> &Parser {
+        &self.list_upgradable
+    }
+    fn parser_list_installed(&self) -> &Parser {
+        &self.list_installed
+    }
+}
