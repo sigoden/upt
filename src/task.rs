@@ -14,7 +14,7 @@ pub enum Task {
     /// sync packages index
     UpdateIndex,
     /// upgrade all outdated packages
-    UpgradeAll,
+    UpgradeAll { assume_yes: bool },
     /// list all upgradable packages
     ListUpgradable,
     /// list all installed packages

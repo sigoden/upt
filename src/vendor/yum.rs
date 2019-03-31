@@ -1,8 +1,9 @@
 create_vendor! {
     name: "yum",
-    install: "install -y|--assumeyes@assume_yes $",
-    remove: "remove -y|--assumeyes@assume_yes $",
-    upgrade: "update -y|--assumeyes@assume_yes $",
+    yes: ["-y", "--assumeyes"],
+    install: "install $",
+    remove: "remove $",
+    upgrade: "update $",
     search: "search $",
     show: "info $",
     update_index: "check-update",

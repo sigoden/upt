@@ -1,8 +1,9 @@
 create_vendor! {
     name: "apk",
-    install: "add -y|--yes@assume_yes $",
-    remove: "del -y|--yes@assume_yes $",
-    upgrade: "upgrade -y|--yes@assume_yes $",
+    yes: [],
+    install: "add $",
+    remove: "del $",
+    upgrade: "upgrade $",
     search: "search $",
     show: "show $",
     update_index: "update",

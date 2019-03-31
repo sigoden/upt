@@ -1,8 +1,9 @@
 create_vendor! {
     name: "choco",
-    install: "install -y@assume_yes $",
-    remove: "uninstall -y@assume_yes $",
-    upgrade: "upgrade -y@assume_yes $",
+    yes: ["-y"],
+    install: "install $",
+    remove: "uninstall $",
+    upgrade: "upgrade $",
     search: "search $",
     show: "info $",
     update_index: "upgrade --noop",

@@ -19,6 +19,7 @@ const LINE_ENDING: &str = "\n";
 #[derive(Debug)]
 pub struct Vendor {
     pub name: String,
+    pub yes: Vec<String>,
     pub install: Parser,
     pub remove: Parser,
     pub upgrade: Parser,
@@ -35,31 +36,32 @@ impl Vendor {
     /// Parse command line, figure out the task to perform
     pub fn parse(&self, args: &[String]) -> Result<Task, UptError> {
         self.check_args(args)?;
-        if let Some((Some(pkg), assume_yes)) = self.install.parse(args) {
+        let empty_yes: Vec<String> = vec![];
+        if let Some((Some(pkg), assume_yes)) = self.install.parse(args, &self.yes) {
             return Ok(Task::Install { pkg, assume_yes });
         }
-        if let Some((Some(pkg), assume_yes)) = self.remove.parse(args) {
+        if let Some((Some(pkg), assume_yes)) = self.remove.parse(args, &self.yes) {
             return Ok(Task::Remove { pkg, assume_yes });
         }
-        if let Some((Some(pkg), assume_yes)) = self.upgrade.parse(args) {
+        if let Some((Some(pkg), assume_yes)) = self.upgrade.parse(args, &self.yes) {
             return Ok(Task::Upgrade { pkg, assume_yes });
         }
-        if let Some((Some(pkg), _)) = self.search.parse(args) {
+        if let Some((Some(pkg), _)) = self.search.parse(args, &empty_yes) {
             return Ok(Task::Search { pkg });
         }
-        if let Some((Some(pkg), _)) = self.show.parse(args) {
+        if let Some((Some(pkg), _)) = self.show.parse(args, &empty_yes) {
             return Ok(Task::Show { pkg });
         }
-        if self.update_index.parse(args).is_some() {
+        if self.update_index.parse(args, &empty_yes).is_some() {
             return Ok(Task::UpdateIndex);
         }
-        if self.upgrade_all.parse(args).is_some() {
-            return Ok(Task::UpgradeAll);
+        if let Some((_, assume_yes)) = self.upgrade_all.parse(args, &self.yes) {
+            return Ok(Task::UpgradeAll { assume_yes });
         }
-        if self.list_upgradable.parse(args).is_some() {
+        if self.list_upgradable.parse(args, &empty_yes).is_some() {
             return Ok(Task::ListUpgradable);
         }
-        if self.list_installed.parse(args).is_some() {
+        if self.list_installed.parse(args, &empty_yes).is_some() {
             return Ok(Task::ListInstalled);
         }
         Err(UptError::NotRecongize)
@@ -69,24 +71,33 @@ impl Vendor {
         let cmd = match task {
             Task::Install { pkg, assume_yes } => self
                 .install
-                .generate_cmd(&Some(pkg.to_string()), *assume_yes),
+                .generate_cmd(&Some(pkg.to_string()), &self.assume_yes_str(*assume_yes)),
             Task::Remove { pkg, assume_yes } => self
                 .remove
-                .generate_cmd(&Some(pkg.to_string()), *assume_yes),
+                .generate_cmd(&Some(pkg.to_string()), &self.assume_yes_str(*assume_yes)),
             Task::Upgrade { pkg, assume_yes } => self
                 .upgrade
-                .generate_cmd(&Some(pkg.to_string()), *assume_yes),
-            Task::Search { pkg } => self.search.generate_cmd(&Some(pkg.to_string()), false),
-            Task::Show { pkg } => self.show.generate_cmd(&Some(pkg.to_string()), false),
-            Task::UpdateIndex => self.update_index.generate_cmd(&None, false),
-            Task::UpgradeAll => self.upgrade_all.generate_cmd(&None, false),
-            Task::ListInstalled => self.list_installed.generate_cmd(&None, false),
-            Task::ListUpgradable => self.list_upgradable.generate_cmd(&None, false),
+                .generate_cmd(&Some(pkg.to_string()), &self.assume_yes_str(*assume_yes)),
+            Task::Search { pkg } => self.search.generate_cmd(&Some(pkg.to_string()), ""),
+            Task::Show { pkg } => self.show.generate_cmd(&Some(pkg.to_string()), ""),
+            Task::UpdateIndex => self.update_index.generate_cmd(&None, ""),
+            Task::UpgradeAll { assume_yes } => self
+                .upgrade_all
+                .generate_cmd(&None, &self.assume_yes_str(*assume_yes)),
+            Task::ListInstalled => self.list_installed.generate_cmd(&None, ""),
+            Task::ListUpgradable => self.list_upgradable.generate_cmd(&None, ""),
         };
         if cmd == "" {
             return Err(UptError::NotSupportTask);
         }
         Ok(self.name.clone() + " " + &cmd)
+    }
+    fn assume_yes_str(&self, assume_yes: bool) -> String {
+        if assume_yes && !self.yes.is_empty() {
+            self.yes[0].clone()
+        } else {
+            String::new()
+        }
     }
     /// Dump help message
     pub fn help(&self) -> String {
@@ -197,6 +208,15 @@ impl Vendor {
             ));
             output.push_str(LINE_ENDING);
         }
+        if !self.yes.is_empty() {
+            output.push_str(LINE_ENDING);
+            output.push_str("");
+            output.push_str(&format!(
+                "Automatically answer yes: {}",
+                self.yes.join(",")
+            ));
+            output.push_str(LINE_ENDING);
+        }
         output
     }
     fn check_args(&self, args: &[String]) -> Result<(), UptError> {
@@ -259,7 +279,7 @@ mod tests {
         check_parse!(upt, ["search", "vim", "jq"], (Search, pkg = "vim jq"));
         check_parse!(upt, ["show", "vim"], (Show, pkg = "vim"));
         check_parse!(upt, ["update"], UpdateIndex);
-        check_parse!(upt, ["upgrade"], UpgradeAll);
+        check_parse!(upt, ["upgrade"], (UpgradeAll, assume_yes = false));
         check_parse!(upt, ["list", "--upgradable"], ListUpgradable);
         check_parse!(upt, ["list", "-i"], ListInstalled);
         check_parse!(upt, ["install"]);
@@ -316,7 +336,7 @@ mod tests {
         check_eval!(upt, (Search, pkg = "vim"), "upt search vim");
         check_eval!(upt, (Show, pkg = "vim"), "upt show vim");
         check_eval!(upt, UpdateIndex, "upt update");
-        check_eval!(upt, UpgradeAll, "upt upgrade");
+        check_eval!(upt, (UpgradeAll, assume_yes = false), "upt upgrade");
         check_eval!(upt, ListInstalled, "upt list -i");
         check_eval!(upt, ListUpgradable, "upt list -u");
     }

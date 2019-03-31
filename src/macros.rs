@@ -2,6 +2,7 @@
 macro_rules! create_vendor {
     (
         name: $name:expr,
+        yes: [$($yes:expr),*],
         install: $install:expr,
         remove: $remove:expr,
         upgrade: $upgrade:expr,
@@ -17,6 +18,7 @@ macro_rules! create_vendor {
         pub fn init() -> Vendor {
             Vendor {
                 name: $name.to_string(),
+                yes: vec![ $($yes.to_string()),* ],
                 install: Parser::from_str($install).unwrap(),
                 remove: Parser::from_str($remove).unwrap(),
                 upgrade: Parser::from_str($upgrade).unwrap(),

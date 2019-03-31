@@ -1,8 +1,9 @@
 create_vendor! {
     name: "brew",
-    install: "install -y|--yes@assume_yes $",
-    remove: "uninstall -y|--yes@assume_yes $",
-    upgrade: "upgrade -y|--yes@assume_yes $",
+    yes: [],
+    install: "install $",
+    remove: "uninstall $",
+    upgrade: "upgrade $",
     search: "search $",
     show: "info $",
     update_index: "update",

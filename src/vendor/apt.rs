@@ -1,8 +1,9 @@
 create_vendor! {
     name: "apt",
-    install: "install -y|--yes@assume_yes $",
-    remove: "remove -y|--yes@assume_yes $",
-    upgrade: "install -y|--yes@assume_yes $",
+    yes: ["-y", "--yes"],
+    install: "install $",
+    remove: "remove $",
+    upgrade: "install $",
     search: "search $",
     show: "show $",
     update_index: "update",

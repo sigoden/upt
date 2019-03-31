@@ -4,7 +4,6 @@ use std::str::FromStr;
 #[derive(Debug, PartialEq, Default)]
 pub struct Parser {
     command: String,
-    assume_yes: Vec<String>,
     have_operands: bool,
     required_options: Vec<Vec<String>>,
 }
@@ -22,24 +21,18 @@ impl FromStr for Parser {
         let (command, remind) = words.split_first().expect("no command");
         let mut have_operands = false;
         let mut required_options: Vec<Vec<String>> = vec![];
-        let mut assume_yes: Vec<String> = Vec::new();
         fn split(v: &str) -> Vec<String> {
             v.split('|').map(|x| x.to_string()).collect::<Vec<String>>()
         }
         for elem in remind {
             if elem.starts_with('-') {
-                if elem.ends_with("@assume_yes") {
-                    assume_yes = split(&elem[0..elem.len() - 11]);
-                } else {
-                    required_options.push(split(elem));
-                }
+                required_options.push(split(elem));
             } else if *elem == "$" {
                 have_operands = true;
             }
         }
         Ok(Parser {
             command: command.to_string(),
-            assume_yes,
             have_operands,
             required_options,
         })
@@ -48,7 +41,7 @@ impl FromStr for Parser {
 
 impl Parser {
     /// Try to parse the command line arguemnts
-    pub fn parse(&self, args: &[String]) -> Option<(Option<String>, bool)> {
+    pub fn parse(&self, args: &[String], yes: &[String]) -> Option<(Option<String>, bool)> {
         if self.is_noop() {
             return None;
         }
@@ -59,10 +52,10 @@ impl Parser {
         if (pkg.is_none() && self.have_operands) || (pkg.is_some() && !self.have_operands) {
             return None;
         }
-        let assume_yes = if !self.assume_yes.is_empty() {
+        let assume_yes = if !yes.is_empty() {
             options
                 .iter()
-                .any(|v| self.assume_yes.iter().any(|x| x == v))
+                .any(|v| yes.iter().any(|x| x == v))
         } else {
             false
         };
@@ -72,7 +65,7 @@ impl Parser {
         Some((pkg, assume_yes))
     }
     /// Generate corespond cmd
-    pub fn generate_cmd(&self, pkg: &Option<String>, assume_yes: bool) -> String {
+    pub fn generate_cmd(&self, pkg: &Option<String>, yes: &str) -> String {
         if self.is_noop() {
             return String::new();
         }
@@ -81,9 +74,9 @@ impl Parser {
             output.push_str(" ");
             output.push_str(&ro[0]);
         }
-        if !self.assume_yes.is_empty() && assume_yes {
+        if !yes.is_empty() {
             output.push_str(" ");
-            output.push_str(&self.assume_yes[0]);
+            output.push_str(yes);
         }
         if let Some(pkg_value) = pkg {
             output.push_str(" ");
@@ -106,11 +99,6 @@ impl Parser {
                 output.push_str(" ");
                 output.push_str(&ro[0]);
             }
-        }
-        if !self.assume_yes.is_empty() {
-            output.push_str(" [");
-            output.push_str(&self.assume_yes.join("|"));
-            output.push_str("]");
         }
         if self.have_operands {
             output.push_str(" ");
@@ -185,11 +173,10 @@ mod tests {
     use std::str::FromStr;
 
     macro_rules! check_parser_from_str {
-        ($input:expr, { $command:expr, [$($ay:expr),*], [$([$($ro:expr),* $(,)*]),*], $op:expr }) => {
+        ($input:expr, { $command:expr, [$([$($ro:expr),* $(,)*]),*], $op:expr }) => {
             let parser = Parser::from_str($input).unwrap();
             let expect_parser = Parser {
                 command: $command.to_string(),
-                assume_yes: vec![ $($ay.to_string()),*],
                 have_operands: $op,
                 required_options: vec![$(vec![$($ro.to_string(),)*],)*],
             };
@@ -199,105 +186,110 @@ mod tests {
     #[test]
     fn test_parser_from_str() {
         check_parser_from_str!(
-            "install -y|--yes@assume_yes $",
-            { "install", ["-y", "--yes"], [], true }
+            "install $",
+            { "install", [], true }
         );
         check_parser_from_str!(
             "search $",
-            { "search", [], [], true }
-        );
-        check_parser_from_str!(
-            "update",
-            { "update", [], [], false }
+            { "search", [], true }
         );
         check_parser_from_str!(
             "list --installed",
-            { "list", [], [["--installed"]], false }
+            { "list", [["--installed"]], false }
         );
         check_parser_from_str!(
-            "-R -s --noconfirm@assume_yes $",
-            { "-R", ["--noconfirm"], [["-s"]], true }
+            "-R -s $",
+            { "-R", [["-s"]], true }
         );
         check_parser_from_str!(
             "-S -y -y",
-            { "-S", [], [["-y"], ["-y"]], false }
+            { "-S", [["-y"], ["-y"]], false }
         );
         check_parser_from_str!(
             "-S $",
-            { "-S", [], [], true }
+            { "-S", [], true }
         );
         check_parser_from_str!(
             "",
-            { "-", [], [], false }
+            { "-", [], false }
         );
     }
     macro_rules! check_parser_parse {
-        ($input:expr, [$($arg:expr),*], ($pkg:expr, $assume_yes:expr)) => {
+        ($input:expr, [$($yes:expr),*], [$($arg:expr),*], ($pkg:expr, $assume_yes:expr)) => {
             {
                 let parser = Parser::from_str($input).unwrap();
-                let args = vec![ $($arg.to_string()),*];
+                let args = vec![$($arg.to_string()),*];
                 let pkg = if $pkg.len() == 0 {
                     None
                 } else {
                     Some($pkg.to_string())
                 };
-                assert_eq!(parser.parse(&args).unwrap(), (pkg, $assume_yes));
+                let yes = vec![$($yes.to_string()),*];
+                assert_eq!(parser.parse(&args, &yes).unwrap(), (pkg, $assume_yes));
             }
         };
-        ($input:expr, [$($arg:expr),*]) => {
+        ($input:expr, [$($yes:expr),*], [$($arg:expr),*]) => {
             {
                 let parser = Parser::from_str($input).unwrap();
                 let args = vec![ $($arg.to_string()),*];
-                assert_eq!(parser.parse(&args), None);
+                let yes = vec![$($yes.to_string()),*];
+                assert_eq!(parser.parse(&args, &yes), None);
             }
         }
     }
     #[test]
     fn test_parser_parse() {
         check_parser_parse!(
-            "install -y|--yes@assume_yes $",
+            "install $",
+            ["-y", "--yes"],
             ["install", "vim"],
             ("vim", false)
         );
         check_parser_parse!(
-            "install -y|--yes@assume_yes $",
+            "install $",
+            ["-y", "--yes"],
             ["install", "-y", "vim"],
             ("vim", true)
         );
         check_parser_parse!(
-            "install -y|--yes@assume_yes $",
+            "install $",
+            ["-y", "--yes"],
             ["install", "--yes", "vim"],
             ("vim", true)
         );
         check_parser_parse!(
-            "install -y|--yes@assume_yes $",
+            "install $",
+            ["-y", "--yes"],
             ["install", "vim", "jq"],
             ("vim jq", false)
         );
-        check_parser_parse!("search $", ["search", "vim"], ("vim", false));
-        check_parser_parse!("list --installed", ["list", "--installed"], ("", false));
+        check_parser_parse!("search $", [], ["search", "vim"], ("vim", false));
+        check_parser_parse!("list --installed", [], ["list", "--installed"], ("", false));
         check_parser_parse!(
-            "-R -s --noconfirm@assume_yes $",
+            "-R -s $",
+            ["--noconfirm"],
             ["-R", "-s", "--noconfirm", "vim"],
             ("vim", true)
         );
         check_parser_parse!(
-            "-R -s --noconfirm@assume_yes $",
+            "-R -s $",
+            ["--noconfirm"],
             ["-Rs", "vim"],
             ("vim", false)
         );
         check_parser_parse!(
-            "-R -s --noconfirm@assume_yes $",
+            "-R -s $",
+            ["--noconfirm"],
             ["-Rs", "--noconfirm", "vim", "jq"],
             ("vim jq", true)
         );
-        check_parser_parse!("-S -y -y", ["-Syy"], ("", false));
-        check_parser_parse!("-S $", ["-S", "vim"], ("vim", false));
-        check_parser_parse!("search $", ["search"]);
-        check_parser_parse!("upgrade", ["upgrade", "vim"]);
-        check_parser_parse!("-S -y -y", ["-Sy"]);
-        check_parser_parse!("-S -y -y", ["-Syyy"]);
-        check_parser_parse!("-Q -i", ["-Qiy"]);
+        check_parser_parse!("-S -y -y", [], ["-Syy"], ("", false));
+        check_parser_parse!("-S $", [], ["-S", "vim"], ("vim", false));
+        check_parser_parse!("search $", [], ["search"]);
+        check_parser_parse!("upgrade", [], ["upgrade", "vim"]);
+        check_parser_parse!("-S -y -y", [], ["-Sy"]);
+        check_parser_parse!("-S -y -y", [], ["-Syyy"]);
+        check_parser_parse!("-Q -i", [], ["-Qiy"]);
     }
     macro_rules! check_parser_generate_cmd {
         ($input:expr, ($pkg:expr, $assume_yes:expr), $cmd:expr) => {{
@@ -314,39 +306,39 @@ mod tests {
     #[test]
     fn test_parser_generate_cmd() {
         check_parser_generate_cmd!(
-            "install -y|--yes@assume_yes $",
-            ("vim", false),
+            "install $",
+            ("vim", ""),
             "install vim"
         );
         check_parser_generate_cmd!(
-            "install -y|--yes@assume_yes $",
-            ("vim", true),
+            "install $",
+            ("vim", "-y"),
             "install -y vim"
         );
         check_parser_generate_cmd!(
-            "install -y|--yes@assume_yes $",
-            ("vim jq", false),
+            "install $",
+            ("vim jq", ""),
             "install vim jq"
         );
-        check_parser_generate_cmd!("search $", ("vim", false), "search vim");
-        check_parser_generate_cmd!("list --installed", ("", false), "list --installed");
+        check_parser_generate_cmd!("search $", ("vim", ""), "search vim");
+        check_parser_generate_cmd!("list --installed", ("", ""), "list --installed");
         check_parser_generate_cmd!(
-            "-R -s --noconfirm@assume_yes $",
-            ("vim", true),
+            "-R -s $",
+            ("vim", "--noconfirm"),
             "-R -s --noconfirm vim"
         );
         check_parser_generate_cmd!(
-            "-R -s --noconfirm@assume_yes $",
-            ("vim", false),
+            "-R -s $",
+            ("vim", ""),
             "-R -s vim"
         );
         check_parser_generate_cmd!(
-            "-R -s --noconfirm@assume_yes $",
-            ("vim jq", true),
+            "-R -s $",
+            ("vim jq", "--noconfirm"),
             "-R -s --noconfirm vim jq"
         );
-        check_parser_generate_cmd!("-S -y -y", ("", false), "-S -y -y");
-        check_parser_generate_cmd!("-S $", ("vim", false), "-S vim");
+        check_parser_generate_cmd!("-S -y -y", ("", ""), "-S -y -y");
+        check_parser_generate_cmd!("-S $", ("vim", ""), "-S vim");
     }
     macro_rules! check_parser_generate_help {
         ($input:expr, $help:expr) => {{
@@ -356,13 +348,9 @@ mod tests {
     }
     #[test]
     fn test_parser_generate_help() {
-        check_parser_generate_help!("install -y|--yes@assume_yes $", "install [-y|--yes] <pkg>");
+        check_parser_generate_help!("install $", "install <pkg>");
         check_parser_generate_help!("search $", "search <pkg>");
         check_parser_generate_help!("list -i|--installed", "list {-i|--installed}");
-        check_parser_generate_help!(
-            "-R -s --noconfirm@assume_yes $",
-            "-R -s [--noconfirm] <pkg>"
-        );
         check_parser_generate_help!("-S -y -y", "-S -y -y");
         check_parser_generate_help!("-S $", "-S <pkg>");
     }

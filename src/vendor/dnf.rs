@@ -1,8 +1,9 @@
 create_vendor! {
     name: "dnf",
-    install: "install -y|--assumeyes@assume_yes $",
-    remove: "remove -y|--assumeyes@assume_yes $",
-    upgrade: "upgrade -y|--assumeyes@assume_yes $",
+    yes: ["-y", "--assumeyes"],
+    install: "install $",
+    remove: "remove $",
+    upgrade: "upgrade $",
     search: "search $",
     show: "info $",
     update_index: "check-update",

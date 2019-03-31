@@ -46,9 +46,9 @@ Upt is not only a command line tool but also an interpreter.
 
 As a command line, it can:
 
-- Install packges: `upt install cargo`, `upt install -y cargo code`(No yes/No prompt)
-- Remove packages: `upt remove cargo`, `upt remove -y cargo code`(No yes/No prompt)
-- Remove packages: `upt upgrade cargo`, `upt upgrade -y cargo code`(No yes/No prompt)
+- Install packges: `upt install cargo`
+- Remove packages: `upt remove cargo`
+- Remove packages: `upt upgrade cargo`
 - Search for packges:  `upt search cargo`
 - Show package details:  `upt show cargo`
 - Show indexes of packages:  `upt update`

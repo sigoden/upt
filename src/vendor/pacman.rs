@@ -1,8 +1,9 @@
 create_vendor! {
     name: "pacman",
-    install: "-S --noconfirm@assume_yes $",
-    remove: "-R -s --noconfirm@assume_yes $",
-    upgrade: "-S --noconfirm@assume_yes $",
+    yes: ["--noconfirm"],
+    install: "-S $",
+    remove: "-R -s $",
+    upgrade: "-S $",
     search: "-S -s $",
     show: "-S -i $",
     update_index: "-S -y -y",
