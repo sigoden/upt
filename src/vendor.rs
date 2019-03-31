@@ -33,6 +33,21 @@ pub struct Vendor {
 
 /// Abstract of a kind of package management tool. e.g. apt, pacman, yum...
 impl Vendor {
+    /// Lookup vender by name
+    pub fn lookup(name: &str) -> Result<Vendor, UptError> {
+        match name {
+            "apk" => return Ok(apk::init()),
+            "apt" => return Ok(apt::init()),
+            "brew" => return Ok(brew::init()),
+            "choco" => return Ok(choco::init()),
+            "dnf" => return Ok(dnf::init()),
+            "pacman" => return Ok(pacman::init()),
+            "upt" => return Ok(upt::init()),
+            "yum" => return Ok(yum::init()),
+            _ => {}
+        }
+        Err(UptError::NoVendor(name.to_string()))
+    }
     /// Parse command line, figure out the task to perform
     pub fn parse(&self, args: &[String]) -> Result<Task, UptError> {
         self.check_args(args)?;
@@ -229,16 +244,6 @@ impl Vendor {
             }
         }
         Ok(())
-    }
-    /// Lookup vender by name
-    pub fn lookup(name: &str) -> Result<Vendor, UptError> {
-        match name {
-            "upt" => return Ok(upt::init()),
-            "apt" => return Ok(apt::init()),
-            "pacman" => return Ok(pacman::init()),
-            _ => {}
-        }
-        Err(UptError::NoVendor(name.to_string()))
     }
 }
 
