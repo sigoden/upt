@@ -1,37 +1,23 @@
 use std::env;
-use std::io::{self, Write};
-use std::process::{self, Command};
-use upt::{detect_os_vendor, UptError, lookup_vendor, Vendor};
+use std::error::Error;
 use std::path::Path;
+use std::process::{self, Command};
+use upt::{UptError, Vendor, detect_os_vendor};
 
 fn main() {
     let env_args = env::args().collect::<Vec<String>>();
     let (bin, remind_args) = env_args.split_first().unwrap();;
     let bin = Path::new(bin).file_stem().unwrap().to_str().unwrap();
-    let vendor = match lookup_vendor(bin) {
-        Ok(v) => v,
-        Err(e) => {
-            eprintln!("{}", e);
-            process::exit(1);
-        }
-
-    };
+    let vendor = exit_if_err(Vendor::lookup(bin));
     let cmd = match create_cmd(&vendor, remind_args) {
         Ok(v) => v,
         Err(e) => {
-            dump_err(&vendor, e);
+            dump_upt_error(&vendor, e);
             process::exit(1);
         }
     };
-    let output = match Command::new("sh").arg("-c").arg(cmd).output() {
-        Ok(v) => v,
-        Err(e) => {
-            eprintln!("{}", e);
-            process::exit(1);
-        }
-    };
-    io::stdout().write_all(&output.stdout).unwrap();
-    io::stderr().write_all(&output.stderr).unwrap();
+    let mut child = exit_if_err(Command::new("sh").arg("-c").arg(cmd).spawn());
+    exit_if_err(child.wait());
 }
 
 fn create_cmd(vendor: &Vendor, args: &[String]) -> Result<String, UptError> {
@@ -41,7 +27,17 @@ fn create_cmd(vendor: &Vendor, args: &[String]) -> Result<String, UptError> {
     Ok(cmd)
 }
 
-fn dump_err(vendor: &Vendor, err: UptError) {
+fn exit_if_err<T, E: Error>(result: Result<T, E>) -> T {
+    match result {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("{}", e);
+            process::exit(1);
+        }
+    }
+}
+
+fn dump_upt_error(vendor: &Vendor, err: UptError) {
     use UptError::*;
     match err {
         NoSubcommand | NotRecongize => {

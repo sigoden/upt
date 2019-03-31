@@ -1,8 +1,9 @@
 
 use std::fmt;
+use std::error::Error;
 #[derive(Debug, PartialEq)]
 pub enum UptError {
-    NotFoundVendor(String),
+    NoVendor(String),
     NotSupportOS,
     NotSupportTask,
     NoSubcommand,
@@ -10,15 +11,18 @@ pub enum UptError {
     BadOption(String),
 }
 
+impl Error for UptError {}
+
 impl fmt::Display for UptError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        use UptError::*;
         match self {
-           UptError::NotFoundVendor(v) => write!(f, "No vendor {}", v),
-           UptError::NoSubcommand => write!(f, "No subcommand"),
-           UptError::NotSupportOS => write!(f, "Your os is not supported currently"),
-           UptError::NotSupportTask =>  write!(f, "Task is not supported"),
-           UptError::BadOption(v) => write!(f, "Invalid option {}", v),
-           UptError::NotRecongize => write!(f, "Your input can not be recongized"),
+           NoVendor(v) => write!(f, "No vendor for {}", v),
+           NoSubcommand => write!(f, "No subcommand"),
+           NotSupportOS => write!(f, "Your os is not supported currently"),
+           NotSupportTask =>  write!(f, "Task is not supported"),
+           BadOption(v) => write!(f, "Invalid option {}", v),
+           NotRecongize => write!(f, "Your input can not be recongized"),
         }
     }
 }

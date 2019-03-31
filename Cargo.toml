@@ -3,4 +3,13 @@ name = "upt"
 version = "0.1.0"
 authors = ["sigoden <sigoden@gmail.com>"]
 edition = "2018"
+description = "Universal pckage management tool for Windows, MacOS, Linux"
+documentation = "https://github.com/sigoden/upt"
+repository = "https://github.com/sigoden/upt"
+keywords = ["apt", "upt", "postman", "yum", "apk", "pckage", "management"]
+license = "MIT"
+readme = "README.md"
 
+[[bin]]
+doc = false
+name = "upt"

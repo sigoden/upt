@@ -99,8 +99,14 @@ impl Parser {
         }
         let mut output = self.command.clone();
         for ro in &self.required_options {
-            output.push_str(" ");
-            output.push_str(&ro.join("|"));
+            if ro.len() > 1 {
+                output.push_str(" {");
+                output.push_str(&ro.join("|"));
+                output.push_str("}");
+            } else {
+                output.push_str(" ");
+                output.push_str(&ro[0]);
+            }
         }
         if self.assume_yes.len() > 0 {
             output.push_str(" [");
@@ -408,8 +414,8 @@ mod tests {
             "search <pkg>"
         );
         check_parser_generate_help!(
-            "list --installed",
-            "list --installed"
+            "list -i|--installed",
+            "list {-i|--installed}"
         );
         check_parser_generate_help!(
             "-R -s --noconfirm@assume_yes $",

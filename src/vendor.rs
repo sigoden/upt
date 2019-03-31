@@ -112,39 +112,84 @@ impl Vendor {
         let max_width = widths.iter().max().unwrap() + 6;
         let head = "  ".to_string() + &self.name + " ";
         if install_help.len() > 0 {
-            output.push_str(&format!("{}{:<width$} Install packages", head, install_help, width=max_width));
+            output.push_str(&format!(
+                "{}{:<width$} Install packages",
+                head,
+                install_help,
+                width = max_width
+            ));
             output.push_str(LINE_ENDING);
         }
         if remove_help.len() > 0 {
-            output.push_str(&format!("{}{:<width$} Remove packages", head, remove_help, width=max_width));
+            output.push_str(&format!(
+                "{}{:<width$} Remove packages",
+                head,
+                remove_help,
+                width = max_width
+            ));
             output.push_str(LINE_ENDING);
         }
         if upgrade_help.len() > 0 {
-            output.push_str(&format!("{}{:<width$} Upgrade packages", head, upgrade_help, width=max_width));
+            output.push_str(&format!(
+                "{}{:<width$} Upgrade packages",
+                head,
+                upgrade_help,
+                width = max_width
+            ));
             output.push_str(LINE_ENDING);
         }
         if search_help.len() > 0 {
-            output.push_str(&format!("{}{:<width$} Search packages", head, search_help, width=max_width));
+            output.push_str(&format!(
+                "{}{:<width$} Search for package",
+                head,
+                search_help,
+                width = max_width
+            ));
             output.push_str(LINE_ENDING);
         }
         if show_help.len() > 0 {
-            output.push_str(&format!("{}{:<width$} Show packages", head, show_help, width=max_width));
+            output.push_str(&format!(
+                "{}{:<width$} Show package details",
+                head,
+                show_help,
+                width = max_width
+            ));
             output.push_str(LINE_ENDING);
         }
         if update_index_help.len() > 0 {
-            output.push_str(&format!("{}{:<width$} Update indexes of packages ", head, update_index_help, width=max_width));
+            output.push_str(&format!(
+                "{}{:<width$} Update indexes of packages",
+                head,
+                update_index_help,
+                width = max_width
+            ));
             output.push_str(LINE_ENDING);
         }
         if upgrade_all_help.len() > 0 {
-            output.push_str(&format!("{}{:<width$} upgrade all outdated packages", head, upgrade_all_help, width=max_width));
+            output.push_str(&format!(
+                "{}{:<width$} Upgrade all packages",
+                head,
+                upgrade_all_help,
+                width = max_width
+            ));
             output.push_str(LINE_ENDING);
         }
         if list_upgradable_help.len() > 0 {
-            output.push_str(&format!("{}{:<width$} list all upgradable packages", head, list_upgradable_help, width=max_width));
+            output.push_str(&format!(
+                "{}{:<width$} List all upgradable packages",
+                head,
+                list_upgradable_help,
+                width = max_width
+            ));
             output.push_str(LINE_ENDING);
         }
         if list_installed_help.len() > 0 {
-            output.push_str(&format!("{}{:<width$} list all installed packages", head, list_installed_help, width=max_width));
+            output.push_str(&format!(
+                "{}{:<width$} List all installed packages",
+                head,
+                list_installed_help,
+                width = max_width
+            ));
             output.push_str(LINE_ENDING);
         }
         output
@@ -159,6 +204,16 @@ impl Vendor {
             }
         }
         Ok(())
+    }
+    /// Lookup vender by name
+    pub fn lookup(name: &str) -> Result<Vendor, UptError> {
+        match name {
+            "upt" => return Ok(upt::init()),
+            "apt" => return Ok(apt::init()),
+            "pacman" => return Ok(pacman::init()),
+            _ => {}
+        }
+        Err(UptError::NoVendor(name.to_string()))
     }
 }
 
@@ -189,11 +244,15 @@ mod tests {
         check_parse!(upt, ["install", "vim"], (Install, "vim", false));
         check_parse!(upt, ["install", "-y", "vim"], (Install, "vim", true));
         check_parse!(upt, ["install", "--yes", "vim"], (Install, "vim", true));
-        check_parse!(upt, ["remove", "--yes", "vim", "jq"], (Remove, "vim jq", true));
+        check_parse!(
+            upt,
+            ["remove", "--yes", "vim", "jq"],
+            (Remove, "vim jq", true)
+        );
         check_parse!(upt, ["upgrade", "vim"], (Upgrade, "vim", false));
-        check_parse!(upt, ["search", "vim"], (Search, pkg="vim"));
-        check_parse!(upt, ["search", "vim", "jq"], (Search, pkg="vim jq"));
-        check_parse!(upt, ["show", "vim"], (Show, pkg="vim"));
+        check_parse!(upt, ["search", "vim"], (Search, pkg = "vim"));
+        check_parse!(upt, ["search", "vim", "jq"], (Search, pkg = "vim jq"));
+        check_parse!(upt, ["show", "vim"], (Show, pkg = "vim"));
         check_parse!(upt, ["update"], UpdateIndex);
         check_parse!(upt, ["upgrade"], UpgradeAll);
         check_parse!(upt, ["list", "--upgradable"], ListUpgradable);
@@ -205,20 +264,42 @@ mod tests {
     }
     macro_rules! check_eval {
         ($parser:expr, ($task:tt, $pkg:expr, $assume_yes:expr), $cmd:expr) => {
-            assert_eq!($parser.eval(&Task::$task { pkg: $pkg.to_string(), assume_yes: $assume_yes }).unwrap(), $cmd.to_string())
+            assert_eq!(
+                $parser
+                    .eval(&Task::$task {
+                        pkg: $pkg.to_string(),
+                        assume_yes: $assume_yes
+                    })
+                    .unwrap(),
+                $cmd.to_string()
+            )
         };
         ($parser:expr, ($task:tt, pkg=$pkg:expr), $cmd:expr) => {
-            assert_eq!($parser.eval(&Task::$task { pkg: $pkg.to_string() }).unwrap(), $cmd.to_string())
+            assert_eq!(
+                $parser
+                    .eval(&Task::$task {
+                        pkg: $pkg.to_string()
+                    })
+                    .unwrap(),
+                $cmd.to_string()
+            )
         };
         ($parser:expr, ($task:tt, assume_yes=$assume_yes:expr), $cmd:expr) => {
-            assert_eq!($parser.eval(&Task::$task { assume_yes: $assume_yes }).unwrap(), $cmd.to_string())
+            assert_eq!(
+                $parser
+                    .eval(&Task::$task {
+                        assume_yes: $assume_yes
+                    })
+                    .unwrap(),
+                $cmd.to_string()
+            )
         };
         ($parser:expr, $task:tt, $cmd:expr) => {
             assert_eq!($parser.eval(&Task::$task).unwrap(), $cmd.to_string())
         };
         ($parser:expr) => {
             assert!($parser.eval(&Task::$task).is_err())
-        }
+        };
     }
     #[test]
     fn test_eval() {
@@ -227,16 +308,11 @@ mod tests {
         check_eval!(upt, (Install, "vim jq", true), "upt install -y vim jq");
         check_eval!(upt, (Remove, "vim jq", false), "upt remove vim jq");
         check_eval!(upt, (Upgrade, "vim", true), "upt upgrade -y vim");
-        check_eval!(upt, (Search, pkg="vim"), "upt search vim");
-        check_eval!(upt, (Show, pkg="vim"), "upt show vim");
+        check_eval!(upt, (Search, pkg = "vim"), "upt search vim");
+        check_eval!(upt, (Show, pkg = "vim"), "upt show vim");
         check_eval!(upt, UpdateIndex, "upt update");
         check_eval!(upt, UpgradeAll, "upt upgrade");
         check_eval!(upt, ListInstalled, "upt list -i");
         check_eval!(upt, ListUpgradable, "upt list -u");
-    }
-    #[test]
-    fn test_help() {
-        let upt = upt::init();
-        assert_eq!(&upt.help(), "")
     }
 }
