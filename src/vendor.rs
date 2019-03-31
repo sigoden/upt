@@ -2,9 +2,14 @@ use crate::error::UptError;
 use crate::parser::Parser;
 use crate::Task;
 
+pub mod apk;
 pub mod apt;
+pub mod brew;
+pub mod choco;
+pub mod dnf;
 pub mod pacman;
 pub mod upt;
+pub mod yum;
 
 #[cfg(windows)]
 const LINE_ENDING: &str = "\r\n";
