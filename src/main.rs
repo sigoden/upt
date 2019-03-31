@@ -1,7 +1,7 @@
 use std::env;
 use std::io::{self, Write};
 use std::process::{self, Command};
-use upt::{detect_os_vender, lookup_vender, UptError};
+use upt::{detect_os_vender, lookup_vender, error::{UptError}};
 
 fn main() {
     let cmd = match solve_cmd() {
@@ -28,6 +28,6 @@ fn solve_cmd() -> Result<String, UptError> {
     let bin_vender = lookup_vender(bin)?;
     let task = bin_vender.parse(remind_args)?;
     let os_vender = detect_os_vender()?;
-    let cmd = os_vender.eval(task);
+    let cmd = os_vender.eval(&task);
     Ok(cmd)
 }

@@ -4,4 +4,3 @@ version = "0.1.0"
 authors = ["sigoden <sigoden@gmail.com>"]
 edition = "2018"
 
-[dependencies]

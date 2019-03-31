@@ -1,6 +1,7 @@
 use crate::{Vender};
 use crate::parser::Parser;
 pub struct Upt {
+    name: String,
     install: Parser,
     uninstall: Parser,
     upgrade: Parser,
@@ -13,6 +14,9 @@ pub struct Upt {
 }
 
 impl Vender for Upt {
+    fn name(&self) -> String {
+        self.name.clone()
+    }
     fn parser_install(&self) -> &Parser {
         &self.install
     }

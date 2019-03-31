@@ -1,18 +1,14 @@
-
 mod parser;
 mod upt;
 
-use parser::Parser;
+pub mod error;
 
-#[derive(Debug, PartialEq)]
-pub enum UptError {
-    NotFoundVender,
-    InvalidArgs,
-    NotRecongize,
-}
+use error::UptError;
+use parser::Parser;
 
 /// Abstract of a kind of package management tool. e.g. apt, pacman, yum...
 pub trait Vender {
+    fn name(&self) -> String;
     fn parser_install(&self) -> &Parser;
     fn parser_uninstall(&self) -> &Parser;
     fn parser_upgrade(&self) -> &Parser;
@@ -55,8 +51,40 @@ pub trait Vender {
         Err(UptError::NotRecongize)
     }
     /// convert the task to command line, which invokes the os's package management tool.
-    fn eval(&self, task: Task) -> String {
-        unimplemented!()
+    fn eval(&self, task: &Task) -> String {
+        let cmd = match task {
+            Task::Install { pkg, assume_yes } => self
+                .parser_install()
+                .generate_cmd(&Some(pkg.to_string()), *assume_yes),
+            Task::Uninstall { pkg, assume_yes } => self
+                .parser_uninstall()
+                .generate_cmd(&Some(pkg.to_string()), *assume_yes),
+            Task::Upgrade { pkg, assume_yes } => self
+                .parser_upgrade()
+                .generate_cmd(&Some(pkg.to_string()), *assume_yes),
+            Task::Search { pkg } => self
+                .parser_search()
+                .generate_cmd(&Some(pkg.to_string()), false),
+            Task::Show { pkg } => self
+                .parser_show()
+                .generate_cmd(&Some(pkg.to_string()), false),
+            Task::UpdateIndex => self
+                .parser_update_index()
+                .generate_cmd(&None, false),
+            Task::UpgradeAll => self
+                .parser_upgrade_all()
+                .generate_cmd(&None, false),
+            Task::ListInstalled => self
+                .parser_list_installed()
+                .generate_cmd(&None, false),
+            Task::ListUpgradable => self
+                .parser_list_upgradable()
+                .generate_cmd(&None, false),
+        };
+        self.name() + " " + &cmd
+    }
+    fn help(&self, err: &UptError)  {
+
     }
     fn check_args(&self, args: &[String]) -> Result<(), UptError> {
         if args.len() == 0 {
