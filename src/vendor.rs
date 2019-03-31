@@ -7,9 +7,9 @@ pub mod pacman;
 pub mod upt;
 
 #[cfg(windows)]
-const LINE_ENDING: &'static str = "\r\n";
+const LINE_ENDING: &str = "\r\n";
 #[cfg(not(windows))]
-const LINE_ENDING: &'static str = "\n";
+const LINE_ENDING: &str = "\n";
 /// Repersent a kind of package management tool. e.g. apt, pacman, yum...
 #[derive(Debug)]
 pub struct Vendor {
@@ -45,16 +45,16 @@ impl Vendor {
         if let Some((Some(pkg), _)) = self.show.parse(args) {
             return Ok(Task::Show { pkg });
         }
-        if let Some(_) = self.update_index.parse(args) {
+        if self.update_index.parse(args).is_some() {
             return Ok(Task::UpdateIndex);
         }
-        if let Some(_) = self.upgrade_all.parse(args) {
+        if self.upgrade_all.parse(args).is_some() {
             return Ok(Task::UpgradeAll);
         }
-        if let Some(_) = self.list_upgradable.parse(args) {
+        if self.list_upgradable.parse(args).is_some() {
             return Ok(Task::ListUpgradable);
         }
-        if let Some(_) = self.list_installed.parse(args) {
+        if self.list_installed.parse(args).is_some() {
             return Ok(Task::ListInstalled);
         }
         Err(UptError::NotRecongize)
@@ -111,7 +111,7 @@ impl Vendor {
         ];
         let max_width = widths.iter().max().unwrap() + 6;
         let head = "  ".to_string() + &self.name + " ";
-        if install_help.len() > 0 {
+        if !install_help.is_empty() {
             output.push_str(&format!(
                 "{}{:<width$} Install packages",
                 head,
@@ -120,7 +120,7 @@ impl Vendor {
             ));
             output.push_str(LINE_ENDING);
         }
-        if remove_help.len() > 0 {
+        if !remove_help.is_empty() {
             output.push_str(&format!(
                 "{}{:<width$} Remove packages",
                 head,
@@ -129,7 +129,7 @@ impl Vendor {
             ));
             output.push_str(LINE_ENDING);
         }
-        if upgrade_help.len() > 0 {
+        if !upgrade_help.is_empty() {
             output.push_str(&format!(
                 "{}{:<width$} Upgrade packages",
                 head,
@@ -138,7 +138,7 @@ impl Vendor {
             ));
             output.push_str(LINE_ENDING);
         }
-        if search_help.len() > 0 {
+        if !search_help.is_empty() {
             output.push_str(&format!(
                 "{}{:<width$} Search for package",
                 head,
@@ -147,7 +147,7 @@ impl Vendor {
             ));
             output.push_str(LINE_ENDING);
         }
-        if show_help.len() > 0 {
+        if !show_help.is_empty() {
             output.push_str(&format!(
                 "{}{:<width$} Show package details",
                 head,
@@ -156,7 +156,7 @@ impl Vendor {
             ));
             output.push_str(LINE_ENDING);
         }
-        if update_index_help.len() > 0 {
+        if !update_index_help.is_empty() {
             output.push_str(&format!(
                 "{}{:<width$} Update indexes of packages",
                 head,
@@ -165,7 +165,7 @@ impl Vendor {
             ));
             output.push_str(LINE_ENDING);
         }
-        if upgrade_all_help.len() > 0 {
+        if !upgrade_all_help.is_empty() {
             output.push_str(&format!(
                 "{}{:<width$} Upgrade all packages",
                 head,
@@ -174,7 +174,7 @@ impl Vendor {
             ));
             output.push_str(LINE_ENDING);
         }
-        if list_upgradable_help.len() > 0 {
+        if !list_upgradable_help.is_empty() {
             output.push_str(&format!(
                 "{}{:<width$} List all upgradable packages",
                 head,
@@ -183,7 +183,7 @@ impl Vendor {
             ));
             output.push_str(LINE_ENDING);
         }
-        if list_installed_help.len() > 0 {
+        if !list_installed_help.is_empty() {
             output.push_str(&format!(
                 "{}{:<width$} List all installed packages",
                 head,
@@ -195,7 +195,7 @@ impl Vendor {
         output
     }
     fn check_args(&self, args: &[String]) -> Result<(), UptError> {
-        if args.len() == 0 {
+        if args.is_empty() {
             return Err(UptError::NoSubcommand);
         }
         for arg in args {
