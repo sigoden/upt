@@ -2,17 +2,21 @@
 use std::fmt;
 #[derive(Debug, PartialEq)]
 pub enum UptError {
-    NotFoundVender,
-    InvalidArgs,
+    NotFoundVendor(String),
+    NotSupportOS,
+    NoSubcommand,
     NotRecongize,
+    BadOption(String),
 }
 
 impl fmt::Display for UptError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match *self {
-           UptError::NotFoundVender => write!(f, "Your os is not supported currently"),
-           UptError::InvalidArgs => write!(f, "Invalid command line"),
-           UptError::NotRecongize => write!(f, "Your command is invalid or not support, see help below"),
+        match self {
+           UptError::NotFoundVendor(v) => write!(f, "Invalid vendor {}", v),
+           UptError::NoSubcommand => write!(f, "No subcommand"),
+           UptError::NotSupportOS => write!(f, "Your os is not supported currently"),
+           UptError::BadOption(v) => write!(f, "Invalid option {}", v),
+           UptError::NotRecongize => write!(f, "Your input can not be recongized"),
         }
     }
 }

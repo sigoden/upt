@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-/// Command line parser
-#[derive(Debug, PartialEq)]
+/// Subcommand parser
+#[derive(Debug, PartialEq, Default)]
 pub struct Parser {
     command: String,
     assume_yes: Vec<String>,
@@ -12,6 +12,12 @@ pub struct Parser {
 impl FromStr for Parser {
     type Err = ();
     fn from_str(s: &str) -> Result<Self, ()> {
+        if s == "" {
+            return Ok(Parser {
+                command: "-".to_string(),
+                ..Default::default()
+            })
+        }
         let words: Vec<&str> = s.split(' ').collect();
         let (command, remind) = words.split_first().expect("no command");
         let mut have_operands = false;
@@ -31,7 +37,6 @@ impl FromStr for Parser {
                 have_operands = true;
             }
         }
-        // unimplemented!()
         Ok(Parser {
             command: command.to_string(),
             assume_yes,
@@ -43,7 +48,11 @@ impl FromStr for Parser {
 
 
 impl Parser {
+    /// Try to parse the command line arguemnts
     pub fn parse(&self, args: &[String]) -> Option<(Option<String>, bool)> {
+        if self.is_noop() {
+            return None;
+        }
         let (command, options, pkg) = self.grouping_args(args);
         if command != self.command {
             return None;
@@ -61,7 +70,11 @@ impl Parser {
         }
         Some((pkg, assume_yes))
     }
+    /// Generate corespond cmd
     pub fn generate_cmd(&self, pkg: &Option<String>, assume_yes: bool) -> String {
+        if self.is_noop() {
+            return String::new();
+        }
         let mut output = self.command.clone();
         for ro in &self.required_options {
             output.push_str(" ");
@@ -77,7 +90,11 @@ impl Parser {
         }
         output
     }
+    /// Genereate help message
     pub fn generate_help(&self) -> String {
+        if self.is_noop() {
+            return String::new();
+        }
         let mut output = self.command.clone();
         for ro in &self.required_options {
             output.push_str(" ");
@@ -93,6 +110,10 @@ impl Parser {
             output.push_str("<pkg>")
         }
         output
+    }
+    /// Whether parser is noop parser
+    fn is_noop(&self) -> bool {
+        &self.command == "-"
     }
     fn grouping_args<'a, 'b>(&'a self, args: &'b [String]) -> (String, Vec<String>, Option<String>) {
         let is_command_with_dash = self.command.starts_with("-");
@@ -195,6 +216,10 @@ mod tests {
             "-S $",
             { "-S", [], [], true }
         );
+        check_parser_from_str!(
+            "",
+            { "-", [], [], false }
+        );
     }
     macro_rules! check_parser_parse {
         ($input:expr, [$($arg:expr),*], ($pkg:expr, $assume_yes:expr)) => {
@@ -275,7 +300,7 @@ mod tests {
             ("vim", false)
         );
         check_parser_parse!(
-            "uninstall -y|--yes@assume_yes $",
+            "remove -y|--yes@assume_yes $",
             ["remove", "vim"]
         );
         check_parser_parse!(

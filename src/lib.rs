@@ -1,103 +1,14 @@
-mod parser;
-mod upt;
+use std::fs;
 
+#[macro_use]
+mod macros;
+
+mod parser;
+pub mod vendor;
 pub mod error;
 
-use error::UptError;
-use parser::Parser;
-
-/// Abstract of a kind of package management tool. e.g. apt, pacman, yum...
-pub trait Vender {
-    fn name(&self) -> String;
-    fn parser_install(&self) -> &Parser;
-    fn parser_uninstall(&self) -> &Parser;
-    fn parser_upgrade(&self) -> &Parser;
-    fn parser_search(&self) -> &Parser;
-    fn parser_show(&self) -> &Parser;
-    fn parser_update_index(&self) -> &Parser;
-    fn parser_upgrade_all(&self) -> &Parser;
-    fn parser_list_upgradable(&self) -> &Parser;
-    fn parser_list_installed(&self) -> &Parser;
-    /// parse command line, figure out the task to perform
-    fn parse(&self, args: &[String]) -> Result<Task, UptError> {
-        self.check_args(args)?;
-        if let Some((Some(pkg), assume_yes)) = self.parser_install().parse(args) {
-            return Ok(Task::Install { pkg, assume_yes });
-        }
-        if let Some((Some(pkg), assume_yes)) = self.parser_uninstall().parse(args) {
-            return Ok(Task::Uninstall { pkg, assume_yes });
-        }
-        if let Some((Some(pkg), assume_yes)) = self.parser_upgrade().parse(args) {
-            return Ok(Task::Upgrade { pkg, assume_yes });
-        }
-        if let Some((Some(pkg), _)) = self.parser_search().parse(args) {
-            return Ok(Task::Search { pkg });
-        }
-        if let Some((Some(pkg), _)) = self.parser_show().parse(args) {
-            return Ok(Task::Show { pkg });
-        }
-        if let Some(_) = self.parser_update_index().parse(args) {
-            return Ok(Task::UpdateIndex);
-        }
-        if let Some(_) = self.parser_upgrade_all().parse(args) {
-            return Ok(Task::UpgradeAll);
-        }
-        if let Some(_) = self.parser_list_upgradable().parse(args) {
-            return Ok(Task::ListUpgradable);
-        }
-        if let Some(_) = self.parser_list_installed().parse(args) {
-            return Ok(Task::ListInstalled);
-        }
-        Err(UptError::NotRecongize)
-    }
-    /// convert the task to command line, which invokes the os's package management tool.
-    fn eval(&self, task: &Task) -> String {
-        let cmd = match task {
-            Task::Install { pkg, assume_yes } => self
-                .parser_install()
-                .generate_cmd(&Some(pkg.to_string()), *assume_yes),
-            Task::Uninstall { pkg, assume_yes } => self
-                .parser_uninstall()
-                .generate_cmd(&Some(pkg.to_string()), *assume_yes),
-            Task::Upgrade { pkg, assume_yes } => self
-                .parser_upgrade()
-                .generate_cmd(&Some(pkg.to_string()), *assume_yes),
-            Task::Search { pkg } => self
-                .parser_search()
-                .generate_cmd(&Some(pkg.to_string()), false),
-            Task::Show { pkg } => self
-                .parser_show()
-                .generate_cmd(&Some(pkg.to_string()), false),
-            Task::UpdateIndex => self
-                .parser_update_index()
-                .generate_cmd(&None, false),
-            Task::UpgradeAll => self
-                .parser_upgrade_all()
-                .generate_cmd(&None, false),
-            Task::ListInstalled => self
-                .parser_list_installed()
-                .generate_cmd(&None, false),
-            Task::ListUpgradable => self
-                .parser_list_upgradable()
-                .generate_cmd(&None, false),
-        };
-        self.name() + " " + &cmd
-    }
-    fn help(&self, err: &UptError)  {
-
-    }
-    fn check_args(&self, args: &[String]) -> Result<(), UptError> {
-        if args.len() == 0 {
-            return Err(UptError::InvalidArgs);
-        }
-        for arg in args {
-            if arg == "-" || arg == "--" || arg.starts_with("---") {
-                return Err(UptError::InvalidArgs);
-            }
-        }
-        Ok(())
-    }
-}
+pub use error::UptError;
+pub use vendor::Vendor;
 
 /// General tasks that every vender provides
 pub enum Task {
@@ -121,12 +32,37 @@ pub enum Task {
     ListInstalled,
 }
 
-/// lookup vender by name
-pub fn lookup_vender(key: &str) -> Result<Box<dyn Vender>, UptError> {
-    unimplemented!()
+/// Lookup vender by name
+pub fn lookup_vendor(key: &str) -> Result<Vendor, UptError> {
+    match key {
+        // "upt" => return Ok(crate::vendor::upt::init),
+        "apt" => return Ok(crate::vendor::apt::init()),
+        _ => {},
+    }
+    Err(UptError::NotFoundVendor(key.to_string()))
 }
 
-/// detect os package management
-pub fn detect_os_vender() -> Result<Box<dyn Vender>, UptError> {
-    unimplemented!()
+/// Detect os package management
+pub fn detect_os_vendor() -> Result<Vendor, UptError> {
+    if cfg!(target_os = "windows") {
+
+    } else if cfg!(target_os = "macos") {
+
+    } else if cfg!(target_os = "linux") {
+        let release = fs::read_to_string("/etc/os-release").map_err(|_| UptError::NotSupportOS)?;
+        let id = release.lines().find(|l| l.starts_with("ID=")).ok_or_else(|| UptError::NotSupportOS)?;
+        match &id[3..] {
+            // "arch" | "manjaro" => return Ok(crate::vendor::pacman::init()),
+            // "centos" | "redhat" => return Ok(crate::vendor::yum::Yum),
+            // "fedora" => return Ok(crate::vendor::dnf::Dnf),
+            // "alpine" => return Ok(crate::vendor::apk::Apk),
+            "debian" | "ubuntu" | "pop-os" | "deepin" | "elementary" => return Ok(crate::vendor::apt::init()),
+            // "freebsd" => return Ok(crate::vendor::pkg::Pkg),
+            // "gentoo" => return Ok(crate::vendor::emerge::Emerge),
+            // "opensuse" => return Ok(crate::vendor::zypper::Zypper),
+            _ => {},
+        }
+    }
+    Err(UptError::NotSupportOS)
 }
+

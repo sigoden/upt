@@ -1,20 +1,30 @@
 use std::env;
 use std::io::{self, Write};
 use std::process::{self, Command};
-use upt::{detect_os_vender, lookup_vender, error::{UptError}};
+use upt::{detect_os_vendor, UptError, lookup_vendor, Vendor};
 
 fn main() {
-    let cmd = match solve_cmd() {
+    let env_args = env::args().collect::<Vec<String>>();
+    let (bin, remind_args) = env_args.split_first().unwrap();;
+    let vendor = match lookup_vendor(bin) {
         Ok(v) => v,
         Err(e) => {
-            eprintln!("{:?}", e);
+            eprintln!("{}", e);
+            process::exit(1);
+        }
+
+    };
+    let cmd = match create_cmd(&vendor, remind_args) {
+        Ok(v) => v,
+        Err(e) => {
+            dump_err(&vendor, e);
             process::exit(1);
         }
     };
     let output = match Command::new("sh").arg("-c").arg(cmd).output() {
         Ok(v) => v,
         Err(e) => {
-            eprintln!("{:?}", e);
+            eprintln!("{}", e);
             process::exit(1);
         }
     };
@@ -22,12 +32,19 @@ fn main() {
     io::stderr().write_all(&output.stderr).unwrap();
 }
 
-fn solve_cmd() -> Result<String, UptError> {
-    let env_args = env::args().collect::<Vec<String>>();
-    let (bin, remind_args) = env_args.split_first().unwrap();;
-    let bin_vender = lookup_vender(bin)?;
-    let task = bin_vender.parse(remind_args)?;
-    let os_vender = detect_os_vender()?;
-    let cmd = os_vender.eval(&task);
+fn create_cmd(vendor: &Vendor, args: &[String]) -> Result<String, UptError> {
+    let task = vendor.parse(args)?;
+    let vendor = detect_os_vendor()?;
+    let cmd = vendor.eval(&task);
     Ok(cmd)
+}
+
+fn dump_err(vendor: &Vendor, err: UptError) {
+    use UptError::*;
+    match err {
+        NoSubcommand | NotRecongize => {
+            eprintln!("{}\n{}", err, vendor.help());
+        }
+        _ => eprintln!("{}", err),
+    }
 }
