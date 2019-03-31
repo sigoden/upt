@@ -59,6 +59,8 @@ impl Parser {
         }
         if pkg.is_none() && self.have_operands {
             return None;
+        } else if pkg.is_some() && !self.have_operands {
+            return None;
         }
         let assume_yes = if self.assume_yes.len() > 0 {
             options.iter().find(|v| self.assume_yes.iter().find(|x| x == v).is_some()).is_some()
@@ -295,17 +297,17 @@ mod tests {
             ("", false)
         );
         check_parser_parse!(
-            "-S vim",
+            "-S $",
             ["-S", "vim"],
             ("vim", false)
         );
         check_parser_parse!(
-            "remove -y|--yes@assume_yes $",
-            ["remove", "vim"]
-        );
-        check_parser_parse!(
             "search $",
             ["search"]
+        );
+        check_parser_parse!(
+            "upgrade",
+            ["upgrade", "vim"]
         );
         check_parser_parse!(
             "-S -y -y",

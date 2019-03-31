@@ -2,10 +2,12 @@ use std::env;
 use std::io::{self, Write};
 use std::process::{self, Command};
 use upt::{detect_os_vendor, UptError, lookup_vendor, Vendor};
+use std::path::Path;
 
 fn main() {
     let env_args = env::args().collect::<Vec<String>>();
     let (bin, remind_args) = env_args.split_first().unwrap();;
+    let bin = Path::new(bin).file_stem().unwrap().to_str().unwrap();
     let vendor = match lookup_vendor(bin) {
         Ok(v) => v,
         Err(e) => {
@@ -35,7 +37,7 @@ fn main() {
 fn create_cmd(vendor: &Vendor, args: &[String]) -> Result<String, UptError> {
     let task = vendor.parse(args)?;
     let vendor = detect_os_vendor()?;
-    let cmd = vendor.eval(&task);
+    let cmd = vendor.eval(&task)?;
     Ok(cmd)
 }
 

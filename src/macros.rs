@@ -3,7 +3,7 @@ macro_rules! create_vendor {
     (
         name: $name:expr,
         install: $install:expr,
-        uninstall: $uninstall:expr,
+        remove: $remove:expr,
         upgrade: $upgrade:expr,
         search: $search:expr,
         show: $show:expr,
@@ -18,7 +18,7 @@ macro_rules! create_vendor {
             Vendor {
                 name: $name.to_string(),
                 install: Parser::from_str($install).unwrap(),
-                uninstall: Parser::from_str($uninstall).unwrap(),
+                remove: Parser::from_str($remove).unwrap(),
                 upgrade: Parser::from_str($upgrade).unwrap(),
                 search: Parser::from_str($search).unwrap(),
                 show: Parser::from_str($show).unwrap(),
