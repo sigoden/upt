@@ -1,15 +1,16 @@
 use crate::error::UptError;
 use crate::parser::Parser;
-use crate::Task;
+use crate::task::Task;
+use std::fs;
 
-pub mod apk;
-pub mod apt;
-pub mod brew;
-pub mod choco;
-pub mod dnf;
-pub mod pacman;
-pub mod upt;
-pub mod yum;
+mod apk;
+mod apt;
+mod brew;
+mod choco;
+mod dnf;
+mod pacman;
+mod upt;
+mod yum;
 
 #[cfg(windows)]
 const LINE_ENDING: &str = "\r\n";
@@ -18,17 +19,17 @@ const LINE_ENDING: &str = "\n";
 /// Repersent a kind of package management tool. e.g. apt, pacman, yum...
 #[derive(Debug)]
 pub struct Vendor {
-    pub name: String,
-    pub yes: Vec<String>,
-    pub install: Parser,
-    pub remove: Parser,
-    pub upgrade: Parser,
-    pub search: Parser,
-    pub show: Parser,
-    pub update_index: Parser,
-    pub upgrade_all: Parser,
-    pub list_upgradable: Parser,
-    pub list_installed: Parser,
+    pub(crate) name: String,
+    pub(crate) yes: Vec<String>,
+    pub(crate) install: Parser,
+    pub(crate) remove: Parser,
+    pub(crate) upgrade: Parser,
+    pub(crate) search: Parser,
+    pub(crate) show: Parser,
+    pub(crate) update_index: Parser,
+    pub(crate) upgrade_all: Parser,
+    pub(crate) list_upgradable: Parser,
+    pub(crate) list_installed: Parser,
 }
 
 /// Abstract of a kind of package management tool. e.g. apt, pacman, yum...
@@ -47,6 +48,32 @@ impl Vendor {
             _ => {}
         }
         Err(UptError::NoVendor(name.to_string()))
+    }
+    /// Detect os package management
+    pub fn detect() -> Result<Vendor, UptError> {
+        if cfg!(target_os = "windows") {
+            return Ok(choco::init());
+        } else if cfg!(target_os = "macos") {
+            return Ok(brew::init());
+        } else if cfg!(target_os = "linux") {
+            let release =
+                fs::read_to_string("/etc/os-release").map_err(|_| UptError::NotSupportOS)?;
+            let id = release
+                .lines()
+                .find(|l| l.starts_with("ID="))
+                .ok_or_else(|| UptError::NotSupportOS)?;
+            match &id[3..] {
+                "arch" | "manjaro" => return Ok(pacman::init()),
+                "centos" | "redhat" => return Ok(yum::init()),
+                "fedora" => return Ok(dnf::init()),
+                "alpine" => return Ok(apk::init()),
+                "debian" | "ubuntu" | "pop-os" | "deepin" | "elementary" => {
+                    return Ok(apt::init());
+                }
+                _ => {}
+            }
+        }
+        Err(UptError::NotSupportOS)
     }
     /// Parse command line, figure out the task to perform
     pub fn parse(&self, args: &[String]) -> Result<Task, UptError> {
@@ -226,10 +253,7 @@ impl Vendor {
         if !self.yes.is_empty() {
             output.push_str(LINE_ENDING);
             output.push_str("");
-            output.push_str(&format!(
-                "Automatically answer yes: {}",
-                self.yes.join(",")
-            ));
+            output.push_str(&format!("Automatically answer yes: {}", self.yes.join(",")));
             output.push_str(LINE_ENDING);
         }
         output

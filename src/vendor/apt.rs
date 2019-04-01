@@ -1,4 +1,4 @@
-create_vendor! {
+vendor! {
     name: "apt",
     yes: ["-y", "--yes"],
     install: "install $",

@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 /// Subcommand parser
 #[derive(Debug, PartialEq, Default)]
-pub struct Parser {
+pub(crate) struct Parser {
     command: String,
     have_operands: bool,
     required_options: Vec<Vec<String>>,
@@ -12,13 +12,10 @@ impl FromStr for Parser {
     type Err = ();
     fn from_str(s: &str) -> Result<Self, ()> {
         if s == "" {
-            return Ok(Parser {
-                command: "-".to_string(),
-                ..Default::default()
-            });
+            return Ok(Default::default());
         }
         let words: Vec<&str> = s.split(' ').collect();
-        let (command, remind) = words.split_first().expect("no command");
+        let (command, remind) = words.split_first().unwrap();
         let mut have_operands = false;
         let mut required_options: Vec<Vec<String>> = vec![];
         fn split(v: &str) -> Vec<String> {
@@ -42,7 +39,7 @@ impl FromStr for Parser {
 impl Parser {
     /// Try to parse the command line arguemnts
     pub fn parse(&self, args: &[String], yes: &[String]) -> Option<(Option<String>, bool)> {
-        if self.is_noop() {
+        if self.is_default() {
             return None;
         }
         let (command, options, pkg) = self.grouping_args(args);
@@ -66,7 +63,7 @@ impl Parser {
     }
     /// Generate corespond cmd
     pub fn generate_cmd(&self, pkg: &Option<String>, yes: &str) -> String {
-        if self.is_noop() {
+        if self.is_default() {
             return String::new();
         }
         let mut output = self.command.clone();
@@ -86,7 +83,7 @@ impl Parser {
     }
     /// Genereate help message
     pub fn generate_help(&self) -> String {
-        if self.is_noop() {
+        if self.is_default() {
             return String::new();
         }
         let mut output = self.command.clone();
@@ -107,8 +104,8 @@ impl Parser {
         output
     }
     /// Whether parser is noop parser
-    fn is_noop(&self) -> bool {
-        &self.command == "-"
+    fn is_default(&self) -> bool {
+        self == &Default::default()
     }
     fn grouping_args<'a, 'b>(
         &'a self,
@@ -167,6 +164,15 @@ impl Parser {
     }
 }
 
+
+/// for vendor!
+pub(crate) fn must_from_str(s: &str, name: &str, field: &str) -> Parser {
+    match Parser::from_str(s) {
+        Ok(p) => p,
+        Err(_) => panic!("{}.{}: invalid parser '{}'", name, field, s),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::Parser;
@@ -208,10 +214,6 @@ mod tests {
         check_parser_from_str!(
             "-S $",
             { "-S", [], true }
-        );
-        check_parser_from_str!(
-            "",
-            { "-", [], false }
         );
     }
     macro_rules! check_parser_parse {

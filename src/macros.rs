@@ -1,5 +1,4 @@
-#[macro_export]
-macro_rules! create_vendor {
+macro_rules! vendor {
     (
         name: $name:expr,
         yes: [$($yes:expr),*],
@@ -13,21 +12,21 @@ macro_rules! create_vendor {
         list_upgradable: $list_upgradable:expr,
         list_installed: $list_installed:expr,
     ) => {
-        use super::{Parser, Vendor};
-        use std::str::FromStr;
+        use crate::parser::must_from_str;
+        use super::Vendor;
         pub fn init() -> Vendor {
             Vendor {
                 name: $name.to_string(),
                 yes: vec![ $($yes.to_string()),* ],
-                install: Parser::from_str($install).unwrap(),
-                remove: Parser::from_str($remove).unwrap(),
-                upgrade: Parser::from_str($upgrade).unwrap(),
-                search: Parser::from_str($search).unwrap(),
-                show: Parser::from_str($show).unwrap(),
-                update_index: Parser::from_str($update_index).unwrap(),
-                upgrade_all: Parser::from_str($upgrade_all).unwrap(),
-                list_upgradable: Parser::from_str($list_upgradable).unwrap(),
-                list_installed: Parser::from_str($list_installed).unwrap(),
+                install: must_from_str($install, $name, "install"),
+                remove: must_from_str($remove, $name, "remove"),
+                upgrade: must_from_str($upgrade, $name, "upgrade"),
+                search: must_from_str($search, $name, "search"),
+                show: must_from_str($show, $name, "show"),
+                update_index: must_from_str($update_index, $name, "update_index"),
+                upgrade_all: must_from_str($upgrade_all, $name, "upgrade_all"),
+                list_upgradable: must_from_str($list_upgradable, $name, "list_upgradable"),
+                list_installed: must_from_str($list_installed, $name, "list_installed"),
             }
         }
     }

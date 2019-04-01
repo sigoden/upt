@@ -1,4 +1,4 @@
-create_vendor! {
+vendor! {
     name: "choco",
     yes: ["-y"],
     install: "install $",

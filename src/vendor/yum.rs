@@ -1,4 +1,4 @@
-create_vendor! {
+vendor! {
     name: "yum",
     yes: ["-y", "--assumeyes"],
     install: "install $",

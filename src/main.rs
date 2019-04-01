@@ -2,7 +2,7 @@ use std::env;
 use std::error::Error;
 use std::path::Path;
 use std::process::{self, Command};
-use upt::{UptError, Vendor, detect_os_vendor};
+use upt::{UptError, Vendor};
 
 fn main() {
     let env_args = env::args().collect::<Vec<String>>();
@@ -22,7 +22,7 @@ fn main() {
 
 fn create_cmd(vendor: &Vendor, args: &[String]) -> Result<String, UptError> {
     let task = vendor.parse(args)?;
-    let vendor = detect_os_vendor()?;
+    let vendor = Vendor::detect()?;
     let cmd = vendor.eval(&task)?;
     Ok(cmd)
 }

@@ -1,4 +1,4 @@
-create_vendor! {
+vendor! {
     name: "apk",
     yes: [],
     install: "add $",

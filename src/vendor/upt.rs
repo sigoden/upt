@@ -1,4 +1,4 @@
-create_vendor! {
+vendor! {
     name: "upt",
     yes: ["-y", "--yes"],
     install: "install $",

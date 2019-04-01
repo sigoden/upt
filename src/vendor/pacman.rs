@@ -1,4 +1,4 @@
-create_vendor! {
+vendor! {
     name: "pacman",
     yes: ["--noconfirm"],
     install: "-S $",

@@ -1,4 +1,4 @@
-create_vendor! {
+vendor! {
     name: "brew",
     yes: [],
     install: "install $",
