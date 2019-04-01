@@ -62,7 +62,8 @@ impl Vendor {
                 .lines()
                 .find(|l| l.starts_with("ID="))
                 .ok_or_else(|| UptError::NotSupportOS)?;
-            let vendor = match &id[3..] {
+            let id = id[3..].trim_matches('"');
+            let vendor = match id {
                 "arch" | "manjaro" => pacman::init(),
                 "centos" | "redhat" => yum::init(),
                 "fedora" => dnf::init(),
