@@ -15,12 +15,11 @@ main() {
             ;;
     esac
 
-    test -f Cargo.lock || cargo generate-lockfile
 
-    # TODO Update this to build the artifacts that matter to you
+    rustup target add $TARGET
+
     cargo rustc --bin upt --target $TARGET --release -- -C lto
 
-    # TODO Update this to package the right artifacts
     cp target/$TARGET/release/upt $stage/
 
     cd $stage
