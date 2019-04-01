@@ -16,5 +16,5 @@ doc = false
 name = "upt"
 
 [badges]
-travis-ci = { repository = "BurntSushi/ripgrep" }
-appveyor = { repository = "BurntSushi/ripgrep" }
+travis-ci = { repository = "sigoden/upt" }
+appveyor = { repository = "sigoden/upt" }
