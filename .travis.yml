@@ -23,7 +23,6 @@ matrix:
       env: TARGET=x86_64-unknown-linux-musl
       rust: stable
     - os: osx
-      osx_image: xcode7.2
       env: TARGET=x86_64-apple-darwin
       rust: stable
     - os: linux
@@ -31,12 +30,12 @@ matrix:
       env: TARGET=x86_64-unknown-linux-musl
       rust: nightly
     - os: osx
-      osx_image: xcode7.2
       rust: nightly
       env: TARGET=x86_64-apple-darwin
 
-script:
-  - bash ci/script.sh
+test_script:
+  - cargo test 
+  - cargo run -- list -i
 
 before_deploy:
   - sh ci/before_deploy.sh
