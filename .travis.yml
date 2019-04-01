@@ -1,5 +1,12 @@
 language: rust
 
+rust:
+  - stable
+  - nightly
+
+os:
+  - linux
+  - osx
 
 cache: 
   timeout: 360
@@ -11,27 +18,6 @@ before_cache:
 env:
   global:
     - CRATE_NAME=upt
-
-matrix:
-  include:
-    - os: linux
-      dist: trusty
-      env: TARGET=i686-unknown-linux-musl
-      rust: stable
-    - os: linux
-      dist: trusty
-      env: TARGET=x86_64-unknown-linux-musl
-      rust: stable
-    - os: osx
-      env: TARGET=x86_64-apple-darwin
-      rust: stable
-    - os: linux
-      dist: trusty
-      env: TARGET=x86_64-unknown-linux-musl
-      rust: nightly
-    - os: osx
-      rust: nightly
-      env: TARGET=x86_64-apple-darwin
 
 test_script:
   - cargo test 

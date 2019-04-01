@@ -6,10 +6,10 @@ use upt::{UptError, Vendor};
 
 fn main() {
     let env_args = env::args().collect::<Vec<String>>();
-    let (bin, remind_args) = env_args.split_first().unwrap();;
+    let (bin, remainer) = env_args.split_first().unwrap();;
     let bin = Path::new(bin).file_stem().unwrap().to_str().unwrap();
     let vendor = exit_if_err(Vendor::lookup(bin));
-    let cmd = match create_cmd(&vendor, remind_args) {
+    let cmd = match create_cmd(&vendor, remainer) {
         Ok(v) => v,
         Err(e) => {
             dump_upt_error(&vendor, e);
@@ -40,7 +40,7 @@ fn exit_if_err<T, E: Error>(result: Result<T, E>) -> T {
 fn dump_upt_error(vendor: &Vendor, err: UptError) {
     use UptError::*;
     match err {
-        NoSubcommand | NotRecongize => {
+        NotRecongize => {
             eprintln!("{}\n{}", err, vendor.help());
         }
         _ => eprintln!("{}", err),

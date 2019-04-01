@@ -172,7 +172,10 @@ impl Vendor {
     }
     fn check_args(&self, args: &[String]) -> Result<(), UptError> {
         if args.is_empty() {
-            return Err(UptError::NoSubcommand);
+            return Err(UptError::NotRecongize);
+        }
+        if args.len() == 1 && args[0].starts_with("--") {
+            return Err(UptError::NotRecongize);
         }
         for arg in args {
             if arg == "-" || arg == "--" || arg.starts_with("---") {
