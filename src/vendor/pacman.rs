@@ -11,5 +11,3 @@ vendor! {
     list_upgradable: "-Q -u",
     list_installed: "-Q -e",
 }
-
- 

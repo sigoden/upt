@@ -50,9 +50,7 @@ impl Parser {
             return None;
         }
         let assume_yes = if !yes.is_empty() {
-            options
-                .iter()
-                .any(|v| yes.iter().any(|x| x == v))
+            options.iter().any(|v| yes.iter().any(|x| x == v))
         } else {
             false
         };
@@ -146,10 +144,7 @@ impl Parser {
         let mut coll: Vec<(usize, &String)> = options.iter().enumerate().collect();
         let mut count_removing = 0;
         for ro in self.required_options.iter() {
-            match coll
-                .iter()
-                .find(|(_, v)| ro.iter().any(|x| x == *v))
-            {
+            match coll.iter().find(|(_, v)| ro.iter().any(|x| x == *v)) {
                 None => return false,
                 Some((i, _)) => {
                     coll.remove(*i - count_removing);
@@ -163,7 +158,6 @@ impl Parser {
         true
     }
 }
-
 
 /// for vendor!
 pub(crate) fn must_from_str(s: &str, name: &str, field: &str) -> Parser {
@@ -273,12 +267,7 @@ mod tests {
             ["-R", "-s", "--noconfirm", "vim"],
             ("vim", true)
         );
-        check_parser_parse!(
-            "-R -s $",
-            ["--noconfirm"],
-            ["-Rs", "vim"],
-            ("vim", false)
-        );
+        check_parser_parse!("-R -s $", ["--noconfirm"], ["-Rs", "vim"], ("vim", false));
         check_parser_parse!(
             "-R -s $",
             ["--noconfirm"],
@@ -307,33 +296,13 @@ mod tests {
     }
     #[test]
     fn test_parser_generate_cmd() {
-        check_parser_generate_cmd!(
-            "install $",
-            ("vim", ""),
-            "install vim"
-        );
-        check_parser_generate_cmd!(
-            "install $",
-            ("vim", "-y"),
-            "install -y vim"
-        );
-        check_parser_generate_cmd!(
-            "install $",
-            ("vim jq", ""),
-            "install vim jq"
-        );
+        check_parser_generate_cmd!("install $", ("vim", ""), "install vim");
+        check_parser_generate_cmd!("install $", ("vim", "-y"), "install -y vim");
+        check_parser_generate_cmd!("install $", ("vim jq", ""), "install vim jq");
         check_parser_generate_cmd!("search $", ("vim", ""), "search vim");
         check_parser_generate_cmd!("list --installed", ("", ""), "list --installed");
-        check_parser_generate_cmd!(
-            "-R -s $",
-            ("vim", "--noconfirm"),
-            "-R -s --noconfirm vim"
-        );
-        check_parser_generate_cmd!(
-            "-R -s $",
-            ("vim", ""),
-            "-R -s vim"
-        );
+        check_parser_generate_cmd!("-R -s $", ("vim", "--noconfirm"), "-R -s --noconfirm vim");
+        check_parser_generate_cmd!("-R -s $", ("vim", ""), "-R -s vim");
         check_parser_generate_cmd!(
             "-R -s $",
             ("vim jq", "--noconfirm"),
