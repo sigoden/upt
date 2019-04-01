@@ -1,5 +1,6 @@
 # Upt
 **U**niversal **P**ackage-management **T**ool for Windows, macOS and Linux.
+
 [![Linux build status](https://travis-ci.org/sigoden/upt.svg)](https://travis-ci.org/sigoden/upt)
 [![Windows build status](https://ci.appveyor.com/api/projects/status/github/sigoden/upt?svg=true)](https://ci.appveyor.com/project/sigoden/upt)
 [![Crates.io](https://img.shields.io/crates/v/upt.svg)](https://crates.io/crates/upt)
