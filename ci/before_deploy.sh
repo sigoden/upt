@@ -2,35 +2,32 @@
 
 set -ex
 
-main() {
+build() {
     local src=$(pwd) \
-          stage= \
-          targets=
+        stage=$1 \
+        TARGET=$2 \
 
-    case $TRAVIS_OS_NAME in
-        linux)
-            stage=$(mktemp -d)
-            targets=(i686-unknown-linux-musl x86_64-unknown-linux-musl)
-            ;;
-        osx)
-            stage=$(mktemp -d -t tmp)
-            targets=(x86_64-apple-darwin)
-            ;;
-    esac
+    rustup target add $TARGET
 
-    for target in ${targets[@]}; do
-        rustup target add $target
+    cargo rustc --bin $CRATE_NAME --target $TARGET --release -- -C lto
 
-        cargo rustc --bin $CRATE_NAME --target $target --release -- -C lto
+    cp target/$TARGET/release/$CRATE_NAME $stage/
 
-        cp target/$target/release/$CRATE_NAME $stage/
+    cd $stage
+    tar czf $src/$CRATE_NAME-$TRAVIS_TAG-$TARGET.tar.gz *
+    cd $src
 
-        cd $stage
-        tar czf $src/$CRATE_NAME-$TRAVIS_TAG-$target.tar.gz *
-        cd $src
-    done
-
-    rm -rf $stage
+    rm -rf $stage/*
 }
 
-main
+case $TRAVIS_OS_NAME in
+    linux)
+        stage=$(mktemp -d)
+        build $stage i686-unknown-linux-musl 
+        build $stage x86_64-unknown-linux-musl 
+        ;;
+    osx)
+        stage=$(mktemp -d -t tmp)
+        build $stage x86_64-apple-darwin
+        ;;
+esac
