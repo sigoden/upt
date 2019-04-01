@@ -66,9 +66,10 @@ impl Vendor {
             let vendor = match id {
                 "arch" | "manjaro" => pacman::init(),
                 "centos" | "redhat" => yum::init(),
-                "fedora" => dnf::init(),
+                "fedora" | "rhel" => dnf::init(),
                 "alpine" => apk::init(),
-                "debian" | "ubuntu" | "pop-os" | "deepin" | "elementary" => apt::init(),
+                "debian" | "ubuntu" | "pop-os" | "deepin" | "elementary OS" | "kali"
+                | "linuxmint" => apt::init(),
                 _ => {
                     return Err(UptError::NotSupportOS);
                 }
