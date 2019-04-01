@@ -2,7 +2,7 @@
 mod macros;
 
 mod error;
-mod parser;
+mod subcommand;
 mod task;
 mod vendor;
 

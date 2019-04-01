@@ -1,5 +1,5 @@
 use crate::error::UptError;
-use crate::parser::Parser;
+use crate::subcommand::SubCommand;
 use crate::task::Task;
 use std::fs;
 
@@ -21,35 +21,35 @@ const LINE_ENDING: &str = "\n";
 pub struct Vendor {
     pub(crate) name: String,
     pub(crate) yes: Vec<String>,
-    pub(crate) install: Parser,
-    pub(crate) remove: Parser,
-    pub(crate) upgrade: Parser,
-    pub(crate) search: Parser,
-    pub(crate) show: Parser,
-    pub(crate) update_index: Parser,
-    pub(crate) upgrade_all: Parser,
-    pub(crate) list_upgradable: Parser,
-    pub(crate) list_installed: Parser,
+    pub(crate) install: SubCommand,
+    pub(crate) remove: SubCommand,
+    pub(crate) upgrade: SubCommand,
+    pub(crate) search: SubCommand,
+    pub(crate) show: SubCommand,
+    pub(crate) update_index: SubCommand,
+    pub(crate) upgrade_all: SubCommand,
+    pub(crate) list_upgradable: SubCommand,
+    pub(crate) list_installed: SubCommand,
 }
 
-/// Abstract of a kind of package management tool. e.g. apt, pacman, yum...
+/// A kind of package management tool. e.g. apt, pacman, yum...
 impl Vendor {
     /// Lookup vender by name
     pub fn lookup(name: &str) -> Result<Vendor, UptError> {
-        match name {
-            "apk" => return Ok(apk::init()),
-            "apt" => return Ok(apt::init()),
-            "brew" => return Ok(brew::init()),
-            "choco" => return Ok(choco::init()),
-            "dnf" => return Ok(dnf::init()),
-            "pacman" => return Ok(pacman::init()),
-            "upt" => return Ok(upt::init()),
-            "yum" => return Ok(yum::init()),
-            _ => {}
-        }
-        Err(UptError::NoVendor(name.to_string()))
+        let vendor = match name {
+            "apk" => apk::init(),
+            "apt" => apt::init(),
+            "brew" => brew::init(),
+            "choco" => choco::init(),
+            "dnf" => dnf::init(),
+            "pacman" => pacman::init(),
+            "upt" => upt::init(),
+            "yum" => yum::init(),
+            _ => return Err(UptError::NoVendor(name.to_string())),
+        };
+        Ok(vendor)
     }
-    /// Detect os package management
+    /// Detect package management on os
     pub fn detect() -> Result<Vendor, UptError> {
         if cfg!(target_os = "windows") {
             return Ok(choco::init());
@@ -62,48 +62,48 @@ impl Vendor {
                 .lines()
                 .find(|l| l.starts_with("ID="))
                 .ok_or_else(|| UptError::NotSupportOS)?;
-            match &id[3..] {
-                "arch" | "manjaro" => return Ok(pacman::init()),
-                "centos" | "redhat" => return Ok(yum::init()),
-                "fedora" => return Ok(dnf::init()),
-                "alpine" => return Ok(apk::init()),
-                "debian" | "ubuntu" | "pop-os" | "deepin" | "elementary" => {
-                    return Ok(apt::init());
+            let vendor = match &id[3..] {
+                "arch" | "manjaro" => pacman::init(),
+                "centos" | "redhat" => yum::init(),
+                "fedora" => dnf::init(),
+                "alpine" => apk::init(),
+                "debian" | "ubuntu" | "pop-os" | "deepin" | "elementary" => apt::init(),
+                _ => {
+                    return Err(UptError::NotSupportOS);
                 }
-                _ => {}
-            }
+            };
+            return Ok(vendor);
         }
         Err(UptError::NotSupportOS)
     }
     /// Parse command line, figure out the task to perform
     pub fn parse(&self, args: &[String]) -> Result<Task, UptError> {
         self.check_args(args)?;
-        let empty_yes: Vec<String> = vec![];
-        if let Some((Some(pkg), assume_yes)) = self.install.parse(args, &self.yes) {
-            return Ok(Task::Install { pkg, assume_yes });
+        if let Some((Some(pkg), yes)) = self.install.parse(args, &self.yes) {
+            return Ok(Task::Install { pkg, yes });
         }
-        if let Some((Some(pkg), assume_yes)) = self.remove.parse(args, &self.yes) {
-            return Ok(Task::Remove { pkg, assume_yes });
+        if let Some((Some(pkg), yes)) = self.remove.parse(args, &self.yes) {
+            return Ok(Task::Remove { pkg, yes });
         }
-        if let Some((Some(pkg), assume_yes)) = self.upgrade.parse(args, &self.yes) {
-            return Ok(Task::Upgrade { pkg, assume_yes });
+        if let Some((Some(pkg), yes)) = self.upgrade.parse(args, &self.yes) {
+            return Ok(Task::Upgrade { pkg, yes });
         }
-        if let Some((Some(pkg), _)) = self.search.parse(args, &empty_yes) {
+        if let Some((Some(pkg), _)) = self.search.parse(args, &[]) {
             return Ok(Task::Search { pkg });
         }
-        if let Some((Some(pkg), _)) = self.show.parse(args, &empty_yes) {
+        if let Some((Some(pkg), _)) = self.show.parse(args, &[]) {
             return Ok(Task::Show { pkg });
         }
-        if self.update_index.parse(args, &empty_yes).is_some() {
+        if self.update_index.parse(args, &[]).is_some() {
             return Ok(Task::UpdateIndex);
         }
-        if let Some((_, assume_yes)) = self.upgrade_all.parse(args, &self.yes) {
-            return Ok(Task::UpgradeAll { assume_yes });
+        if let Some((_, yes)) = self.upgrade_all.parse(args, &self.yes) {
+            return Ok(Task::UpgradeAll { yes });
         }
-        if self.list_upgradable.parse(args, &empty_yes).is_some() {
+        if self.list_upgradable.parse(args, &[]).is_some() {
             return Ok(Task::ListUpgradable);
         }
-        if self.list_installed.parse(args, &empty_yes).is_some() {
+        if self.list_installed.parse(args, &[]).is_some() {
             return Ok(Task::ListInstalled);
         }
         Err(UptError::NotRecongize)
@@ -111,152 +111,64 @@ impl Vendor {
     /// Convert the task to command line, which invokes the os's package management tool.
     pub fn eval(&self, task: &Task) -> Result<String, UptError> {
         let cmd = match task {
-            Task::Install { pkg, assume_yes } => self
-                .install
-                .generate_cmd(&Some(pkg.to_string()), &self.assume_yes_str(*assume_yes)),
-            Task::Remove { pkg, assume_yes } => self
-                .remove
-                .generate_cmd(&Some(pkg.to_string()), &self.assume_yes_str(*assume_yes)),
-            Task::Upgrade { pkg, assume_yes } => self
-                .upgrade
-                .generate_cmd(&Some(pkg.to_string()), &self.assume_yes_str(*assume_yes)),
-            Task::Search { pkg } => self.search.generate_cmd(&Some(pkg.to_string()), ""),
-            Task::Show { pkg } => self.show.generate_cmd(&Some(pkg.to_string()), ""),
-            Task::UpdateIndex => self.update_index.generate_cmd(&None, ""),
-            Task::UpgradeAll { assume_yes } => self
-                .upgrade_all
-                .generate_cmd(&None, &self.assume_yes_str(*assume_yes)),
-            Task::ListInstalled => self.list_installed.generate_cmd(&None, ""),
-            Task::ListUpgradable => self.list_upgradable.generate_cmd(&None, ""),
+            Task::Install { pkg, yes } => self.install.to_cmd(pkg, self.yes_str(yes)),
+            Task::Remove { pkg, yes } => self.remove.to_cmd(pkg, self.yes_str(yes)),
+            Task::Upgrade { pkg, yes } => self.upgrade.to_cmd(pkg, self.yes_str(yes)),
+            Task::Search { pkg } => self.search.to_cmd(pkg, ""),
+            Task::Show { pkg } => self.show.to_cmd(pkg, ""),
+            Task::UpdateIndex => self.update_index.to_cmd("", ""),
+            Task::UpgradeAll { yes } => self.upgrade_all.to_cmd("", self.yes_str(yes)),
+            Task::ListInstalled => self.list_installed.to_cmd("", ""),
+            Task::ListUpgradable => self.list_upgradable.to_cmd("", ""),
         };
-        if cmd == "" {
-            return Err(UptError::NotSupportTask);
+        match cmd {
+            None => Err(UptError::NotSupportTask),
+            Some(cmd) => Ok([self.name.clone(), cmd].join(" ")),
         }
-        Ok(self.name.clone() + " " + &cmd)
     }
-    fn assume_yes_str(&self, assume_yes: bool) -> String {
-        if assume_yes && !self.yes.is_empty() {
-            self.yes[0].clone()
-        } else {
-            String::new()
+    fn yes_str(&self, yes: &bool) -> &str {
+        if !*yes || self.yes.is_empty() {
+            return "";
         }
+        &self.yes[0]
     }
     /// Dump help message
     pub fn help(&self) -> String {
-        let mut output = String::new();
-        output.push_str(LINE_ENDING);
-        output.push_str("Usage:");
-        output.push_str(LINE_ENDING);
-        let install_help = self.install.generate_help();
-        let remove_help = self.remove.generate_help();
-        let upgrade_help = self.upgrade.generate_help();
-        let search_help = self.search.generate_help();
-        let show_help = self.show.generate_help();
-        let update_index_help = self.update_index.generate_help();
-        let upgrade_all_help = self.upgrade_all.generate_help();
-        let list_upgradable_help = self.list_upgradable.generate_help();
-        let list_installed_help = self.list_installed.generate_help();
-        let widths = vec![
-            install_help.len(),
-            remove_help.len(),
-            upgrade_help.len(),
-            search_help.len(),
-            show_help.len(),
-            update_index_help.len(),
-            upgrade_all_help.len(),
-            list_upgradable_help.len(),
-            list_installed_help.len(),
+        let mut lines: Vec<String> = Vec::new();
+        lines.push(String::new());
+        lines.push(String::from("Usage: "));
+        let helps = vec![
+            (self.install.help(), "Install packages"),
+            (self.remove.help(), "Remove packages"),
+            (self.upgrade.help(), "Upgrade packages"),
+            (self.search.help(), "Search for packages"),
+            (self.show.help(), "Show package details"),
+            (self.update_index.help(), "Update package indexes"),
+            (self.upgrade_all.help(), "Upgrade all packages"),
+            (self.list_upgradable.help(), "List all upgradable packages"),
+            (self.list_installed.help(), "List all installed packages"),
         ];
-        let max_width = widths.iter().max().unwrap() + 6;
-        let head = "  ".to_string() + &self.name + " ";
-        if !install_help.is_empty() {
-            output.push_str(&format!(
-                "{}{:<width$} Install packages",
-                head,
-                install_help,
-                width = max_width
+        let helps: Vec<(&String, &str)> = helps
+            .iter()
+            .filter(|(v, _)| v.is_some())
+            .map(|(v, d)| (v.as_ref().unwrap(), *d))
+            .collect();
+        let width = helps.iter().map(|(v, _)| v.len()).max().unwrap() + 6;
+        for (cmd, description) in &helps {
+            lines.push(format!(
+                "  {} {:<width$} {}",
+                self.name,
+                cmd,
+                description,
+                width = width
             ));
-            output.push_str(LINE_ENDING);
-        }
-        if !remove_help.is_empty() {
-            output.push_str(&format!(
-                "{}{:<width$} Remove packages",
-                head,
-                remove_help,
-                width = max_width
-            ));
-            output.push_str(LINE_ENDING);
-        }
-        if !upgrade_help.is_empty() {
-            output.push_str(&format!(
-                "{}{:<width$} Upgrade packages",
-                head,
-                upgrade_help,
-                width = max_width
-            ));
-            output.push_str(LINE_ENDING);
-        }
-        if !search_help.is_empty() {
-            output.push_str(&format!(
-                "{}{:<width$} Search for package",
-                head,
-                search_help,
-                width = max_width
-            ));
-            output.push_str(LINE_ENDING);
-        }
-        if !show_help.is_empty() {
-            output.push_str(&format!(
-                "{}{:<width$} Show package details",
-                head,
-                show_help,
-                width = max_width
-            ));
-            output.push_str(LINE_ENDING);
-        }
-        if !update_index_help.is_empty() {
-            output.push_str(&format!(
-                "{}{:<width$} Update indexes of packages",
-                head,
-                update_index_help,
-                width = max_width
-            ));
-            output.push_str(LINE_ENDING);
-        }
-        if !upgrade_all_help.is_empty() {
-            output.push_str(&format!(
-                "{}{:<width$} Upgrade all packages",
-                head,
-                upgrade_all_help,
-                width = max_width
-            ));
-            output.push_str(LINE_ENDING);
-        }
-        if !list_upgradable_help.is_empty() {
-            output.push_str(&format!(
-                "{}{:<width$} List all upgradable packages",
-                head,
-                list_upgradable_help,
-                width = max_width
-            ));
-            output.push_str(LINE_ENDING);
-        }
-        if !list_installed_help.is_empty() {
-            output.push_str(&format!(
-                "{}{:<width$} List all installed packages",
-                head,
-                list_installed_help,
-                width = max_width
-            ));
-            output.push_str(LINE_ENDING);
         }
         if !self.yes.is_empty() {
-            output.push_str(LINE_ENDING);
-            output.push_str("");
-            output.push_str(&format!("Automatically answer yes: {}", self.yes.join(",")));
-            output.push_str(LINE_ENDING);
+            lines.push(String::new());
+            lines.push(format!("Automatically answer yes: {}", self.yes.join(",")));
+            lines.push(String::new());
         }
-        output
+        lines.join(LINE_ENDING)
     }
     fn check_args(&self, args: &[String]) -> Result<(), UptError> {
         if args.is_empty() {
@@ -276,20 +188,20 @@ mod tests {
     use super::*;
 
     macro_rules! check_parse {
-        ($parser:expr, [$($arg:expr),*], ($task:tt, $pkg:expr, $assume_yes:expr)) => {
-            assert_eq!($parser.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task { pkg: $pkg.to_string(),assume_yes: $assume_yes })
+        ($vendor:expr, [$($arg:expr),*], ($task:tt, $pkg:expr, $yes:expr)) => {
+            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task { pkg: $pkg.to_string(),yes: $yes })
         };
-        ($parser:expr, [$($arg:expr),*], ($task:tt, pkg=$pkg:expr)) => {
-            assert_eq!($parser.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task { pkg: $pkg.to_string() })
+        ($vendor:expr, [$($arg:expr),*], ($task:tt, pkg=$pkg:expr)) => {
+            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task { pkg: $pkg.to_string() })
         };
-        ($parser:expr, [$($arg:expr),*], ($task:tt, assume_yes=$assume_yes:expr)) => {
-            assert_eq!($parser.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task { assume_yes: $assume_yes })
+        ($vendor:expr, [$($arg:expr),*], ($task:tt, yes=$yes:expr)) => {
+            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task { yes: $yes })
         };
-        ($parser:expr, [$($arg:expr),*], $task:tt) => {
-            assert_eq!($parser.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task)
+        ($vendor:expr, [$($arg:expr),*], $task:tt) => {
+            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task)
         };
-        ($parser:expr, [$($arg:expr),*]) => {
-            assert!($parser.parse(&vec![ $($arg.to_string()),* ]).is_err())
+        ($vendor:expr, [$($arg:expr),*]) => {
+            assert!($vendor.parse(&vec![ $($arg.to_string()),* ]).is_err())
         }
     }
     #[test]
@@ -308,7 +220,7 @@ mod tests {
         check_parse!(upt, ["search", "vim", "jq"], (Search, pkg = "vim jq"));
         check_parse!(upt, ["show", "vim"], (Show, pkg = "vim"));
         check_parse!(upt, ["update"], UpdateIndex);
-        check_parse!(upt, ["upgrade"], (UpgradeAll, assume_yes = false));
+        check_parse!(upt, ["upgrade"], (UpgradeAll, yes = false));
         check_parse!(upt, ["list", "--upgradable"], ListUpgradable);
         check_parse!(upt, ["list", "-i"], ListInstalled);
         check_parse!(upt, ["install"]);
@@ -317,20 +229,20 @@ mod tests {
         check_parse!(upt, ["list"]);
     }
     macro_rules! check_eval {
-        ($parser:expr, ($task:tt, $pkg:expr, $assume_yes:expr), $cmd:expr) => {
+        ($vendor:expr, ($task:tt, $pkg:expr, $yes:expr), $cmd:expr) => {
             assert_eq!(
-                $parser
+                $vendor
                     .eval(&Task::$task {
                         pkg: $pkg.to_string(),
-                        assume_yes: $assume_yes
+                        yes: $yes
                     })
                     .unwrap(),
                 $cmd.to_string()
             )
         };
-        ($parser:expr, ($task:tt, pkg=$pkg:expr), $cmd:expr) => {
+        ($vendor:expr, ($task:tt, pkg=$pkg:expr), $cmd:expr) => {
             assert_eq!(
-                $parser
+                $vendor
                     .eval(&Task::$task {
                         pkg: $pkg.to_string()
                     })
@@ -338,21 +250,17 @@ mod tests {
                 $cmd.to_string()
             )
         };
-        ($parser:expr, ($task:tt, assume_yes=$assume_yes:expr), $cmd:expr) => {
+        ($vendor:expr, ($task:tt, yes=$yes:expr), $cmd:expr) => {
             assert_eq!(
-                $parser
-                    .eval(&Task::$task {
-                        assume_yes: $assume_yes
-                    })
-                    .unwrap(),
+                $vendor.eval(&Task::$task { yes: $yes }).unwrap(),
                 $cmd.to_string()
             )
         };
-        ($parser:expr, $task:tt, $cmd:expr) => {
-            assert_eq!($parser.eval(&Task::$task).unwrap(), $cmd.to_string())
+        ($vendor:expr, $task:tt, $cmd:expr) => {
+            assert_eq!($vendor.eval(&Task::$task).unwrap(), $cmd.to_string())
         };
-        ($parser:expr) => {
-            assert!($parser.eval(&Task::$task).is_err())
+        ($vendor:expr) => {
+            assert!($vendor.eval(&Task::$task).is_none())
         };
     }
     #[test]
@@ -365,7 +273,7 @@ mod tests {
         check_eval!(upt, (Search, pkg = "vim"), "upt search vim");
         check_eval!(upt, (Show, pkg = "vim"), "upt show vim");
         check_eval!(upt, UpdateIndex, "upt update");
-        check_eval!(upt, (UpgradeAll, assume_yes = false), "upt upgrade");
+        check_eval!(upt, (UpgradeAll, yes = false), "upt upgrade");
         check_eval!(upt, ListInstalled, "upt list -i");
         check_eval!(upt, ListUpgradable, "upt list -u");
     }

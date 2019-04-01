@@ -12,7 +12,7 @@ macro_rules! vendor {
         list_upgradable: $list_upgradable:expr,
         list_installed: $list_installed:expr,
     ) => {
-        use crate::parser::must_from_str;
+        use crate::subcommand::must_from_str;
         use super::Vendor;
         pub fn init() -> Vendor {
             Vendor {

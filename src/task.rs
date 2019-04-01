@@ -2,11 +2,11 @@
 #[derive(Debug, PartialEq)]
 pub enum Task {
     /// install packages
-    Install { pkg: String, assume_yes: bool },
+    Install { pkg: String, yes: bool },
     /// remove packages
-    Remove { pkg: String, assume_yes: bool },
+    Remove { pkg: String, yes: bool },
     /// upgrade packages
-    Upgrade { pkg: String, assume_yes: bool },
+    Upgrade { pkg: String, yes: bool },
     /// search for a package
     Search { pkg: String },
     /// show details about a package
@@ -14,7 +14,7 @@ pub enum Task {
     /// sync packages index
     UpdateIndex,
     /// upgrade all outdated packages
-    UpgradeAll { assume_yes: bool },
+    UpgradeAll { yes: bool },
     /// list all upgradable packages
     ListUpgradable,
     /// list all installed packages
