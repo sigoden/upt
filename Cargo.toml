@@ -6,10 +6,15 @@ edition = "2018"
 description = "Universal pckage management tool for Windows, MacOS, Linux"
 documentation = "https://github.com/sigoden/upt"
 repository = "https://github.com/sigoden/upt"
-keywords = ["apt", "upt", "postman", "yum", "apk", "pckage", "management"]
+keywords = ["universal", "pckage", "management"]
+categories = ["command-line-utilities"]
 license = "MIT"
 readme = "README.md"
 
 [[bin]]
 doc = false
 name = "upt"
+
+[badges]
+travis-ci = { repository = "BurntSushi/ripgrep" }
+appveyor = { repository = "BurntSushi/ripgrep" }

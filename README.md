@@ -1,9 +1,14 @@
 # Upt
 **U**niversal **P**ackage-management **T**ool for Windows, macOS and Linux.
+[![Linux build status](https://travis-ci.org/sigoden/upt.svg)](https://travis-ci.org/sigoden/upt)
+[![Windows build status](https://ci.appveyor.com/api/projects/status/github/sigoden/upt?svg=true)](https://ci.appveyor.com/project/sigoden/upt)
+[![Crates.io](https://img.shields.io/crates/v/upt.svg)](https://crates.io/crates/upt)
 
 Upt recongizes your input, and interprets it into the command which invokes the native package management tool.
 
 For example, if your input `brew install vim` or `upt install vim` on `Ubutu`, upt will recongize that your want to install vim, then execute `apt install vim`.
+
+Rename `upt` to `pacman`, your can take advantage of your `pacman` experience to manage packages. It becomes `pacman`. Type `pacman -S cargo` to install cargo other than `pacman install cargo`. 
 
 ## Install
 
@@ -58,9 +63,7 @@ As a command line, it can:
 
 > For general purpose, upt only provide most general and useful commands.
 
-As a interpreter, it can act as other command line tool.
-
-Rename `upt` to `pacman`, your can take advantage of your `pacman` experience to manage packages. It becomes `pacman`. Type `pacman -S cargo` to install cargo other than `pacman install cargo`. 
+As a interpreter, it can act as other command line tool by rename `upt`. See blow.
 
 ```
 | task                       | udt              | apt                   | brew                | choco                | yum                | dnf                  | pacman          | apk                  |
@@ -81,3 +84,5 @@ Rename `upt` to `pacman`, your can take advantage of your `pacman` experience to
 Copyright (c) 2019 sigoden
 
 Licensed under the MIT license.
+
+[releases]: https://github.com/sigoden/upt/releases
