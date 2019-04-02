@@ -4,7 +4,7 @@
 [![Windows build status](https://ci.appveyor.com/api/projects/status/github/sigoden/upt?svg=true)](https://ci.appveyor.com/project/sigoden/upt)
 [![Crates.io](https://img.shields.io/crates/v/upt.svg)](https://crates.io/crates/upt)
 
-English | 简体中文(./README-zh_CN.md)
+English | [简体中文](./README-zh_CN.md)
 
 ## Features
 
