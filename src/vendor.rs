@@ -65,8 +65,8 @@ impl Vendor {
             let id = id[3..].trim_matches('"');
             let vendor = match id {
                 "arch" | "manjaro" => pacman::init(),
-                "centos" | "redhat" => yum::init(),
-                "fedora" | "rhel" => dnf::init(),
+                "centos" | "redhat" | "rhel" => yum::init(),
+                "fedora" => dnf::init(),
                 "alpine" => apk::init(),
                 "debian" | "ubuntu" | "pop-os" | "deepin" | "elementary OS" | "kali"
                 | "linuxmint" => apt::init(),
