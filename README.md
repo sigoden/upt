@@ -20,7 +20,7 @@ yum list updates          # Centos, Redhat...
 brew outdated             # MacOS Homebrew
 apk list --upgrades       # Apline
 pacman -Qu                # Arch, Manjaro...
-choco outdated            # Windows Chocolaty
+choco outdated            # Windows Chocolatey
 dnf list --upgrades       # Fedora
 ```
 
