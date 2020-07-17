@@ -12,7 +12,7 @@ English | [简体中文](./README-zh_CN.md)
 
 Each OS has its own package management tool. To complete the same operation, you need to enter different commands.
 
-For example, we need to get an updateable package, We have to execute the following command:
+For example, we need to get an updatable package, We have to execute the following command:
 
 ```sh
 apt list --upgradable       # Ubuntu, Debian, Linux Mint...
@@ -142,9 +142,9 @@ The `upt` executable file is small, but it needs to be universal across the plat
 When you run `upt` in Ubuntu:
 
  - Input `upt list -u`
- - After parsing, `upt` find that you are going to execute task: `list all updateable packages'.
+ - After parsing, `upt` find that you are going to execute task: `list all updatable packages'.
  - `upt` detects the `apt` package management tool used by your system.
- - `upt` interpret the task `list all updateable packages` to `apt` command.
+ - `upt` interpret the task `list all updatable packages` to `apt` command.
  - Run `apt list --upgradable`.
 
 If you rename `upt` to `brew`, `upt` will use the `brew` syntax to resolve the task. **Command Replacement** is implemented this way.
