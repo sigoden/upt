@@ -8,7 +8,7 @@ os:
   - linux
   - osx
 
-cache: 
+cache:
   timeout: 360
   cargo: true
 
@@ -20,7 +20,7 @@ env:
     - CRATE_NAME=upt
 
 test_script:
-  - cargo test 
+  - cargo test
   - cargo run -- list -i
 
 before_deploy:

@@ -23,8 +23,8 @@ build() {
 case $TRAVIS_OS_NAME in
     linux)
         stage=$(mktemp -d)
-        build $stage i686-unknown-linux-musl 
-        build $stage x86_64-unknown-linux-musl 
+        build $stage i686-unknown-linux-musl
+        build $stage x86_64-unknown-linux-musl
         ;;
     osx)
         stage=$(mktemp -d -t tmp)

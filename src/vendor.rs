@@ -108,7 +108,7 @@ impl Vendor {
         if self.list_installed.parse(args, &[]).is_some() {
             return Ok(Task::ListInstalled);
         }
-        Err(UptError::NotRecongize)
+        Err(UptError::NotRecognize)
     }
     /// Convert the task to command line, which invokes the os's package management tool.
     pub fn eval(&self, task: &Task) -> Result<String, UptError> {
@@ -174,10 +174,10 @@ impl Vendor {
     }
     fn check_args(&self, args: &[String]) -> Result<(), UptError> {
         if args.is_empty() {
-            return Err(UptError::NotRecongize);
+            return Err(UptError::NotRecognize);
         }
         if args.len() == 1 && args[0].starts_with("--") {
-            return Err(UptError::NotRecongize);
+            return Err(UptError::NotRecognize);
         }
         for arg in args {
             if arg == "-" || arg == "--" || arg.starts_with("---") {
