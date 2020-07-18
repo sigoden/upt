@@ -40,7 +40,7 @@ fn exit_if_err<T, E: Error>(result: Result<T, E>) -> T {
 fn dump_upt_error(vendor: &Vendor, err: UptError) {
     use UptError::*;
     match err {
-        NotRecongize => {
+        NotRecognize => {
             eprintln!("{}\n{}", err, vendor.help());
         }
         _ => eprintln!("{}", err),

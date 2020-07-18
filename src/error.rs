@@ -5,7 +5,7 @@ pub enum UptError {
     NoVendor(String),
     NotSupportOS,
     NotSupportTask,
-    NotRecongize,
+    NotRecognize,
     BadOption(String),
 }
 
@@ -19,7 +19,7 @@ impl fmt::Display for UptError {
             NotSupportOS => write!(f, "Your os is not supported currently"),
             NotSupportTask => write!(f, "Task is not supported by your os"),
             BadOption(v) => write!(f, "Option `{}` is invalid", v),
-            NotRecongize => write!(f, "Your input can not be recongized"),
+            NotRecognize => write!(f, "Your input can not be Recognized"),
         }
     }
 }
