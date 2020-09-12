@@ -1,7 +1,6 @@
 # UPT —— 统一的包管理工具
 
-[![Linux build status](https://travis-ci.org/sigoden/upt.svg)](https://travis-ci.org/sigoden/upt)
-[![Windows build status](https://ci.appveyor.com/api/projects/status/github/sigoden/upt?svg=true)](https://ci.appveyor.com/project/sigoden/upt)
+[![Build status](https://github.com/sigoden/upt/workflows/CI/badge.svg)](https://github.com/sigoden/upt/actions)
 [![Crates.io](https://img.shields.io/crates/v/upt.svg)](https://crates.io/crates/upt)
 
 [English](./README.md) | 简体中文
