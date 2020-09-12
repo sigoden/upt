@@ -8,11 +8,11 @@ mod apk;
 mod apt;
 mod brew;
 mod choco;
+mod scoop;
 mod dnf;
 mod pacman;
 mod upt;
 mod yum;
-mod scoop;
 
 #[cfg(windows)]
 const LINE_ENDING: &str = "\r\n";

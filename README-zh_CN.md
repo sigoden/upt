@@ -55,6 +55,7 @@ brew install wget # upt可以像brew样工作
 - [x] apt
 - [x] brew
 - [x] choco
+- [x] scoop
 - [x] dnf
 - [x] pacman
 - [x] yum
