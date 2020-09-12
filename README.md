@@ -55,6 +55,7 @@ brew install wget # upt will work like brew
 - [x] apt
 - [x] brew
 - [x] choco
+- [x] scoop
 - [x] dnf
 - [x] pacman
 - [x] yum

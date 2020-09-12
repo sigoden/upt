@@ -1,7 +1,9 @@
+use std::fs;
+use std::process::{Command, Stdio};
+
 use crate::error::UptError;
 use crate::subcommand::SubCommand;
 use crate::task::Task;
-use std::fs;
 
 mod apk;
 mod apt;
@@ -9,6 +11,7 @@ mod brew;
 mod choco;
 mod dnf;
 mod pacman;
+mod scoop;
 mod upt;
 mod yum;
 
@@ -41,6 +44,7 @@ impl Vendor {
             "apt" => apt::init(),
             "brew" => brew::init(),
             "choco" => choco::init(),
+            "scoop" => scoop::init(),
             "dnf" => dnf::init(),
             "pacman" => pacman::init(),
             "upt" => upt::init(),
@@ -52,6 +56,9 @@ impl Vendor {
     /// Detect package management on os
     pub fn detect() -> Result<Vendor, UptError> {
         if cfg!(target_os = "windows") {
+            if which("scoop") {
+                return Ok(scoop::init());
+            }
             return Ok(choco::init());
         } else if cfg!(target_os = "macos") {
             return Ok(brew::init());
@@ -186,6 +193,14 @@ impl Vendor {
         }
         Ok(())
     }
+}
+
+fn which(name: &str) -> bool {
+    Command::new(name)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .is_ok()
 }
 
 #[cfg(test)]

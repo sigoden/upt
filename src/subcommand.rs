@@ -130,7 +130,7 @@ impl SubCommand {
                 } else {
                     options.remove(0)
                 }
-            },
+            }
             false => {
                 if operands.len() == 0 {
                     String::new()
