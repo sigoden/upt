@@ -108,7 +108,6 @@ impl SubCommand {
         args: &'b [String],
     ) -> (String, Vec<String>, Option<String>) {
         let is_dashed = self.name.starts_with('-'); // SubCommand of pacman is dashed
-        let name;
         let mut options: Vec<String> = vec![];
         let mut operands: Vec<String> = vec![];
         for arg in args.iter() {
@@ -124,11 +123,22 @@ impl SubCommand {
                 operands.push(arg.to_string());
             }
         }
-        if is_dashed {
-            name = options.remove(0);
-        } else {
-            name = operands.remove(0);
-        }
+        let name = match is_dashed {
+            true => {
+                if options.len() == 0 {
+                    String::new()
+                } else {
+                    options.remove(0)
+                }
+            },
+            false => {
+                if operands.len() == 0 {
+                    String::new()
+                } else {
+                    operands.remove(0)
+                }
+            }
+        };
         let pkg = if operands.is_empty() {
             None
         } else {
