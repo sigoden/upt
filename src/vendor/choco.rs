@@ -9,5 +9,5 @@ vendor! {
     update_index: "upgrade --noop",
     upgrade_all: "upgrade all",
     list_upgradable: "outdated",
-    list_installed: "list -lai",
+    list_installed: "list -l|--local-only",
 }

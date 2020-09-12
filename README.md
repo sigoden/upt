@@ -45,6 +45,21 @@ In order to use `upt`, you have to learn `upt` command, which is not easy. Fortu
 
 If you are a person familiar with `brew`, when you have to manage the package in Ubuntu, you can download the `upt` command. By **rename upt** to `brew`. You can use `brew`-style for package management in Ubuntu.
 
+```sh
+cp upt brew
+brew install wget # upt will work like brew
+```
+
+**Many supported package management tools**
+
+- [x] apk
+- [x] apt
+- [x] brew
+- [x] choco
+- [x] dnf
+- [x] pacman
+- [x] yum
+
 ## Install
 
 **Download Binary**

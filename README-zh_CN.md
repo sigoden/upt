@@ -45,6 +45,21 @@ upt list -u # 所有平台命令一致。
 
 如果你是一个熟悉 `brew` 的人，在 Ubuntu 中进行包管理时，可以下载 `upt` 命令后，**重命名 upt** 为 `brew`。你可以在 Ubuntu 中使用 `brew` 进行包管理了。
 
+```sh
+cp upt brew
+brew install wget # upt可以像brew样工作
+```
+
+**支持多种包管理工具**
+
+- [x] apk
+- [x] apt
+- [x] brew
+- [x] choco
+- [x] dnf
+- [x] pacman
+- [x] yum
+
 ## 安装
 
 **下载可执行文件**
@@ -173,8 +188,6 @@ upt list -u
 > 如果你发现有错误，或者想添加其他包管理工具，欢迎发 [Issue](https://github.com/sigoden/upt/issues/new)。
 
 ## License
-
-Copyright (c) 2019 sigoden
 
 Licensed under the MIT license.
 

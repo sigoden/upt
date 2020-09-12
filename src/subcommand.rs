@@ -1,3 +1,4 @@
+use std::cell::Cell;
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Default)]
@@ -51,12 +52,14 @@ impl SubCommand {
         if (pkg.is_none() && self.has_pkg) || (pkg.is_some() && !self.has_pkg) {
             return None;
         }
-        let yes = if !yes_options.is_empty() {
-            options.iter().any(|v| yes_options.iter().any(|x| x == v))
-        } else {
-            false
-        };
-        if !self.satisfy_options(&options, yes) {
+        let options_no_yes: Vec<String> = options
+            .iter()
+            .filter(|v| yes_options.iter().find(|y| y == v).is_none())
+            .cloned()
+            .collect();
+
+        let yes = options_no_yes.len() != options.len();
+        if !self.satisfy_options(&options_no_yes) {
             return None;
         }
         Some((pkg, yes))
@@ -105,7 +108,7 @@ impl SubCommand {
         args: &'b [String],
     ) -> (String, Vec<String>, Option<String>) {
         let is_dashed = self.name.starts_with('-'); // SubCommand of pacman is dashed
-        let mut name;
+        let name;
         let mut options: Vec<String> = vec![];
         let mut operands: Vec<String> = vec![];
         for arg in args.iter() {
@@ -133,23 +136,25 @@ impl SubCommand {
         };
         (name, options, pkg)
     }
-    fn satisfy_options(&self, options: &[String], has_yes: bool) -> bool {
-        let mut index_options: Vec<(usize, &String)> = options.iter().enumerate().collect();
-        let mut count_removed = 0;
-        for ro in self.options.iter() {
-            match index_options
-                .iter()
-                .find(|(_, v)| ro.iter().any(|x| x == *v))
-            {
-                None => return false,
-                Some((i, _)) => {
-                    index_options.remove(*i - count_removed);
-                    count_removed += 1;
-                }
-            };
+    fn satisfy_options(&self, options: &[String]) -> bool {
+        let marks: Vec<Cell<bool>> = self.options.iter().map(|_| Cell::new(false)).collect();
+        if options.len() != self.options.len() {
+            return false;
         }
-        let unused_options_n = index_options.len() - (has_yes as usize);
-        unused_options_n == 0
+        options.iter().all(|v| {
+            self.options
+                .iter()
+                .enumerate()
+                .find(|(i, y)| {
+                    let mark = marks.get(*i).unwrap();
+                    if mark.get() == false && y.iter().find(|z| *z == v).is_some() {
+                        mark.set(true);
+                        return true;
+                    }
+                    false
+                })
+                .is_some()
+        })
     }
 }
 
