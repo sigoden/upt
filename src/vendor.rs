@@ -1,4 +1,5 @@
 use std::fs;
+use std::process::{Command, Stdio};
 
 use crate::error::UptError;
 use crate::subcommand::SubCommand;
@@ -8,9 +9,9 @@ mod apk;
 mod apt;
 mod brew;
 mod choco;
-mod scoop;
 mod dnf;
 mod pacman;
+mod scoop;
 mod upt;
 mod yum;
 
@@ -195,7 +196,11 @@ impl Vendor {
 }
 
 fn which(name: &str) -> bool {
-    std::process::Command::new(name).spawn().is_ok()
+    Command::new(name)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .is_ok()
 }
 
 #[cfg(test)]
