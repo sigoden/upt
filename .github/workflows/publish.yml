@@ -30,10 +30,6 @@ jobs:
       with:
         fetch-depth: 1
 
-    - name: Set the version
-      id: version
-      run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
-
     - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
@@ -56,7 +52,7 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: target/release/upt
-        asset_name: upt-${{ steps.version.outputs.VERSION }}-${{ matrix.target }}
+        asset_name: upt-${{ matrix.target }}
         tag: ${{ github.ref }}
 
     - name: Upload binaries to release
@@ -65,5 +61,5 @@ jobs:
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: target/release/upt.exe
-        asset_name: upt-${{ steps.version.outputs.VERSION }}-${{ matrix.target }}.exe
+        asset_name: upt-${{ matrix.target }}.exe
         tag: ${{ github.ref }}
