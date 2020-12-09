@@ -11,6 +11,7 @@ mod brew;
 mod choco;
 mod dnf;
 mod pacman;
+mod pkgman;
 mod scoop;
 mod upt;
 mod yum;
@@ -47,6 +48,7 @@ impl Vendor {
             "scoop" => scoop::init(),
             "dnf" => dnf::init(),
             "pacman" => pacman::init(),
+            "pkgman" => pkgman::init(),
             "upt" => upt::init(),
             "yum" => yum::init(),
             _ => return Err(UptError::NoVendor(name.to_string())),
@@ -82,6 +84,8 @@ impl Vendor {
                 }
             };
             return Ok(vendor);
+        } else if cfg!(target_os = "haiku") {
+            return Ok(pkgman::init());
         }
         Err(UptError::NotSupportOS)
     }
