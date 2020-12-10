@@ -75,7 +75,7 @@ impl Vendor {
                 "centos" | "redhat" | "rhel" => yum::init(),
                 "fedora" => dnf::init(),
                 "alpine" => apk::init(),
-                "debian" | "ubuntu" | "pop-os" | "deepin" | "elementary OS" | "kali"
+                "debian" | "ubuntu" | "pop" | "deepin" | "elementary OS" | "kali"
                 | "linuxmint" => apt::init(),
                 _ => {
                     return Err(UptError::NotSupportOS);
