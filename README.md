@@ -188,6 +188,12 @@ The table also lists:
 
 If you find errors or want to add other package management tools, please [issue](https://github.com/sigoden/upt/issues/new).
 
+## Related Projects
+
+![Universal Install Script](https://imgs.xkcd.com/comics/universal_install_script.png "Universal Install Script")
+
+> https://xkcd.com/1654/ 
+
 ## License
 
 

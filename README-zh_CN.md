@@ -187,6 +187,12 @@ upt list -u
 
 > 如果你发现有错误，或者想添加其他包管理工具，欢迎发 [Issue](https://github.com/sigoden/upt/issues/new)。
 
+## Related Projects
+
+![Universal Install Script](https://imgs.xkcd.com/comics/universal_install_script.png "Universal Install Script")
+
+> https://xkcd.com/1654/ 
+
 ## License
 
 Licensed under the MIT license.
