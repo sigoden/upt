@@ -5,11 +5,10 @@
 
 ## Features
 
-**Unified Command**
+### Unified Command
 
-Each OS has its own package management tool. To complete the same operation, you need to enter different commands.
-
-For example, we need to get an updatable package, We have to execute the following command:
+Each operating system (OS) has its own package management tool, which requires different commands to complete the same operation.
+This can be inconvenient when switching between or trying new OSs. 
 
 ```sh
 apt list --upgradable       # Ubuntu, Debian, Linux Mint...
@@ -21,36 +20,72 @@ choco outdated            # Windows Chocolatey
 dnf list --upgrades       # Fedora
 ```
 
-This brings us a lot of inconvenience in switching and experiencing the new OS. After all, package management is a essential and common operation.
-
-`upt` can solve this problem. It can run on various platforms and even in various distributions, provided **Unified Command** to execute the package management operations.
+However, `upt` offers a solution by providing a unified command for package management operations across various platforms and distributions. 
 
 ```sh
-upt list -u # All in one command
+upt install vim # Works on any OSs that upt supports
 ```
 
-> UPT only provides a unified interface, and the package management function is implemented by calling the system's native tools.
+**Upt is just dynamic alias, relying on the platform's package management tool to do the job**
 
+### Act as an command
 
-**Command Replacement**
-
-Everyone has their familiar operating system and package management tool.
-
-People who use MacOS may be familiar with the `brew` command, People who use Windows may be familiar with the `choco` command, People who use Ubuntu may be familiar with the `apt` command。
-
-In order to use `upt`, you have to learn `upt` command, which is not easy. Fortunately, `upt` supports command replacement. You do not need to learn a new command.
-
-If you are a person familiar with `brew`, when you have to manage the package in Ubuntu, you can download the `upt` command. By **rename upt** to `brew`. You can use `brew`-style for package management in Ubuntu.
+Upt can act as other commands and use their syntax.
 
 ```sh
 cp upt brew
-brew install wget # upt will work like brew
+brew install vim # use brew syntax to install a package
+cp upt pacman
+pacman -S vim    # use pacman syntax to install a package
 ```
 
-**Many supported package management tools**
+### Supported Tools
 
-![Commands](https://github.com/sigoden/upt/assets/4012553/7e629471-6499-439a-9692-d296cd669a9b)
+```
++--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
+| Tool   | Install            | Uninstall            | Upgrade            | Search                | Info            | Update Index             | Upgrade All       | List upgradable     | List Installed       |
++--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
+| upt    | upt install $pkg   | upt remove $pkg      | upt upgrade $pkg   | upt search $pattern   | upt show $pkg   | upt update               | upt upgrade       | upt list -u         | upt list -i          |
++--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
+| apt    | apt install $pkg   | apt remove $pkg      | apt install $pkg   | apt search $pattern   | apt show $pkg   | apt update               | apt upgrade       | apt list --upgrade  | apt list --installed |
++--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
+| brew   | brew install $pkg  | brew uninstall $pkg  | brew upgrade $pkg  | brew search $pattern  | brew info $pkg  | brew update              | brew upgrade      | brew outdated       | brew list            |
++--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
+| choco  | choco install $pkg | choco uninstall $pkg | choco upgrade $pkg | choco search $pattern | choco info $pkg | choco upgrade all --noop | choco upgrade all | choco outdated      | choco list           |
++--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
+| dnf    | dnf install $pkg   | dnf remove $pkg      | dnf update $pkg    | dnf search $pattern   | dnf info $pkg   | dnf check-update         | dnf update        | dnf list --upgrades | dnf list --installed |
++--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
+| yum    | yum install $pkg   | yum remove $pkg      | yum upgrade $pkg   | yum search $pattern   | yum info $pkg   | yum check-update         | yum update        | yum list updates    | yum list installed   |
++--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
+| pacman | pacman -S $pkg     | Pacman -Rs $pkg      | pacman -S $pkg     | pacman -Ss $pattern   | pacman -Si $pkg | pacman -Syy              | pacman -Syu       | pacman -Qu          | pacman -Qe           |
++--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
+| apk    | apk add $pkg       | apk del $pkg         | apk upgrade $pkg   | apk search $pattern   | apk info $pkg   | apk update               | apk upgrade       | apk list --upgrades | apk list --installed |
++--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
+```
 
+### Supported OS
+
+```
++-------------------------------------------+----------------------+
+| OS                                        | Tools                |
++-------------------------------------------+----------------------+
+| windows                                   | scoop, choco, winget |
++-------------------------------------------+----------------------+
+| macos                                     | brew, port           |
++-------------------------------------------+----------------------+
+| ubuntu, debian, linuxmint, pop-os, deepin | apt                  |
+| elementry OS, kali, aosc                  |                      |
++-------------------------------------------+----------------------+
+| fedora, redhat, rhel                      | dnf                  |
++-------------------------------------------+----------------------+
+| centos, rocky                             | yum                  |
++-------------------------------------------+----------------------+
+```
+
+Some platforms may support multiple package management tools, and upt defaults to selecting them in the order listed in the table. 
+Of course, you can also specify the `UPT_TOOL` environment variable.
+
+For example, in Windows, `upt` will prioritize using `scoop`. If `scoop` is not available, it will use `choco`. If `choco` is also not available, it will use `winget`. If you set `UPT_TOOL=choco`, `choco` will be used even though `scoop` exists.
 
 ## Install
 
@@ -69,10 +104,9 @@ move upt C:\Windows\System32
 
 **Use Cargo**
 
-`upt` is written in the rust language and posted to [crates](https://crates.io/crates/upt). So you can install it using [cargo](https://doc.rust-lang.org/stable/cargo/).
+`upt` is written in the rust you can install it using [cargo](https://doc.rust-lang.org/stable/cargo/).
 
 ```sh
-# curl https://sh.rustup.rs -sSf | sh # 安装 cargo
 cargo install upt
 ```
 
@@ -142,7 +176,8 @@ upt list -u
 
 ## License
 
+Copyright (c) 2023 argc-developers.
 
-Copyright (c) 2023 sigoden
+aichat is made available under the terms of either the MIT License or the Apache License 2.0, at your option.
 
-Licensed under the MIT license.
+See the LICENSE-APACHE and LICENSE-MIT files for license details.
