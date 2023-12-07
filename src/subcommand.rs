@@ -11,7 +11,7 @@ pub(crate) struct SubCommand {
 impl FromStr for SubCommand {
     type Err = ();
     fn from_str(s: &str) -> Result<Self, ()> {
-        if s == "" {
+        if s.is_empty() {
             return Ok(Default::default());
         }
         let words: Vec<&str> = s.split(' ').collect();
@@ -54,7 +54,7 @@ impl SubCommand {
         }
         let options_no_yes: Vec<String> = options
             .iter()
-            .filter(|v| yes_options.iter().find(|y| y == v).is_none())
+            .filter(|v| !yes_options.iter().any(|y| &y == v))
             .cloned()
             .collect();
 
@@ -74,10 +74,10 @@ impl SubCommand {
             segs.push(&ro[0]);
         }
         if !yes.is_empty() {
-            segs.push(&yes);
+            segs.push(yes);
         }
         if !pkg.is_empty() {
-            segs.push(&pkg);
+            segs.push(pkg);
         }
         Some(segs.join(" "))
     }
@@ -103,10 +103,7 @@ impl SubCommand {
     fn is_default(&self) -> bool {
         self == &Default::default()
     }
-    fn classify_args<'a, 'b>(
-        &'a self,
-        args: &'b [String],
-    ) -> (String, Vec<String>, Option<String>) {
+    fn classify_args(&self, args: &[String]) -> (String, Vec<String>, Option<String>) {
         let is_dashed = self.name.starts_with('-'); // SubCommand of pacman is dashed
         let mut options: Vec<String> = vec![];
         let mut operands: Vec<String> = vec![];
@@ -125,14 +122,14 @@ impl SubCommand {
         }
         let name = match is_dashed {
             true => {
-                if options.len() == 0 {
+                if options.is_empty() {
                     String::new()
                 } else {
                     options.remove(0)
                 }
             }
             false => {
-                if operands.len() == 0 {
+                if operands.is_empty() {
                     String::new()
                 } else {
                     operands.remove(0)
@@ -152,18 +149,14 @@ impl SubCommand {
             return false;
         }
         options.iter().all(|v| {
-            self.options
-                .iter()
-                .enumerate()
-                .find(|(i, y)| {
-                    let mark = marks.get(*i).unwrap();
-                    if mark.get() == false && y.iter().find(|z| *z == v).is_some() {
-                        mark.set(true);
-                        return true;
-                    }
-                    false
-                })
-                .is_some()
+            self.options.iter().enumerate().any(|(i, y)| {
+                let mark = marks.get(i).unwrap();
+                if !mark.get() && y.iter().any(|z| z == v) {
+                    mark.set(true);
+                    return true;
+                }
+                false
+            })
         })
     }
 }

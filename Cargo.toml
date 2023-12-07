@@ -2,7 +2,7 @@
 name = "upt"
 version = "0.3.0"
 authors = ["sigoden <sigoden@gmail.com>"]
-edition = "2018"
+edition = "2021"
 description = "Universal package management tool for Windows, MacOS, Linux"
 documentation = "https://github.com/sigoden/upt"
 repository = "https://github.com/sigoden/upt"
@@ -14,7 +14,3 @@ readme = "README.md"
 [[bin]]
 doc = false
 name = "upt"
-
-[badges]
-travis-ci = { repository = "sigoden/upt" }
-appveyor = { repository = "sigoden/upt" }
