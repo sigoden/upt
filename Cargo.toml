@@ -1,16 +1,20 @@
 [package]
 name = "upt"
 version = "0.3.0"
-authors = ["sigoden <sigoden@gmail.com>"]
 edition = "2021"
+authors = ["sigoden <sigoden@gmail.com>"]
 description = "Universal package management tool for Windows, MacOS, Linux"
-documentation = "https://github.com/sigoden/upt"
+license = "MIT OR Apache-2.0"
+homepage = "https://github.com/sigoden/upt"
 repository = "https://github.com/sigoden/upt"
-keywords = ["universal", "package", "management"]
 categories = ["command-line-utilities"]
-license = "MIT"
-readme = "README.md"
+keywords = ["universal", "package", "management"]
 
 [[bin]]
 doc = false
 name = "upt"
+
+[profile.release]
+lto = true
+strip = true
+opt-level = "z"
