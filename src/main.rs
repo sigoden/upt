@@ -34,7 +34,7 @@ fn run_cmd(cmd: &str) {
 
 #[cfg(target_os = "windows")]
 fn run_cmd(cmd: &str) {
-    let mut child = exit_if_err(Command::new("cmd").args(&["/C", cmd]).spawn());
+    let mut child = exit_if_err(Command::new("cmd").args(["/C", cmd]).spawn());
     exit_if_err(child.wait());
 }
 
