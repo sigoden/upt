@@ -68,7 +68,7 @@ impl Vendor {
             let id = release
                 .lines()
                 .find(|l| l.starts_with("ID="))
-                .ok_or_else(|| UptError::NotSupportOS)?;
+                .ok_or(UptError::NotSupportOS)?;
             let id = id[3..].trim_matches('"');
             let vendor = match id {
                 "arch" | "manjaro" => pacman::init(),
