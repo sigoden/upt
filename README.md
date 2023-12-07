@@ -49,14 +49,8 @@ brew install wget # upt will work like brew
 
 **Many supported package management tools**
 
-- [x] apk
-- [x] apt
-- [x] brew
-- [x] choco
-- [x] scoop
-- [x] dnf
-- [x] pacman
-- [x] yum
+![Commands](https://github.com/sigoden/upt/assets/4012553/7e629471-6499-439a-9692-d296cd669a9b)
+
 
 ## Install
 
@@ -146,46 +140,9 @@ upt list -u
 ```
 > If you feel `upt` should support a package management operation, feel free to create [issue](https://github.com/sigoden/upt/issues/new) to discuss it.
 
-## Command Replacement Table
-
-The `upt` executable file is small, but it needs to be universal across the platform. It is impossible to *embed* package management function.
-
-`upt` implements package management functions by calling the system's native tools. So `upt` is essentially an **interpreter**.
-
-When you run `upt` in Ubuntu:
-
- - Input `upt list -u`
- - After parsing, `upt` find that you are going to execute task: `list all updatable packages'.
- - `upt` detects the `apt` package management tool used by your system.
- - `upt` interpret the task `list all updatable packages` to `apt` command.
- - Run `apt list --upgradable`.
-
-If you rename `upt` to `brew`, `upt` will use the `brew` syntax to resolve the task. **Command Replacement** is implemented this way.
-
-The following table is the input and output mapping:
-
-| Tool   | Install            | Uninstall            | Upgrade            | Search                | Info            | Update Index             | Upgrade All       | List upgradable     | List Installed       |
-| ------ | ------------------ | -------------------- | ------------------ | --------------------- | --------------- | ------------------------ | ----------------- | ------------------- | -------------------- |
-| upt    | upt install $pkg   | upt remove $pkg      | upt upgrade $pkg   | upt search $pattern   | upt show $pkg   | upt update               | upt upgrade       | upt list -u         | upt list -i          |
-| apt    | apt install $pkg   | apt remove $pkg      | apt install $pkg   | apt search $pattern   | apt show $pkg   | apt update               | apt upgrade       | apt list --upgrade  | apt list --installed |
-| brew   | brew install $pkg  | brew uninstall $pkg  | brew upgrade $pkg  | brew search $pattern  | brew info $pkg  | brew update              | brew upgrade      | brew outdated       | brew list            |
-| choco  | choco install $pkg | choco uninstall $pkg | choco upgrade $pkg | choco search $pattern | choco info $pkg | choco upgrade all --noop | choco upgrade all | choco outdated      | choco list           |
-| dnf    | dnf install $pkg   | dnf remove $pkg      | dnf update $pkg    | dnf search $pattern   | dnf info $pkg   | dnf check-update         | dnf update        | dnf list --upgrades | dnf list --installed |
-| yum    | yum install $pkg   | yum remove $pkg      | yum upgrade $pkg   | yum search $pattern   | yum info $pkg   | yum check-update         | yum update        | yum list updates    | yum list installed   |
-| pacman | pacman -S $pkg     | Pacman -Rs $pkg      | pacman -S $pkg     | pacman -Ss $pattern   | pacman -Si $pkg | pacman -Syy              | pacman -Syu       | pacman -Qu          | pacman -Qe           |
-| apk    | apk add $pkg       | apk del $pkg         | apk upgrade $pkg   | apk search $pattern   | apk info $pkg   | apk update               | apk upgrade       | apk list --upgrades | apk list --installed |
-
-The table also lists:
-
-  - commands that can be replaced
-  - Supported package management tools
-  - Syntax for inter-command conversion
-
-If you find errors or want to add other package management tools, please [issue](https://github.com/sigoden/upt/issues/new).
-
 ## License
 
 
-Copyright (c) 2019 sigoden
+Copyright (c) 2023 sigoden
 
 Licensed under the MIT license.
