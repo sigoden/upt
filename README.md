@@ -1,9 +1,7 @@
 # Upt — **U**niversal **P**ackage-management **T**ool.
 
-[![Build status](https://github.com/sigoden/upt/workflows/CI/badge.svg)](https://github.com/sigoden/upt/actions)
+[![Build status](https://github.com/sigoden/aichat/actions/workflows/ci.yaml/badge.svg)](https://github.com/sigoden/upt/actions)
 [![Crates.io](https://img.shields.io/crates/v/upt.svg)](https://crates.io/crates/upt)
-
-English | [简体中文](./README-zh_CN.md)
 
 ## Features
 
@@ -166,19 +164,16 @@ If you rename `upt` to `brew`, `upt` will use the `brew` syntax to resolve the t
 
 The following table is the input and output mapping:
 
-```
-| task                         | upt              | apt                   | brew                | choco                | yum                | dnf                  | pacman          | apk                  |
-| :--------------------------- | :--------------- | :-------------------- | :------------------ | :------------------- | :----------------- | :------------------- | :-------------- | :------------------- |
-| Install packages             | upt install $pkg | apt install $pkg      | brew install $pkg   | choco install $pkg   | yum install $pkg   | dnf install $pkg     | pacman -S $pkg  | apk add $pkg         |
-| Remove packages              | upt remove $pkg  | apt remove $pkg       | brew uninstall $pkg | choco uninstall $pkg | yum remove $pkg    | dnf remove $pkg      | pacman -Rs $pkg | apk del $pkg         |
-| Upgrade packages             | upt upgrade $pkg | apt install $pkg      | brew upgrade $pkg   | choco upgrade $pkg   | yum update $pkg    | dnf upgrade $pkg     | pacman -S $pkg  | apk upgrade $pkg     |
-| Search for package           | upt search $pkg  | apt search $pkg       | brew search $pkg    | choco search $pkg    | yum search $pkg    | dnf search $pkg      | pacman -Ss $pkg | apk search $pkg      |
-| Show package details         | upt show $pkg    | apt show $pkg         | brew info $pkg      | choco info $pkg      | yum info $pkg      | dnf info $pkg        | pacman -Si $pkg | apk info $pkg        |
-| Update indexes of packages   | upt update       | apt update            | brew update         | choco upgrade --noop | yum check-update   | dnf check-update     | pacman -Syy     | apk update           |
-| Upgrade all packages         | upt upgrade      | apt upgrade           | brew upgrade        | choco upgrade all    | yum update         | dnf upgrade          | pacman -Syu     | apk upgrade          |
-| List all upgradable packages | upt list -u      | apt list --upgradable | brew outdated       | choco outdated       | yum list updates   | dnf list --upgrades  | pacman -Qu      | apk list --upgrades  |
-| List all installed packages  | upt list -i      | apt list --installed  | brew list           | choco list -lai      | yum list installed | dnf list --installed | pacman -Qe      | apk list --installed |
-```
+| Tool   | Install            | Uninstall            | Upgrade            | Search                | Info            | Update Index             | Upgrade All       | List upgradable     | List Installed       |
+| ------ | ------------------ | -------------------- | ------------------ | --------------------- | --------------- | ------------------------ | ----------------- | ------------------- | -------------------- |
+| upt    | upt install $pkg   | upt remove $pkg      | upt upgrade $pkg   | upt search $pattern   | upt show $pkg   | upt update               | upt upgrade       | upt list -u         | upt list -i          |
+| apt    | apt install $pkg   | apt remove $pkg      | apt install $pkg   | apt search $pattern   | apt show $pkg   | apt update               | apt upgrade       | apt list --upgrade  | apt list --installed |
+| brew   | brew install $pkg  | brew uninstall $pkg  | brew upgrade $pkg  | brew search $pattern  | brew info $pkg  | brew update              | brew upgrade      | brew outdated       | brew list            |
+| choco  | choco install $pkg | choco uninstall $pkg | choco upgrade $pkg | choco search $pattern | choco info $pkg | choco upgrade all --noop | choco upgrade all | choco outdated      | choco list           |
+| dnf    | dnf install $pkg   | dnf remove $pkg      | dnf update $pkg    | dnf search $pattern   | dnf info $pkg   | dnf check-update         | dnf update        | dnf list --upgrades | dnf list --installed |
+| yum    | yum install $pkg   | yum remove $pkg      | yum upgrade $pkg   | yum search $pattern   | yum info $pkg   | yum check-update         | yum update        | yum list updates    | yum list installed   |
+| pacman | pacman -S $pkg     | Pacman -Rs $pkg      | pacman -S $pkg     | pacman -Ss $pattern   | pacman -Si $pkg | pacman -Syy              | pacman -Syu       | pacman -Qu          | pacman -Qe           |
+| apk    | apk add $pkg       | apk del $pkg         | apk upgrade $pkg   | apk search $pattern   | apk info $pkg   | apk update               | apk upgrade       | apk list --upgrades | apk list --installed |
 
 The table also lists:
 
