@@ -1,11 +1,15 @@
 # Upt — **U**niversal **P**ackage-management **T**ool.
 
+Upt provides a set of commands to manage packages for all OSs. 
+
+Upt is just an advanced alias, relying on the platform's package management tool to do the job.
+
 [![Build status](https://github.com/sigoden/aichat/actions/workflows/ci.yaml/badge.svg)](https://github.com/sigoden/upt/actions)
 [![Crates.io](https://img.shields.io/crates/v/upt.svg)](https://crates.io/crates/upt)
 
 ## Features
 
-### Unified Command
+### Unified Interface
 
 Each operating system (OS) has its own package management tool, which requires different commands to complete the same operation.
 This can be inconvenient when switching between or trying new OSs. 
@@ -23,20 +27,19 @@ dnf list --upgrades       # Fedora
 However, `upt` offers a solution by providing a unified command for package management operations across various platforms and distributions. 
 
 ```sh
-upt install vim # Works on any OSs that upt supports
+upt install vim # Works on any OS
 ```
 
-**Upt is just dynamic alias, relying on the platform's package management tool to do the job**
-
-### Act as an command
+### Act as other command
 
 Upt can act as other commands and use their syntax.
 
 ```sh
 cp upt brew
-brew install vim # use brew syntax to install a package
+brew install vim # use brew syntax
+
 cp upt pacman
-pacman -S vim    # use pacman syntax to install a package
+pacman -S vim    # use pacman syntax
 ```
 
 ### Supported Tools
@@ -63,7 +66,7 @@ pacman -S vim    # use pacman syntax to install a package
 +--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
 ```
 
-### Supported OS
+### Supported OSs
 
 ```
 +-------------------------------------------+----------------------+
