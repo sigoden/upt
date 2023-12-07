@@ -76,7 +76,7 @@ impl Vendor {
                 "fedora" => dnf::init(),
                 "alpine" => apk::init(),
                 "debian" | "ubuntu" | "pop-os" | "deepin" | "elementary OS" | "kali"
-                | "linuxmint" => apt::init(),
+                | "linuxmint" | "aosc" => apt::init(),
                 _ => {
                     return Err(UptError::NotSupportOS);
                 }
