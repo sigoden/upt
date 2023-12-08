@@ -39,12 +39,12 @@ pub fn find_tool(tools: &[&str]) -> Option<String> {
 
 #[cfg(target_os = "windows")]
 pub fn detect_os() -> Option<String> {
-    return Some("windows".to_string());
+    Some("windows".to_string())
 }
 
 #[cfg(target_os = "macos")]
 pub fn detect_os() -> Option<String> {
-    return Some("macos".to_string());
+    Some("macos".to_string())
 }
 
 #[cfg(not(any(target_os = "windows", target_os = "macos")))]
