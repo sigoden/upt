@@ -2,17 +2,18 @@ macro_rules! vendors {
     (
         $(
             $key:ident: {
-                name: $name:expr,
-                yes: [$($yes:expr),*],
-                install: $install:expr,
-                remove: $remove:expr,
-                upgrade: $upgrade:expr,
-                search: $search:expr,
-                show: $show:expr,
-                update_index: $update_index:expr,
-                upgrade_all: $upgrade_all:expr,
-                list_upgradable: $list_upgradable:expr,
-                list_installed: $list_installed:expr,
+                name: $name:literal,
+                help_options: $help_options:literal,
+                confirm_options: $confirm_options:literal,
+                install: $install:literal,
+                remove: $remove:literal,
+                upgrade: $upgrade:literal,
+                search: $search:literal,
+                info: $show:literal,
+                update_index: $update_index:literal,
+                upgrade_all: $upgrade_all:literal,
+                list_upgradable: $list_upgradable:literal,
+                list_installed: $list_installed:literal,
             },
         )+
     ) => {
@@ -23,12 +24,13 @@ macro_rules! vendors {
                     $name => {
                         let vendor = $crate::Vendor {
                             name: $name.to_string(),
-                            yes: vec![ $($yes.to_string()),* ],
+                            help_options: $help_options.to_string(),
+                            confirm_options: $confirm_options.to_string(),
                             install: must_from_str($install, $name, "install"),
                             remove: must_from_str($remove, $name, "remove"),
                             upgrade: must_from_str($upgrade, $name, "upgrade"),
                             search: must_from_str($search, $name, "search"),
-                            show: must_from_str($show, $name, "show"),
+                            info: must_from_str($show, $name, "show"),
                             update_index: must_from_str($update_index, $name, "update_index"),
                             upgrade_all: must_from_str($upgrade_all, $name, "upgrade_all"),
                             list_upgradable: must_from_str($list_upgradable, $name, "list_upgradable"),
@@ -43,13 +45,13 @@ macro_rules! vendors {
     };
 }
 
-macro_rules! detect_tool {
-    ($( $os:literal => ($($vendor:literal),+ $(,)?), )+) => {
+macro_rules! tools {
+    ($($os:literal => $($tool:literal),+);+$(;)?) => {
         pub fn detect_tool() -> std::result::Result<$crate::Vendor, $crate::UptError> {
             let os = crate::utils::detect_os().ok_or(UptError::NotSupportOS)?;
             let tools: Vec<&str> = match os.as_str() {
                 $(
-                    $os => vec![$($vendor),+],
+                    $os => vec![$($tool),+],
                 )+
                 _ => return Err(UptError::NotSupportOS),
             };

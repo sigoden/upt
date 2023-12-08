@@ -15,10 +15,15 @@ fn main() {
 
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let env_args = env::args().collect::<Vec<String>>();
-    let (bin, remainer) = env_args.split_first().unwrap();
-    let bin = Path::new(bin).file_stem().unwrap().to_str().unwrap();
+    let bin = Path::new(&env_args[0])
+        .file_stem()
+        .unwrap()
+        .to_str()
+        .unwrap();
     let vendor = init_vendor(bin)?;
-    let cmd = create_cmd(&vendor, remainer)?;
+    let mut args = vec![bin.to_string()];
+    args.extend(env_args.iter().skip(1).cloned());
+    let cmd = create_cmd(&vendor, &args)?;
     run_cmd(cmd.as_str())
 }
 
