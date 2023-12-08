@@ -1,12 +1,13 @@
 use std::error::Error;
 use std::fmt;
+
 #[derive(Debug, PartialEq)]
 pub enum UptError {
     NoVendor(String),
     NotSupportOS,
     NotSupportTask,
-    NotRecognize,
-    BadOption(String),
+    NotFoundTool,
+    InvalidArgs(String),
 }
 
 impl Error for UptError {}
@@ -16,10 +17,10 @@ impl fmt::Display for UptError {
         use UptError::*;
         match self {
             NoVendor(v) => write!(f, "Vendor {} is not supported", v),
-            NotSupportOS => write!(f, "Your os is not supported currently"),
-            NotSupportTask => write!(f, "Task is not supported by your os"),
-            BadOption(v) => write!(f, "Option `{}` is invalid", v),
-            NotRecognize => write!(f, "Your input can not be Recognized"),
+            NotSupportOS => write!(f, "Your OS is not supported currently"),
+            NotSupportTask => write!(f, "The task is not supported by your os"),
+            NotFoundTool => write!(f, "No found package management tool"),
+            InvalidArgs(v) => write!(f, "Invalid arguments\n{}", v),
         }
     }
 }
