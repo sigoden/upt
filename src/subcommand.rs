@@ -1,7 +1,7 @@
 use std::cell::Cell;
 use std::str::FromStr;
 
-#[derive(Debug, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub(crate) struct SubCommand {
     name: String,
     has_pkg: bool,

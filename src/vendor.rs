@@ -1,26 +1,153 @@
-use std::fs;
-use std::process::{Command, Stdio};
-
 use crate::error::UptError;
 use crate::subcommand::SubCommand;
 use crate::task::Task;
 
-mod apk;
-mod apt;
-mod brew;
-mod choco;
-mod dnf;
-mod pacman;
-mod scoop;
-mod upt;
-mod yum;
+detect_tool!(
+  "windows" => ("scoop", "choco", "winget"),
+  "macos" => ("brew", "port"),
+  "ubuntu" => ("apt"),
+  "debian" => ("apt"),
+  "linuxmint" => ("apt"),
+  "pop" => ("apt"),
+  "deepin" => ("apt"),
+  "apt" => ("apt"),
+  "elementary OS" => ("apt"),
+  "kali" => ("apt"),
+  "aosc" => ("apt"),
+  "fedora" => ("dnf"),
+  "redhat" => ("dnf"),
+  "rhel" => ("dnf"),
+  "centos" => ("yum"),
+  "rocky" => ("yum"),
+);
+
+vendors!(
+    apk: {
+        name: "apk",
+        yes: [],
+        install: "add $",
+        remove: "del $",
+        upgrade: "upgrade $",
+        search: "search $",
+        show: "show $",
+        update_index: "update",
+        upgrade_all: "upgrade",
+        list_upgradable: "list -u|--upgradable",
+        list_installed: "list -I|--installed",
+    },
+    apt: {
+        name: "apt",
+        yes: ["-y", "--yes"],
+        install: "install $",
+        remove: "remove $",
+        upgrade: "install $",
+        search: "search $",
+        show: "show $",
+        update_index: "update",
+        upgrade_all: "upgrade",
+        list_upgradable: "list -u|--upgradable",
+        list_installed: "list -i|--installed",
+    },
+    brew: {
+        name: "brew",
+        yes: [],
+        install: "install $",
+        remove: "uninstall $",
+        upgrade: "upgrade $",
+        search: "search $",
+        show: "info $",
+        update_index: "update",
+        upgrade_all: "upgrade",
+        list_upgradable: "outdated",
+        list_installed: "list",
+    },
+    choco: {
+        name: "choco",
+        yes: ["-y"],
+        install: "install $",
+        remove: "uninstall $",
+        upgrade: "upgrade $",
+        search: "search $",
+        show: "info $",
+        update_index: "upgrade all --noop",
+        upgrade_all: "upgrade all",
+        list_upgradable: "outdated",
+        list_installed: "list -l|--local-only",
+    },
+    dnf: {
+        name: "dnf",
+        yes: ["-y", "--assumeyes"],
+        install: "install $",
+        remove: "remove $",
+        upgrade: "upgrade $",
+        search: "search $",
+        show: "info $",
+        update_index: "check-update",
+        upgrade_all: "update",
+        list_upgradable: "list --upgrades",
+        list_installed: "list --installed",
+    },
+    pacman: {
+        name: "pacman",
+        yes: ["--noconfirm"],
+        install: "-S $",
+        remove: "-R -s $",
+        upgrade: "-S $",
+        search: "-S -s $",
+        show: "-S -i $",
+        update_index: "-S -y -y",
+        upgrade_all: "-S -y -u",
+        list_upgradable: "-Q -u",
+        list_installed: "-Q -e",
+    },
+    scoop: {
+        name: "scoop",
+        yes: [],
+        install: "install $",
+        remove: "uninstall $",
+        upgrade: "update $",
+        search: "search $",
+        show: "info $",
+        update_index: "update",
+        upgrade_all: "update *",
+        list_upgradable: "list",
+        list_installed: "list",
+    },
+    upt: {
+        name: "upt",
+        yes: ["-y", "--yes"],
+        install: "install $",
+        remove: "remove $",
+        upgrade: "upgrade $",
+        search: "search $",
+        show: "show $",
+        update_index: "update",
+        upgrade_all: "upgrade",
+        list_upgradable: "list -u|--upgradable",
+        list_installed: "list -i|--installed",
+    },
+    yum: {
+        name: "yum",
+        yes: ["-y", "--assumeyes"],
+        install: "install $",
+        remove: "remove $",
+        upgrade: "update $",
+        search: "search $",
+        show: "info $",
+        update_index: "check-update",
+        upgrade_all: "update",
+        list_upgradable: "list updates",
+        list_installed: "list installed",
+    },
+);
 
 #[cfg(windows)]
 const LINE_ENDING: &str = "\r\n";
 #[cfg(not(windows))]
 const LINE_ENDING: &str = "\n";
+
 /// Repersent a kind of package management tool. e.g. apt, pacman, yum...
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Vendor {
     pub(crate) name: String,
     pub(crate) yes: Vec<String>,
@@ -35,56 +162,7 @@ pub struct Vendor {
     pub(crate) list_installed: SubCommand,
 }
 
-/// A kind of package management tool. e.g. apt, pacman, yum...
 impl Vendor {
-    /// Lookup vender by name
-    pub fn lookup(name: &str) -> Result<Vendor, UptError> {
-        let vendor = match name {
-            "apk" => apk::init(),
-            "apt" => apt::init(),
-            "brew" => brew::init(),
-            "choco" => choco::init(),
-            "scoop" => scoop::init(),
-            "dnf" => dnf::init(),
-            "pacman" => pacman::init(),
-            "upt" => upt::init(),
-            "yum" => yum::init(),
-            _ => return Err(UptError::NoVendor(name.to_string())),
-        };
-        Ok(vendor)
-    }
-    /// Detect package management on os
-    pub fn detect() -> Result<Vendor, UptError> {
-        if cfg!(target_os = "windows") {
-            if which("scoop") {
-                return Ok(scoop::init());
-            }
-            return Ok(choco::init());
-        } else if cfg!(target_os = "macos") {
-            return Ok(brew::init());
-        } else if cfg!(target_os = "linux") {
-            let release =
-                fs::read_to_string("/etc/os-release").map_err(|_| UptError::NotSupportOS)?;
-            let id = release
-                .lines()
-                .find(|l| l.starts_with("ID="))
-                .ok_or(UptError::NotSupportOS)?;
-            let id = id[3..].trim_matches('"');
-            let vendor = match id {
-                "arch" | "manjaro" => pacman::init(),
-                "centos" | "redhat" | "rhel" => yum::init(),
-                "fedora" => dnf::init(),
-                "alpine" => apk::init(),
-                "debian" | "ubuntu" | "pop-os" | "deepin" | "elementary OS" | "kali"
-                | "linuxmint" | "aosc" => apt::init(),
-                _ => {
-                    return Err(UptError::NotSupportOS);
-                }
-            };
-            return Ok(vendor);
-        }
-        Err(UptError::NotSupportOS)
-    }
     /// Parse command line, figure out the task to perform
     pub fn parse(&self, args: &[String]) -> Result<Task, UptError> {
         self.check_args(args)?;
@@ -115,8 +193,9 @@ impl Vendor {
         if self.list_installed.parse(args, &[]).is_some() {
             return Ok(Task::ListInstalled);
         }
-        Err(UptError::NotRecognize)
+        Err(UptError::InvalidArgs(self.help()))
     }
+
     /// Convert the task to command line, which invokes the os's package management tool.
     pub fn eval(&self, task: &Task) -> Result<String, UptError> {
         let cmd = match task {
@@ -135,12 +214,14 @@ impl Vendor {
             Some(cmd) => Ok([self.name.clone(), cmd].join(" ")),
         }
     }
+
     fn yes_str(&self, yes: &bool) -> &str {
         if !*yes || self.yes.is_empty() {
             return "";
         }
         &self.yes[0]
     }
+
     /// Dump help message
     pub fn help(&self) -> String {
         let mut lines: Vec<String> = Vec::new();
@@ -179,28 +260,21 @@ impl Vendor {
         }
         lines.join(LINE_ENDING)
     }
+
     fn check_args(&self, args: &[String]) -> Result<(), UptError> {
         if args.is_empty() {
-            return Err(UptError::NotRecognize);
+            return Err(UptError::InvalidArgs(self.help()));
         }
         if args.len() == 1 && args[0].starts_with("--") {
-            return Err(UptError::NotRecognize);
+            return Err(UptError::InvalidArgs(self.help()));
         }
         for arg in args {
-            if arg == "-" || arg == "--" || arg.starts_with("---") {
-                return Err(UptError::BadOption(arg.to_string()));
+            if arg == "-" || arg == "--" {
+                return Err(UptError::InvalidArgs(self.help()));
             }
         }
         Ok(())
     }
-}
-
-fn which(name: &str) -> bool {
-    Command::new(name)
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()
-        .is_ok()
 }
 
 #[cfg(test)]
@@ -226,7 +300,7 @@ mod tests {
     }
     #[test]
     fn test_parse() {
-        let upt = upt::init();
+        let upt = init("upt").unwrap();
         check_parse!(upt, ["install", "vim"], (Install, "vim", false));
         check_parse!(upt, ["install", "-y", "vim"], (Install, "vim", true));
         check_parse!(upt, ["install", "--yes", "vim"], (Install, "vim", true));
@@ -285,7 +359,7 @@ mod tests {
     }
     #[test]
     fn test_eval() {
-        let upt = upt::init();
+        let upt = init("upt").unwrap();
         check_eval!(upt, (Install, "vim", false), "upt install vim");
         check_eval!(upt, (Install, "vim jq", true), "upt install -y vim jq");
         check_eval!(upt, (Remove, "vim jq", false), "upt remove vim jq");
