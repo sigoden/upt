@@ -2,19 +2,19 @@
 #[derive(Debug, PartialEq)]
 pub enum Task {
     /// install packages
-    Install { pkg: String, yes: bool },
+    Install { pkg: String, confirm: bool },
     /// remove packages
-    Remove { pkg: String, yes: bool },
+    Remove { pkg: String, confirm: bool },
     /// upgrade packages
-    Upgrade { pkg: String, yes: bool },
+    Upgrade { pkg: String, confirm: bool },
     /// search for a package
     Search { pkg: String },
-    /// show details about a package
-    Show { pkg: String },
+    /// show a package info
+    Info { pkg: String },
     /// sync packages index
     UpdateIndex,
     /// upgrade all outdated packages
-    UpgradeAll { yes: bool },
+    UpgradeAll { confirm: bool },
     /// list all upgradable packages
     ListUpgradable,
     /// list all installed packages

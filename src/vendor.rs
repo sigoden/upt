@@ -2,160 +2,165 @@ use crate::error::UptError;
 use crate::subcommand::SubCommand;
 use crate::task::Task;
 
-detect_tool!(
-  "windows" => ("scoop", "choco", "winget"),
-  "macos" => ("brew", "port"),
-  "ubuntu" => ("apt"),
-  "debian" => ("apt"),
-  "linuxmint" => ("apt"),
-  "pop" => ("apt"),
-  "deepin" => ("apt"),
-  "apt" => ("apt"),
-  "elementary OS" => ("apt"),
-  "kali" => ("apt"),
-  "aosc" => ("apt"),
-  "fedora" => ("dnf"),
-  "redhat" => ("dnf"),
-  "rhel" => ("dnf"),
-  "centos" => ("yum"),
-  "rocky" => ("yum"),
+tools!(
+  "windows" => "scoop", "choco", "winget";
+  "macos" => "brew", "port";
+  "ubuntu" => "apt";
+  "debian" => "apt";
+  "linuxmint" => "apt";
+  "pop" => "apt";
+  "deepin" => "apt";
+  "apt" => "apt";
+  "elementary OS" => "apt";
+  "kali" => "apt";
+  "aosc" => "apt";
+  "fedora" => "dnf";
+  "redhat" => "dnf";
+  "rhel" => "dnf";
+  "centos" => "yum";
+  "rocky" => "yum";
 );
 
 vendors!(
     apk: {
         name: "apk",
-        yes: [],
-        install: "add $",
-        remove: "del $",
-        upgrade: "upgrade $",
-        search: "search $",
-        show: "show $",
-        update_index: "update",
-        upgrade_all: "upgrade",
-        list_upgradable: "list -u|--upgradable",
-        list_installed: "list -I|--installed",
+        help_options: "-h/--help",
+        confirm_options: "",
+        install: "apk add $",
+        remove: "apk del $",
+        upgrade: "apk upgrade $",
+        search: "apk search $",
+        info: "apk show $",
+        update_index: "apk update",
+        upgrade_all: "apk upgrade",
+        list_upgradable: "apk list -u/--upgradable",
+        list_installed: "apk list -I/--installed",
     },
     apt: {
         name: "apt",
-        yes: ["-y", "--yes"],
-        install: "install $",
-        remove: "remove $",
-        upgrade: "install $",
-        search: "search $",
-        show: "show $",
-        update_index: "update",
-        upgrade_all: "upgrade",
-        list_upgradable: "list -u|--upgradable",
-        list_installed: "list -i|--installed",
+        help_options: "-h/--help",
+        confirm_options: "-y/--yes",
+        install: "apt install $",
+        remove: "apt remove $",
+        upgrade: "apt install $",
+        search: "apt search $",
+        info: "apt show $",
+        update_index: "apt update",
+        upgrade_all: "apt upgrade",
+        list_upgradable: "apt list -u/--upgradable",
+        list_installed: "apt list -i/--installed",
     },
     brew: {
         name: "brew",
-        yes: [],
-        install: "install $",
-        remove: "uninstall $",
-        upgrade: "upgrade $",
-        search: "search $",
-        show: "info $",
-        update_index: "update",
-        upgrade_all: "upgrade",
-        list_upgradable: "outdated",
-        list_installed: "list",
+        help_options: "-h/--help",
+        confirm_options: "",
+        install: "brew install $",
+        remove: "brew uninstall $",
+        upgrade: "brew upgrade $",
+        search: "brew search $",
+        info: "brew info $",
+        update_index: "brew update",
+        upgrade_all: "brew upgrade",
+        list_upgradable: "brew outdated",
+        list_installed: "brew list",
     },
     choco: {
         name: "choco",
-        yes: ["-y"],
-        install: "install $",
-        remove: "uninstall $",
-        upgrade: "upgrade $",
-        search: "search $",
-        show: "info $",
-        update_index: "upgrade all --noop",
-        upgrade_all: "upgrade all",
-        list_upgradable: "outdated",
-        list_installed: "list -l|--local-only",
+        help_options: "-h/--help",
+        confirm_options: "-y",
+        install: "choco install $",
+        remove: "choco uninstall $",
+        upgrade: "choco upgrade $",
+        search: "choco search $",
+        info: "choco info $",
+        update_index: "choco upgrade all --noop",
+        upgrade_all: "choco upgrade all",
+        list_upgradable: "choco outdated",
+        list_installed: "choco list -l/--local-only",
     },
     dnf: {
         name: "dnf",
-        yes: ["-y", "--assumeyes"],
-        install: "install $",
-        remove: "remove $",
-        upgrade: "upgrade $",
-        search: "search $",
-        show: "info $",
-        update_index: "check-update",
-        upgrade_all: "update",
-        list_upgradable: "list --upgrades",
-        list_installed: "list --installed",
+        help_options: "-h/--help",
+        confirm_options: "-y/--assumeyes",
+        install: "dnf install $",
+        remove: "dnf remove $",
+        upgrade: "dnf upgrade $",
+        search: "dnf search $",
+        info: "dnf info $",
+        update_index: "dnf check-update",
+        upgrade_all: "dnf update",
+        list_upgradable: "dnf list --upgrades",
+        list_installed: "dnf list --installed",
     },
     pacman: {
         name: "pacman",
-        yes: ["--noconfirm"],
-        install: "-S $",
-        remove: "-R -s $",
-        upgrade: "-S $",
-        search: "-S -s $",
-        show: "-S -i $",
-        update_index: "-S -y -y",
-        upgrade_all: "-S -y -u",
-        list_upgradable: "-Q -u",
-        list_installed: "-Q -e",
+        help_options: "-h/--help",
+        confirm_options: "--noconfirm",
+        install: "pacman -S $",
+        remove: "pacman -R -s $",
+        upgrade: "pacman -S $",
+        search: "pacman -S -s $",
+        info: "pacman -S -i $",
+        update_index: "pacman -S -y -y",
+        upgrade_all: "pacman -S -y -u",
+        list_upgradable: "pacman -Q -u",
+        list_installed: "pacman -Q -e",
     },
     scoop: {
         name: "scoop",
-        yes: [],
-        install: "install $",
-        remove: "uninstall $",
-        upgrade: "update $",
-        search: "search $",
-        show: "info $",
-        update_index: "update",
-        upgrade_all: "update *",
-        list_upgradable: "list",
-        list_installed: "list",
+        help_options: "-h/--help",
+        confirm_options: "",
+        install: "scoop install $",
+        remove: "scoop uninstall $",
+        upgrade: "scoop update $",
+        search: "scoop search $",
+        info: "scoop info $",
+        update_index: "scoop update",
+        upgrade_all: "scoop update *",
+        list_upgradable: "scoop status",
+        list_installed: "scoop list",
     },
     upt: {
         name: "upt",
-        yes: ["-y", "--yes"],
-        install: "install $",
-        remove: "remove $",
-        upgrade: "upgrade $",
-        search: "search $",
-        show: "show $",
-        update_index: "update",
-        upgrade_all: "upgrade",
-        list_upgradable: "list -u|--upgradable",
-        list_installed: "list -i|--installed",
+        help_options: "-h/--help",
+        confirm_options: "-y/--yes",
+        install: "upt install $",
+        remove: "upt remove $",
+        upgrade: "upt upgrade $",
+        search: "upt search $",
+        info: "upt info $",
+        update_index: "upt update",
+        upgrade_all: "upt upgrade",
+        list_upgradable: "upt list -u/--upgradable",
+        list_installed: "upt list -i/--installed",
     },
     yum: {
         name: "yum",
-        yes: ["-y", "--assumeyes"],
-        install: "install $",
-        remove: "remove $",
-        upgrade: "update $",
-        search: "search $",
-        show: "info $",
-        update_index: "check-update",
-        upgrade_all: "update",
-        list_upgradable: "list updates",
-        list_installed: "list installed",
+        help_options: "-h/--help",
+        confirm_options: "-y/--assumeyes",
+        install: "yum install $",
+        remove: "yum remove $",
+        upgrade: "yum update $",
+        search: "yum search $",
+        info: "yum info $",
+        update_index: "yum check-update",
+        upgrade_all: "yum update",
+        list_upgradable: "yum list --upgrades",
+        list_installed: "yum list --installed",
     },
 );
-
-#[cfg(windows)]
-const LINE_ENDING: &str = "\r\n";
-#[cfg(not(windows))]
-const LINE_ENDING: &str = "\n";
 
 /// Repersent a kind of package management tool. e.g. apt, pacman, yum...
 #[derive(Debug, Clone, PartialEq)]
 pub struct Vendor {
     pub(crate) name: String,
-    pub(crate) yes: Vec<String>,
+    pub(crate) help_options: String,
+    pub(crate) confirm_options: String,
     pub(crate) install: SubCommand,
     pub(crate) remove: SubCommand,
     pub(crate) upgrade: SubCommand,
     pub(crate) search: SubCommand,
-    pub(crate) show: SubCommand,
+    pub(crate) info: SubCommand,
     pub(crate) update_index: SubCommand,
     pub(crate) upgrade_all: SubCommand,
     pub(crate) list_upgradable: SubCommand,
@@ -165,32 +170,34 @@ pub struct Vendor {
 impl Vendor {
     /// Parse command line, figure out the task to perform
     pub fn parse(&self, args: &[String]) -> Result<Task, UptError> {
-        self.check_args(args)?;
-        if let Some((Some(pkg), yes)) = self.install.parse(args, &self.yes) {
-            return Ok(Task::Install { pkg, yes });
+        if self.is_help(args) {
+            return Err(UptError::DisplyHelp(self.help()));
         }
-        if let Some((Some(pkg), yes)) = self.remove.parse(args, &self.yes) {
-            return Ok(Task::Remove { pkg, yes });
+        if let Some((Some(pkg), yes)) = self.install.parse(args, &self.confirm_options) {
+            return Ok(Task::Install { pkg, confirm: yes });
         }
-        if let Some((Some(pkg), yes)) = self.upgrade.parse(args, &self.yes) {
-            return Ok(Task::Upgrade { pkg, yes });
+        if let Some((Some(pkg), yes)) = self.remove.parse(args, &self.confirm_options) {
+            return Ok(Task::Remove { pkg, confirm: yes });
         }
-        if let Some((Some(pkg), _)) = self.search.parse(args, &[]) {
+        if let Some((Some(pkg), yes)) = self.upgrade.parse(args, &self.confirm_options) {
+            return Ok(Task::Upgrade { pkg, confirm: yes });
+        }
+        if let Some((Some(pkg), _)) = self.search.parse(args, "") {
             return Ok(Task::Search { pkg });
         }
-        if let Some((Some(pkg), _)) = self.show.parse(args, &[]) {
-            return Ok(Task::Show { pkg });
+        if let Some((Some(pkg), _)) = self.info.parse(args, "") {
+            return Ok(Task::Info { pkg });
         }
-        if self.update_index.parse(args, &[]).is_some() {
+        if self.update_index.parse(args, "").is_some() {
             return Ok(Task::UpdateIndex);
         }
-        if let Some((_, yes)) = self.upgrade_all.parse(args, &self.yes) {
-            return Ok(Task::UpgradeAll { yes });
+        if let Some((_, yes)) = self.upgrade_all.parse(args, &self.confirm_options) {
+            return Ok(Task::UpgradeAll { confirm: yes });
         }
-        if self.list_upgradable.parse(args, &[]).is_some() {
+        if self.list_upgradable.parse(args, "").is_some() {
             return Ok(Task::ListUpgradable);
         }
-        if self.list_installed.parse(args, &[]).is_some() {
+        if self.list_installed.parse(args, "").is_some() {
             return Ok(Task::ListInstalled);
         }
         Err(UptError::InvalidArgs(self.help()))
@@ -199,40 +206,47 @@ impl Vendor {
     /// Convert the task to command line, which invokes the os's package management tool.
     pub fn eval(&self, task: &Task) -> Result<String, UptError> {
         let cmd = match task {
-            Task::Install { pkg, yes } => self.install.to_cmd(pkg, self.yes_str(yes)),
-            Task::Remove { pkg, yes } => self.remove.to_cmd(pkg, self.yes_str(yes)),
-            Task::Upgrade { pkg, yes } => self.upgrade.to_cmd(pkg, self.yes_str(yes)),
+            Task::Install { pkg, confirm: yes } => self.install.to_cmd(pkg, self.yes_str(yes)),
+            Task::Remove { pkg, confirm: yes } => self.remove.to_cmd(pkg, self.yes_str(yes)),
+            Task::Upgrade { pkg, confirm: yes } => self.upgrade.to_cmd(pkg, self.yes_str(yes)),
             Task::Search { pkg } => self.search.to_cmd(pkg, ""),
-            Task::Show { pkg } => self.show.to_cmd(pkg, ""),
+            Task::Info { pkg } => self.info.to_cmd(pkg, ""),
             Task::UpdateIndex => self.update_index.to_cmd("", ""),
-            Task::UpgradeAll { yes } => self.upgrade_all.to_cmd("", self.yes_str(yes)),
+            Task::UpgradeAll { confirm: yes } => self.upgrade_all.to_cmd("", self.yes_str(yes)),
             Task::ListInstalled => self.list_installed.to_cmd("", ""),
             Task::ListUpgradable => self.list_upgradable.to_cmd("", ""),
         };
-        match cmd {
-            None => Err(UptError::NotSupportTask),
-            Some(cmd) => Ok([self.name.clone(), cmd].join(" ")),
-        }
+        cmd.ok_or(UptError::NotSupportTask)
     }
 
     fn yes_str(&self, yes: &bool) -> &str {
-        if !*yes || self.yes.is_empty() {
+        if !*yes || self.confirm_options.is_empty() {
             return "";
         }
-        &self.yes[0]
+        match self.confirm_options.split_once('/') {
+            Some((v, _)) => v,
+            None => "",
+        }
+    }
+
+    fn is_help(&self, args: &[String]) -> bool {
+        args.len() < 2
+            || args
+                .iter()
+                .skip(1)
+                .any(|arg| self.help_options.split('/').any(|option| option == arg))
     }
 
     /// Dump help message
-    pub fn help(&self) -> String {
+    fn help(&self) -> String {
         let mut lines: Vec<String> = Vec::new();
-        lines.push(String::new());
         lines.push(String::from("Usage: "));
         let helps = vec![
             (self.install.help(), "Install packages"),
             (self.remove.help(), "Remove packages"),
             (self.upgrade.help(), "Upgrade packages"),
             (self.search.help(), "Search for packages"),
-            (self.show.help(), "Show package details"),
+            (self.info.help(), "Show package details"),
             (self.update_index.help(), "Update package indexes"),
             (self.upgrade_all.help(), "Upgrade all packages"),
             (self.list_upgradable.help(), "List all upgradable packages"),
@@ -245,35 +259,13 @@ impl Vendor {
             .collect();
         let width = helps.iter().map(|(v, _)| v.len()).max().unwrap() + 6;
         for (cmd, description) in &helps {
-            lines.push(format!(
-                "  {} {:<width$} {}",
-                self.name,
-                cmd,
-                description,
-                width = width
-            ));
+            lines.push(format!("  {:<width$} {}", cmd, description, width = width));
         }
-        if !self.yes.is_empty() {
+        if !self.confirm_options.is_empty() {
             lines.push(String::new());
-            lines.push(format!("Automatically answer yes: {}", self.yes.join(",")));
-            lines.push(String::new());
+            lines.push(format!("Automatically confirm: {}", self.confirm_options));
         }
-        lines.join(LINE_ENDING)
-    }
-
-    fn check_args(&self, args: &[String]) -> Result<(), UptError> {
-        if args.is_empty() {
-            return Err(UptError::InvalidArgs(self.help()));
-        }
-        if args.len() == 1 && args[0].starts_with("--") {
-            return Err(UptError::InvalidArgs(self.help()));
-        }
-        for arg in args {
-            if arg == "-" || arg == "--" {
-                return Err(UptError::InvalidArgs(self.help()));
-            }
-        }
-        Ok(())
+        lines.join("\n")
     }
 }
 
@@ -282,14 +274,14 @@ mod tests {
     use super::*;
 
     macro_rules! check_parse {
-        ($vendor:expr, [$($arg:expr),*], ($task:tt, $pkg:expr, $yes:expr)) => {
-            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task { pkg: $pkg.to_string(),yes: $yes })
+        ($vendor:expr, [$($arg:expr),*], ($task:tt, $pkg:expr, $confirm:expr)) => {
+            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task { pkg: $pkg.to_string(), confirm: $confirm })
         };
         ($vendor:expr, [$($arg:expr),*], ($task:tt, pkg=$pkg:expr)) => {
             assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task { pkg: $pkg.to_string() })
         };
-        ($vendor:expr, [$($arg:expr),*], ($task:tt, yes=$yes:expr)) => {
-            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task { yes: $yes })
+        ($vendor:expr, [$($arg:expr),*], ($task:tt, confirm=$confirm:expr)) => {
+            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task { confirm: $confirm })
         };
         ($vendor:expr, [$($arg:expr),*], $task:tt) => {
             assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task)
@@ -301,34 +293,42 @@ mod tests {
     #[test]
     fn test_parse() {
         let upt = init("upt").unwrap();
-        check_parse!(upt, ["install", "vim"], (Install, "vim", false));
-        check_parse!(upt, ["install", "-y", "vim"], (Install, "vim", true));
-        check_parse!(upt, ["install", "--yes", "vim"], (Install, "vim", true));
+        check_parse!(upt, ["upt", "install", "vim"], (Install, "vim", false));
+        check_parse!(upt, ["upt", "install", "-y", "vim"], (Install, "vim", true));
         check_parse!(
             upt,
-            ["remove", "--yes", "vim", "jq"],
+            ["upt", "install", "--yes", "vim"],
+            (Install, "vim", true)
+        );
+        check_parse!(
+            upt,
+            ["upt", "remove", "--yes", "vim", "jq"],
             (Remove, "vim jq", true)
         );
-        check_parse!(upt, ["upgrade", "vim"], (Upgrade, "vim", false));
-        check_parse!(upt, ["search", "vim"], (Search, pkg = "vim"));
-        check_parse!(upt, ["search", "vim", "jq"], (Search, pkg = "vim jq"));
-        check_parse!(upt, ["show", "vim"], (Show, pkg = "vim"));
-        check_parse!(upt, ["update"], UpdateIndex);
-        check_parse!(upt, ["upgrade"], (UpgradeAll, yes = false));
-        check_parse!(upt, ["list", "--upgradable"], ListUpgradable);
-        check_parse!(upt, ["list", "-i"], ListInstalled);
-        check_parse!(upt, ["install"]);
-        check_parse!(upt, ["install", "--ye"]);
-        check_parse!(upt, ["update", "--yes"]);
-        check_parse!(upt, ["list"]);
+        check_parse!(upt, ["upt", "upgrade", "vim"], (Upgrade, "vim", false));
+        check_parse!(upt, ["upt", "search", "vim"], (Search, pkg = "vim"));
+        check_parse!(
+            upt,
+            ["upt", "search", "vim", "jq"],
+            (Search, pkg = "vim jq")
+        );
+        check_parse!(upt, ["upt", "info", "vim"], (Info, pkg = "vim"));
+        check_parse!(upt, ["upt", "update"], UpdateIndex);
+        check_parse!(upt, ["upt", "upgrade"], (UpgradeAll, confirm = false));
+        check_parse!(upt, ["upt", "list", "--upgradable"], ListUpgradable);
+        check_parse!(upt, ["upt", "list", "-i"], ListInstalled);
+        check_parse!(upt, ["upt", "install"]);
+        check_parse!(upt, ["upt", "install", "--ye"]);
+        check_parse!(upt, ["upt", "update", "--yes"]);
+        check_parse!(upt, ["upt", "list"]);
     }
     macro_rules! check_eval {
-        ($vendor:expr, ($task:tt, $pkg:expr, $yes:expr), $cmd:expr) => {
+        ($vendor:expr, ($task:tt, $pkg:expr, $confirm:expr), $cmd:expr) => {
             assert_eq!(
                 $vendor
                     .eval(&Task::$task {
                         pkg: $pkg.to_string(),
-                        yes: $yes
+                        confirm: $confirm
                     })
                     .unwrap(),
                 $cmd.to_string()
@@ -344,9 +344,9 @@ mod tests {
                 $cmd.to_string()
             )
         };
-        ($vendor:expr, ($task:tt, yes=$yes:expr), $cmd:expr) => {
+        ($vendor:expr, ($task:tt, confirm=$confirm:expr), $cmd:expr) => {
             assert_eq!(
-                $vendor.eval(&Task::$task { yes: $yes }).unwrap(),
+                $vendor.eval(&Task::$task { confirm: $confirm }).unwrap(),
                 $cmd.to_string()
             )
         };
@@ -365,9 +365,9 @@ mod tests {
         check_eval!(upt, (Remove, "vim jq", false), "upt remove vim jq");
         check_eval!(upt, (Upgrade, "vim", true), "upt upgrade -y vim");
         check_eval!(upt, (Search, pkg = "vim"), "upt search vim");
-        check_eval!(upt, (Show, pkg = "vim"), "upt show vim");
+        check_eval!(upt, (Info, pkg = "vim"), "upt info vim");
         check_eval!(upt, UpdateIndex, "upt update");
-        check_eval!(upt, (UpgradeAll, yes = false), "upt upgrade");
+        check_eval!(upt, (UpgradeAll, confirm = false), "upt upgrade");
         check_eval!(upt, ListInstalled, "upt list -i");
         check_eval!(upt, ListUpgradable, "upt list -u");
     }
