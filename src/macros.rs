@@ -63,7 +63,7 @@ macro_rules! tools {
                 $(
                     $os => vec![$($tool),+].into_iter().filter_map(|v| which_cmd(v)).collect(),
                 )+
-                _ => return Err(UptError::NotSupportOS),
+                _ => vec!["apt", "dnf", "pacman"],
             };
             match $crate::utils::find_tool(&tools) {
                 Some(tool) => $crate::vendor::init(&tool),

@@ -21,7 +21,10 @@ impl fmt::Display for UptError {
             NoVendor(v) => write!(f, "Vendor {} is not supported.", v),
             NotSupportOS => write!(f, "Your OS is not supported currently."),
             NotSupportTask => write!(f, "The task is not supported by your OS."),
-            NotFoundTool => write!(f, "No found package management tool."),
+            NotFoundTool => write!(
+                f,
+                "No found package management tool, use `$UPT_TOOL` to specify one."
+            ),
             InvalidSubcommand(v) => write!(f, "Invalid subcommand '{}'.", v),
             InvalidArgs(v) => write!(f, "Invalid arguments.\n\n{}", v),
             DisplyHelp(v) => write!(f, "{}", v),
