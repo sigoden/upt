@@ -270,7 +270,7 @@ vendors![
         info: "snap info $",
         update_index: "",
         upgrade_all: "snap refresh",
-        list_installed: "list",
+        list_installed: "snap list",
     },
     {
         name: "upt",
@@ -346,7 +346,7 @@ vendors![
     },
 ];
 
-/// Repersent a kind of package management tool. e.g. apt, pacman, yum...
+/// Represent a kind of package management tool. e.g. apt, pacman, yum...
 #[derive(Debug, Clone, PartialEq)]
 pub struct Vendor {
     pub(crate) name: String,
@@ -482,6 +482,7 @@ mod tests {
             assert!($vendor.parse(&vec![ $($arg.to_string()),* ]).is_err())
         }
     }
+
     #[test]
     fn test_parse() {
         let upt = init("upt").unwrap();
@@ -512,6 +513,7 @@ mod tests {
         check_parse!(upt, ["upt", "install", "--ye"]);
         check_parse!(upt, ["upt", "update", "--yes"]);
     }
+
     macro_rules! check_eval {
         ($vendor:expr, ($task:tt, $pkg:expr, $confirm:expr), $cmd:expr) => {
             assert_eq!(
@@ -547,6 +549,7 @@ mod tests {
             assert!($vendor.eval(&Task::$task).is_none())
         };
     }
+
     #[test]
     fn test_eval() {
         let upt = init("upt").unwrap();
@@ -559,5 +562,12 @@ mod tests {
         check_eval!(upt, UpdateIndex, "upt update");
         check_eval!(upt, (UpgradeAll, confirm = false), "upt upgrade");
         check_eval!(upt, ListInstalled, "upt list");
+    }
+
+    #[test]
+    fn test_vendors() {
+        for tool in support_tools() {
+            init(tool).unwrap();
+        }
     }
 }
