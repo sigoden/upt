@@ -1,6 +1,6 @@
 # Upt — **U**niversal **P**ackage-management **T**ool.
 
-Upt provides a unified command interface to manage packages for all OS(s). 
+Upt provides a unified command interface to manage packages for all OSs. 
 
 Upt relies on platform's package management tool to do the job, it is more like an alias.
 
