@@ -2,7 +2,7 @@ use crate::error::UptError;
 use crate::subcommand::SubCommand;
 use crate::task::Task;
 
-tools!(
+os_tools!(
   "windows" => "scoop", "choco", "winget";
   "macos" => "brew", "port";
   // apt
@@ -58,11 +58,11 @@ tools!(
   "slackware" => "slackpkg";
   // eopkg
   "solus" => "eopkg";
+  // opkg
+  "openwrt" => "opkg";
   // pkg
   "freebsd" => "pkg";
   "ghostbsd" => "pkg";
-  // opkg
-  "openwrt" => "opkg";
   // pkg(2)
   "andorid" => "pkg(2)"
 );

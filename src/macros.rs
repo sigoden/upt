@@ -55,7 +55,7 @@ macro_rules! vendors {
     }
 }
 
-macro_rules! tools {
+macro_rules! os_tools {
     ($($os:literal => $($tool:literal),+);+$(;)?) => {
         pub fn detect_tool() -> std::result::Result<$crate::Vendor, $crate::UptError> {
             let os = crate::utils::detect_os().ok_or(UptError::NotSupportOS)?;

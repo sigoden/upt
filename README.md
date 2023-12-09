@@ -1,8 +1,8 @@
 # Upt — **U**niversal **P**ackage-management **T**ool.
 
-Upt provides a set of commands to manage packages for all OSs. 
+Upt provides a unified command interface to manage packages for all OSs. 
 
-Upt is just an advanced alias, relying on the platform's package management tool to do the job.
+Upt relies on platform's package management tool to do the job, it is more like an alias.
 
 [![Build status](https://github.com/sigoden/aichat/actions/workflows/ci.yaml/badge.svg)](https://github.com/sigoden/upt/actions)
 [![Crates.io](https://img.shields.io/crates/v/upt.svg)](https://crates.io/crates/upt)
@@ -27,7 +27,7 @@ dnf list --upgrades       # Fedora
 However, `upt` offers a solution by providing a unified command for package management operations across various platforms and distributions. 
 
 ```sh
-upt install vim # Works on any OS
+upt install vim           # Works on any OS
 ```
 
 ### Act as other command
@@ -36,10 +36,10 @@ Upt can act as other commands and use their syntax.
 
 ```sh
 cp upt brew
-brew install vim        # use brew syntax
+brew install vim          # use brew syntax to install a package
 
 cp upt pacman
-pacman -S vim           # use pacman syntax
+pacman -S vim             # use pacman syntax to install a package
 ```
 
 ### Supported Tools
@@ -103,9 +103,9 @@ pacman -S vim           # use pacman syntax
 +------------------------------------------------------+----------------------+
 | solus                                                | eopkg                |
 +------------------------------------------------------+----------------------+
-| freebsd, ghostbsd                                    | pkg                  |
-+------------------------------------------------------+----------------------+
 | openwrt                                              | opkg                 |
++------------------------------------------------------+----------------------+
+| freebsd, ghostbsd                                    | pkg                  |
 +------------------------------------------------------+----------------------+
 | android                                              | pkg(2)               |
 +------------------------------------------------------+----------------------+
@@ -113,11 +113,17 @@ pacman -S vim           # use pacman syntax
 
 Some platforms may support multiple package management tools, and upt selects one of them in the order listed in the table.
 
+You can also specify the package management tool that UPT should use through `UPT_TOOL` environment tool.
+
+```sh
+UPT_TOOL=nix upt install vim       # On Ubuntu, upt will use nix-env to install vim instead of apt
+```
+
 ## Install
 
 **Use Cargo**
 
-`upt` is written in the rust you can install it using [cargo](https://doc.rust-lang.org/stable/cargo/).
+Upt is written in the rust you can install it using [cargo](https://doc.rust-lang.org/stable/cargo/).
 
 ```sh
 cargo install upt
@@ -143,7 +149,6 @@ Usage:
 
 Automatically confirm the action with: -y/--yes
 ```
-
 
 ## License
 
