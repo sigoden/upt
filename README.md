@@ -135,7 +135,7 @@ Upt is written in the rust you can install it using [cargo](https://doc.rust-lan
 cargo install upt
 ```
 
-**Download Binary**
+**Binaries for macOS, Linux, Windows, BSD**
 
 Download it from [GitHub Releases](https://github.com/sigoden/upt/releases), unzip and add `upt` to your $PATH.
 
@@ -157,7 +157,7 @@ Automatically confirm the action with: -y/--yes
 
 ## License
 
-Copyright (c) 2023 argc-developers.
+Copyright (c) 2023 upt-developers.
 
 Upt is made available under the terms of either the MIT License or the Apache License 2.0, at your option.
 
