@@ -46,7 +46,7 @@ os_tools!(
   "opensuse-leap" => "zypper";
   "opensuse-tumbleweed" => "zypper";
   // nix
-  "nixos" => "nix";
+  "nixos" => "nix-env";
   // emerge
   "gentoo" => "emerge";
   "funtoo" => "emerge";
@@ -177,7 +177,7 @@ vendors![
         list_installed: "guix package -I/--list-installed",
     },
     {
-        name: "nix",
+        name: "nix-env",
         confirm: "",
         install: "nix-env -i/--install $",
         remove: "pacman -e/--uninstall $",

@@ -56,7 +56,7 @@ pacman -S vim             # use pacman syntax to install a package
 | eopkg    | eopkg install <pkg>          | eopkg remove <pkg>           | eopkg upgrade <pkg>            | eopkg search <pkg>         | eopkg info <pkg>                | eopkg update-repo        | eopkg upgrade            | eopkg list-installed              |
 | flatpak  | flatpak install <pkg>        | flatpak uninstall <pkg>      | flatpak update <pkg>           | flatpak search <pkg>       | flatpak info <pkg>              | -                        | flatpak update           | flatpak list                      |
 | guix     | guix install <pkg>           | guix remove <pkg>            | guix upgrade <pkg>             | guix search <pkg>          | guix show <pkg>                 | guix refresh             | guix upgrade             | guix package -I/--list-installed  |
-| nix      | nix-env -i/--install <pkg>   | nix-env -e/--uninstall <pkg> | nix-env -u/--upgrade <pkg>     | nix-env -qaP <pkg>         | nix-env -qa --description <pkg> | nix-channel --update     | nix-env -u/--upgrade     | nix-env -q/--query --installed    |
+| nix-env  | nix-env -i/--install <pkg>   | nix-env -e/--uninstall <pkg> | nix-env -u/--upgrade <pkg>     | nix-env -qaP <pkg>         | nix-env -qa --description <pkg> | nix-channel --update     | nix-env -u/--upgrade     | nix-env -q/--query --installed    |
 | opkg     | opkg install <pkg>           | opkg remove <pkg>            | opkg upgrade <pkg>             | opkg find <pkg>            | opkg info <pkg>                 | opkg update              | opkg upgrade             | opkg list --installed             |
 | pacman   | pacman -S <pkg>              | pacman -Rs <pkg>             | pacman -S <pkg>                | pacman -Ss <pkg>           | pacman -Si <pkg>                | pacman -Syy              | pacman -Syu              | pacman -Qe                        |
 | pkg      | pkg install <pkg>            | pkg remove <pkg>             | pkg install <pkg>              | pkg search <pkg>           | pkg info <pkg>                  | pkg update               | pkg upgrade              | pkg info -a/--all                 |
@@ -95,7 +95,7 @@ pacman -S vim             # use pacman syntax to install a package
 +------------------------------------------------------+----------------------+
 | opensuse, opensuse-leap, opensuse-tumbleweed         | zypper               |
 +------------------------------------------------------+----------------------+
-| nixos                                                | nix                  |
+| nixos                                                | nix-env              |
 +------------------------------------------------------+----------------------+
 | gentoo, funtoo                                       | emerge               |
 +------------------------------------------------------+----------------------+
