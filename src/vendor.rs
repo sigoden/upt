@@ -5,27 +5,72 @@ use crate::task::Task;
 tools!(
   "windows" => "scoop", "choco", "winget";
   "macos" => "brew", "port";
+  // apt
   "ubuntu" => "apt";
   "debian" => "apt";
   "linuxmint" => "apt";
   "pop" => "apt";
   "deepin" => "apt";
-  "apt" => "apt";
-  "elementary OS" => "apt";
+  "elementray" => "apt";
   "kali" => "apt";
+  "raspbian" => "apt";
   "aosc" => "apt";
-  "fedora" => "dnf";
-  "redhat" => "dnf";
-  "rhel" => "dnf";
-  "centos" => "yum";
-  "rocky" => "yum";
+  "zorin" => "apt";
+  "antix" => "apt";
+  "devuan" => "apt";
+  // dnf
+  "fedora" => "dnf", "yum";
+  "redhat" => "dnf", "yum";
+  "rhel" => "dnf", "yum";
+  "amzn" => "dnf", "yum";
+  "ol" => "dnf", "yum";
+  "almalinux" => "dnf", "yum";
+  "rocky" => "dnf", "yum";
+  "oubes" => "dnf", "yum";
+  "centos" => "dnf", "yum";
+  "qubes" => "dnf", "yum";
+  "eurolinux" => "dnf", "yum";
+  // pacman
+  "arch" => "pacman";
+  "manjaro" => "pacman";
+  "endeavouros" => "pacman";
+  "arcolinux" => "pacman";
+  "garuda" => "pacman";
+  "antergos" => "pacman";
+  "kaos" => "pacman";
+  // apk
+  "alpine" => "apk";
+  "postmarket" => "apk";
+  // zypper
+  "opensuse" => "zypper";
+  "opensuse-leap" => "zypper";
+  "opensuse-tumbleweed" => "zypper";
+  // nix
+  "nixos" => "nix";
+  // emerge
+  "gentoo" => "emerge";
+  "funtoo" => "emerge";
+  // xps
+  "void" => "xbps";
+  // urpm
+  "mageia" => "urpm";
+  // slackpkg
+  "slackware" => "slackpkg";
+  // eopkg
+  "solus" => "eopkg";
+  // pkg
+  "freebsd" => "pkg";
+  "ghostbsd" => "pkg";
+  // opkg
+  "openwrt" => "opkg";
+  // pkg(2)
+  "andorid" => "pkg(2)"
 );
 
-vendors!(
-    apk: {
+vendors![
+    {
         name: "apk",
-        help_options: "-h/--help",
-        confirm_options: "",
+        confirm: "",
         install: "apk add $",
         remove: "apk del $",
         upgrade: "apk upgrade $",
@@ -36,10 +81,9 @@ vendors!(
         list_upgradable: "apk list -u/--upgradable",
         list_installed: "apk list -I/--installed",
     },
-    apt: {
+    {
         name: "apt",
-        help_options: "-h/--help",
-        confirm_options: "-y/--yes",
+        confirm: "-y/--yes",
         install: "apt install $",
         remove: "apt remove $",
         upgrade: "apt install $",
@@ -50,10 +94,9 @@ vendors!(
         list_upgradable: "apt list -u/--upgradable",
         list_installed: "apt list -i/--installed",
     },
-    brew: {
+    {
         name: "brew",
-        help_options: "-h/--help",
-        confirm_options: "",
+        confirm: "",
         install: "brew install $",
         remove: "brew uninstall $",
         upgrade: "brew upgrade $",
@@ -64,10 +107,9 @@ vendors!(
         list_upgradable: "brew outdated",
         list_installed: "brew list",
     },
-    choco: {
+    {
         name: "choco",
-        help_options: "-h/--help",
-        confirm_options: "-y",
+        confirm: "-y",
         install: "choco install $",
         remove: "choco uninstall $",
         upgrade: "choco upgrade $",
@@ -78,10 +120,9 @@ vendors!(
         list_upgradable: "choco outdated",
         list_installed: "choco list -l/--local-only",
     },
-    dnf: {
+    {
         name: "dnf",
-        help_options: "-h/--help",
-        confirm_options: "-y/--assumeyes",
+        confirm: "-y/--assumeyes",
         install: "dnf install $",
         remove: "dnf remove $",
         upgrade: "dnf upgrade $",
@@ -92,10 +133,61 @@ vendors!(
         list_upgradable: "dnf list --upgrades",
         list_installed: "dnf list --installed",
     },
-    pacman: {
+    {
+        name: "emerge",
+        confirm: "",
+        install: "emerge $",
+        remove: "emerge --deselect $",
+        upgrade: "emerge --update $",
+        search: "emerge --search $",
+        info: "emerge --info $",
+        update_index: "emerge --sync",
+        upgrade_all: "emerge -vuDN @world",
+        list_upgradable: "emerge -puDv @world",
+        list_installed: "qlist -Iv",
+    },
+    {
+        name: "eopkg",
+        confirm: "-y/--yes-all",
+        install: "eopkg install $",
+        remove: "eopkg remove $",
+        upgrade: "eopkg upgrade $",
+        search: "eopkg search $",
+        info: "eopkg info $",
+        update_index: "eopkg update-repo",
+        upgrade_all: "eopkg upgrade",
+        list_upgradable: "eopkg list-upgrades",
+        list_installed: "eopkg list-installed",
+    },
+    {
+        name: "nix",
+        confirm: "",
+        install: "nix-env -i/--install $",
+        remove: "pacman -e/--uninstall $",
+        upgrade: "nix-env -u/--upgrade $",
+        search: "nix-env -qaP $",
+        info: "nix-env -qa --description $",
+        update_index: "nix-channel --update",
+        upgrade_all: "nix-env -u/--upgrade",
+        list_upgradable: "nix-env -q/--query",
+        list_installed: "nix-env -q/--query --installed",
+    },
+    {
+        name: "opkg",
+        confirm: "",
+        install: "opkg install $",
+        remove: "opkg remove $",
+        upgrade: "opkg upgrade $",
+        search: "opkg find $",
+        info: "opkg info $",
+        update_index: "opkg update",
+        upgrade_all: "opkg upgrade",
+        list_upgradable: "opkg list-upgrades",
+        list_installed: "opkg list-installed",
+    },
+    {
         name: "pacman",
-        help_options: "-h/--help",
-        confirm_options: "--noconfirm",
+        confirm: "--noconfirm",
         install: "pacman -S $",
         remove: "pacman -R -s $",
         upgrade: "pacman -S $",
@@ -106,10 +198,35 @@ vendors!(
         list_upgradable: "pacman -Q -u",
         list_installed: "pacman -Q -e",
     },
-    scoop: {
+    {
+        name: "pkg",
+        confirm: "-y/--yes",
+        install: "pkg install $",
+        remove: "pkg remove $",
+        upgrade: "pkg install $",
+        search: "pkg search $",
+        info: "pkg info $",
+        update_index: "pkg update",
+        upgrade_all: "pkg upgrade",
+        list_upgradable: "pkg upgrade -n/--dry-run",
+        list_installed: "pkg info -a/--all",
+    },
+    {
+        name: "pkg(2)",
+        confirm: "-y/--yes",
+        install: "pkg install $",
+        remove: "pkg uninstall $",
+        upgrade: "pkg install $",
+        search: "pkg search $",
+        info: "pkg show $",
+        update_index: "pkg update",
+        upgrade_all: "pkg upgrade",
+        list_upgradable: "",
+        list_installed: "pkg list-installed",
+    },
+    {
         name: "scoop",
-        help_options: "-h/--help",
-        confirm_options: "",
+        confirm: "",
         install: "scoop install $",
         remove: "scoop uninstall $",
         upgrade: "scoop update $",
@@ -120,10 +237,22 @@ vendors!(
         list_upgradable: "scoop status",
         list_installed: "scoop list",
     },
-    upt: {
+    {
+        name: "slackpkg",
+        confirm: "",
+        install: "slackpkg install $",
+        remove: "slackpkg remove $",
+        upgrade: "slackpkg upgrade $",
+        search: "slackpkg search $",
+        info: "slackpkg info $",
+        update_index: "slackpkg update",
+        upgrade_all: "slackpkg upgrade-all",
+        list_upgradable: "",
+        list_installed: "ls -1 /var/log/packages",
+    },
+    {
         name: "upt",
-        help_options: "-h/--help",
-        confirm_options: "-y/--yes",
+        confirm: "-y/--yes",
         install: "upt install $",
         remove: "upt remove $",
         upgrade: "upt upgrade $",
@@ -134,10 +263,35 @@ vendors!(
         list_upgradable: "upt list -u/--upgradable",
         list_installed: "upt list -i/--installed",
     },
-    yum: {
+    {
+        name: "urpm",
+        confirm: "",
+        install: "urpmi $",
+        remove: "urpme $",
+        upgrade: "urpmi $",
+        search: "urpmq -y/--fuzzy $",
+        info: "urpmq -i $",
+        update_index: "urpmi.update -a",
+        upgrade_all: "urpmi --auto-update",
+        list_upgradable: "urpmq --auto-select",
+        list_installed: "rpm -q/--query --all",
+    },
+    {
+        name: "xbps",
+        confirm: "-y/--yes",
+        install: "xbps-install $",
+        remove: "xbps-remove $",
+        upgrade: "xbps-install -u/--update $",
+        search: "xbps-query -Rs $",
+        info: "xbps-query -RS $",
+        update_index: "xbps-install -S/--sync",
+        upgrade_all: "xbps-install -u/--update",
+        list_upgradable: "xbps-install -un",
+        list_installed: "xbps-query -l/--list-pkgs",
+    },
+    {
         name: "yum",
-        help_options: "-h/--help",
-        confirm_options: "-y/--assumeyes",
+        confirm: "-y/--assumeyes",
         install: "yum install $",
         remove: "yum remove $",
         upgrade: "yum update $",
@@ -148,14 +302,26 @@ vendors!(
         list_upgradable: "yum list --upgrades",
         list_installed: "yum list --installed",
     },
-);
+    {
+        name: "zypper",
+        confirm: "-y/--no-confirm",
+        install: "zypper install $",
+        remove: "zypper remove $",
+        upgrade: "zypper update $",
+        search: "zypper search $",
+        info: "zypper info $",
+        update_index: "zypper refresh",
+        upgrade_all: "zypper update",
+        list_upgradable: "zypper list-updates -a/--all",
+        list_installed: "zypper search -i/--installed-only",
+    },
+];
 
 /// Repersent a kind of package management tool. e.g. apt, pacman, yum...
 #[derive(Debug, Clone, PartialEq)]
 pub struct Vendor {
     pub(crate) name: String,
-    pub(crate) help_options: String,
-    pub(crate) confirm_options: String,
+    pub(crate) confirm: String,
     pub(crate) install: SubCommand,
     pub(crate) remove: SubCommand,
     pub(crate) upgrade: SubCommand,
@@ -173,13 +339,13 @@ impl Vendor {
         if self.is_help(args) {
             return Err(UptError::DisplyHelp(self.help()));
         }
-        if let Some((Some(pkg), yes)) = self.install.parse(args, &self.confirm_options) {
+        if let Some((Some(pkg), yes)) = self.install.parse(args, &self.confirm) {
             return Ok(Task::Install { pkg, confirm: yes });
         }
-        if let Some((Some(pkg), yes)) = self.remove.parse(args, &self.confirm_options) {
+        if let Some((Some(pkg), yes)) = self.remove.parse(args, &self.confirm) {
             return Ok(Task::Remove { pkg, confirm: yes });
         }
-        if let Some((Some(pkg), yes)) = self.upgrade.parse(args, &self.confirm_options) {
+        if let Some((Some(pkg), yes)) = self.upgrade.parse(args, &self.confirm) {
             return Ok(Task::Upgrade { pkg, confirm: yes });
         }
         if let Some((Some(pkg), _)) = self.search.parse(args, "") {
@@ -191,7 +357,7 @@ impl Vendor {
         if self.update_index.parse(args, "").is_some() {
             return Ok(Task::UpdateIndex);
         }
-        if let Some((_, yes)) = self.upgrade_all.parse(args, &self.confirm_options) {
+        if let Some((_, yes)) = self.upgrade_all.parse(args, &self.confirm) {
             return Ok(Task::UpgradeAll { confirm: yes });
         }
         if self.list_upgradable.parse(args, "").is_some() {
@@ -220,10 +386,10 @@ impl Vendor {
     }
 
     fn yes_str(&self, yes: &bool) -> &str {
-        if !*yes || self.confirm_options.is_empty() {
+        if !*yes || self.confirm.is_empty() {
             return "";
         }
-        match self.confirm_options.split_once('/') {
+        match self.confirm.split_once('/') {
             Some((v, _)) => v,
             None => "",
         }
@@ -234,7 +400,7 @@ impl Vendor {
             || args
                 .iter()
                 .skip(1)
-                .any(|arg| self.help_options.split('/').any(|option| option == arg))
+                .any(|arg| ["-h", "--help"].iter().any(|option| option == arg))
     }
 
     /// Dump help message
@@ -261,9 +427,12 @@ impl Vendor {
         for (cmd, description) in &helps {
             lines.push(format!("  {:<width$} {}", cmd, description, width = width));
         }
-        if !self.confirm_options.is_empty() {
+        if !self.confirm.is_empty() {
             lines.push(String::new());
-            lines.push(format!("Automatically confirm: {}", self.confirm_options));
+            lines.push(format!(
+                "Automatically confirm the action with: {}",
+                self.confirm
+            ));
         }
         lines.join("\n")
     }

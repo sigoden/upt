@@ -15,7 +15,7 @@ Each operating system (OS) has its own package management tool, which requires d
 This can be inconvenient when switching between or trying new OSs. 
 
 ```sh
-apt list --upgradable       # Ubuntu, Debian, Linux Mint...
+apt list --upgradable     # Ubuntu, Debian, Linux Mint...
 yum list updates          # Centos, Redhat...
 brew outdated             # MacOS Homebrew
 apk list --upgrades       # Alpine
@@ -36,55 +36,79 @@ Upt can act as other commands and use their syntax.
 
 ```sh
 cp upt brew
-brew install vim # use brew syntax
+brew install vim        # use brew syntax
 
 cp upt pacman
-pacman -S vim    # use pacman syntax
+pacman -S vim           # use pacman syntax
 ```
 
 ### Supported Tools
 
 ```
-+--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
-| Tool   | Install            | Uninstall            | Upgrade            | Search                | Info            | Update Index             | Upgrade All       | List upgradable     | List Installed       |
-+--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
-| upt    | upt install $pkg   | upt remove $pkg      | upt upgrade $pkg   | upt search $pattern   | upt show $pkg   | upt update               | upt upgrade       | upt list -u         | upt list -i          |
-+--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
-| apt    | apt install $pkg   | apt remove $pkg      | apt install $pkg   | apt search $pattern   | apt show $pkg   | apt update               | apt upgrade       | apt list --upgrade  | apt list --installed |
-+--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
-| brew   | brew install $pkg  | brew uninstall $pkg  | brew upgrade $pkg  | brew search $pattern  | brew info $pkg  | brew update              | brew upgrade      | brew outdated       | brew list            |
-+--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
-| choco  | choco install $pkg | choco uninstall $pkg | choco upgrade $pkg | choco search $pattern | choco info $pkg | choco upgrade all --noop | choco upgrade all | choco outdated      | choco list           |
-+--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
-| dnf    | dnf install $pkg   | dnf remove $pkg      | dnf update $pkg    | dnf search $pattern   | dnf info $pkg   | dnf check-update         | dnf update        | dnf list --upgrades | dnf list --installed |
-+--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
-| yum    | yum install $pkg   | yum remove $pkg      | yum upgrade $pkg   | yum search $pattern   | yum info $pkg   | yum check-update         | yum update        | yum list updates    | yum list installed   |
-+--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
-| pacman | pacman -S $pkg     | Pacman -Rs $pkg      | pacman -S $pkg     | pacman -Ss $pattern   | pacman -Si $pkg | pacman -Syy              | pacman -Syu       | pacman -Qu          | pacman -Qe           |
-+--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
-| apk    | apk add $pkg       | apk del $pkg         | apk upgrade $pkg   | apk search $pattern   | apk info $pkg   | apk update               | apk upgrade       | apk list --upgrades | apk list --installed |
-+--------+--------------------+----------------------+--------------------+-----------------------+-----------------+--------------------------+-------------------+---------------------+----------------------+
+| Tool     | Install                     | Uninstall                    | Upgrade                        | Search                     | Info                            | Update Index             | Upgrade All              | List Upgradable              | List Installed                    |
+| -------- | --------------------------- | ---------------------------- | ------------------------------ | -------------------------- | ------------------------------- | ------------------------ | ------------------------ | ---------------------------- | --------------------------------- |
+| apk      | apk add <pkg>               | apk del <pkg>                | apk upgrade <pkg>              | apk search <pkg>           | apk info <pkg>                  | apk update               | apk upgrade              | apk list -u/--upgradeable    | apk list -I/--installed           |
+| apt      | apt install <pkg>           | apt remove <pkg>             | apt install <pkg>              | apt search <pkg>           | apt show <pkg>                  | apt update               | apt upgrade              | apt list -u/--upgrade        | apt list -i/--installed           |
+| brew     | brew install <pkg>          | brew uninstall <pkg>         | brew upgrade <pkg>             | brew search <pkg>          | brew info <pkg>                 | brew update              | brew upgrade             | brew outdated                | brew list                         |
+| choco    | choco install <pkg>         | choco uninstall <pkg>        | choco upgrade <pkg>            | choco search <pkg>         | choco info <pkg>                | choco upgrade all --noop | choco upgrade all        | choco outdated               | choco list -l/--local-only        |
+| dnf      | dnf install <pkg>           | dnf remove <pkg>             | dnf upgrade <pkg>              | dnf search <pkg>           | dnf info <pkg>                  | dnf check-update         | dnf update               | dnf list --upgrades          | dnf list --installed              |
+| emerge   | emerge <pkg>                | emerge --deselect <pkg>      | emerge --update <pkg>          | emerge --search <pkg>      | emerge --info <pkg>             | emerge --sync            | emerge -vuDN @world      | emerge -puDN @world          | qlist -lv                         |
+| eopkg    | eopkg install <pkg>         | eopkg remove <pkg>           | eopkg upgrade <pkg>            | eopkg search <pkg>         | eopkg info <pkg>                | eopkg update-repo        | eopkg upgrade            | eopkg list-upgrades          | eopkg list-installed              |
+| nix      | nix-env -i/--install <pkg>  | nix-env -e/--uninstall <pkg> | nix-env -u/--upgrade <pkg>     | nix-env -qaP <pkg>         | nix-env -qa --description <pkg> | nix-channel --update     | nix-env -u/--upgrade     | nix-env -q/--query           | nix-env -q/--query --installed    |
+| opkg     | opkg install <pkg>          | opkg remove <pkg>            | opkg upgrade <pkg>             | opkg find <pkg>            | opkg info <pkg>                 | opkg update              | opkg upgrade             | opkg list --upgrades         | opkg list --installed             |
+| pacman   | pacman -S <pkg>             | Pacman -Rs <pkg>             | pacman -S <pkg>                | pacman -Ss <pkg>           | pacman -Si <pkg>                | pacman -Syy              | pacman -Syu              | pacman -Qu                   | pacman -Qe                        |
+| pkg      | pkg install <pkg>           | pkg remove <pkg>             | pkg install <pkg>              | pkg search <pkg>           | pkg info <pkg>                  | pkg update               | pkg upgrade              | pkg upgrade -n/--dry-run     | pkg info -a/--all                 |
+| pkg(2)   | pkg install <pkg>           | pkg uninstall <pkg>          | pkg install <pkg>              | pkg search <pkg>           | pkg show <pkg>                  | pkg update               | pkg upgrade              | -                            | pkg list-installed                |
+| scoop    | scoop install <pkg>         | scoop uninstall <pkg>        | scoop update <pkg>             | scoop search <pkg>         | scoop info <pkg>                | scoop update             | scoop update *           | scoop status                 | scoop list                        |
+| slackpkg | slackpkg install <slackpkg> | slackpkg remove <slackpkg>   | slackpkg upgrade <slackpkg>    | slackpkg search <slackpkg> | slackpkg info <slackpkg>        | slackpkg update          | slackpkg upgrade-all     | -                            | ls -1 /var/log/packages           |
+| upt      | upt install <pkg>           | upt remove <pkg>             | upt upgrade <pkg>              | upt search <pkg>           | upt info <pkg>                  | upt update               | upt upgrade              | upt list -u/--upgradable     | upt list -i/--installed           |
+| urpm     | urpmi <pkg>                 | urpme <pkg>                  | urpmi <pkg>                    | urpmq -y/--fuzzy <pkg>     | urpmq -i <pkg>                  | urpmi.update -a          | urpmi --auto-update      | urpmq --auto-select          | rpm -q/--query --all              |
+| xbps     | xbps-install <pkg>          | xbps-remove <pkg>            | xbps-install -u/--update <pkg> | xbps-query -Rs <pkg>       | xbps-query -RS <pkg>            | xbps-install -S/--sync   | xbps-install -u/--update | xbps-install -un             | qxbps-query -l/--list-pkgs        |
+| yum      | yum install <pkg>           | yum remove <pkg>             | yum upgrade <pkg>              | yum search <pkg>           | yum info <pkg>                  | yum check-update         | yum update               | yum list --upgrades          | yum list --installed              |
+| zypper   | zypper install <pkg>        | zypper remove <pkg>          | zypper update <pkg>            | zypper search <pkg>        | zypper info <pkg>               | zypper refresh           | zypper update            | zypper list-updates -a/--all | zypper search -i/--installed-only |
 ```
 
 ### Supported OSs
 
 ```
-+-------------------------------------------+----------------------+
-| OS                                        | Tools                |
-+-------------------------------------------+----------------------+
-| windows                                   | scoop, choco, winget |
-+-------------------------------------------+----------------------+
-| macos                                     | brew, port           |
-+-------------------------------------------+----------------------+
-| ubuntu, debian, linuxmint, pop, deepin | apt                  |
-| elementary OS, kali, aosc                  |                      |
-+-------------------------------------------+----------------------+
-| fedora, redhat, rhel                      | dnf                  |
-+-------------------------------------------+----------------------+
-| centos, rocky                             | yum                  |
-+-------------------------------------------+----------------------+
-| alpine                                    | apk                  |
-+-------------------------------------------+----------------------+
++------------------------------------------------------+----------------------+
+| OS                                                   | Tools                |
++------------------------------------------------------+----------------------+
+| windows                                              | scoop, choco, winget |
++------------------------------------------------------+----------------------+
+| macos                                                | brew, port           |
++------------------------------------------------------+----------------------+
+| ubuntu, debian, linuxmint, pop, deepin, elementray   | apt                  |
+| kali, raspbian, aosc, zorin, antix, devuan           |                      |
++------------------------------------------------------+----------------------+
+| fedora, redhat, rhel, amzn, ol, almalinux, rocky     | dnf, yum             |
+| oubes, centos, qubes, eurolinux                      |                      |
++------------------------------------------------------+----------------------+
+| arch, manjaro, endeavouros, arcolinux, garuda        | pacman               |
+| antergos, kaos                                       |                      |
++------------------------------------------------------+----------------------+
+| alpine, postmarket                                   | apk                  |
++------------------------------------------------------+----------------------+
+| opensuse, opensuse-leap, opensuse-tumbleweed         | zypper               |
++------------------------------------------------------+----------------------+
+| nixos                                                | nix                  |
++------------------------------------------------------+----------------------+
+| gentoo, funtoo                                       | emerge               |
++------------------------------------------------------+----------------------+
+| void                                                 | xbps                 |
++------------------------------------------------------+----------------------+
+| mageia                                               | urpm                 |
++------------------------------------------------------+----------------------+
+| slackware                                            | slackpkg             |
++------------------------------------------------------+----------------------+
+| solus                                                | eopkg                |
++------------------------------------------------------+----------------------+
+| freebsd, ghostbsd                                    | pkg                  |
++------------------------------------------------------+----------------------+
+| openwrt                                              | opkg                 |
++------------------------------------------------------+----------------------+
+| android                                              | pkg(2)               |
++------------------------------------------------------+----------------------+
 ```
 
 Some platforms may support multiple package management tools, and upt defaults to selecting them in the order listed in the table. 
@@ -94,19 +118,6 @@ For example, in Windows, `upt` will prioritize using `scoop`. If `scoop` is not 
 
 ## Install
 
-**Download Binary**
-
-Binary are available for download [Releases](https://github.com/sigoden/upt/releases) . Make sure to put the path to the binary into your `PATH`.
-
-```sh
-mv upt /usr/local/bin # Linux, MacOS
-```
-
-```bat
-:: Windows, Run as administrator
-move upt C:\Windows\System32
-```
-
 **Use Cargo**
 
 `upt` is written in the rust you can install it using [cargo](https://doc.rust-lang.org/stable/cargo/).
@@ -115,69 +126,27 @@ move upt C:\Windows\System32
 cargo install upt
 ```
 
-## Usage
+**Download Binary**
 
-- Install packages
+Download it from [GitHub Releases](https://github.com/sigoden/upt/releases), unzip and add aichat to your $PATH.
 
-```sh
-upt install vim                 # install a single package
-upt install vim ripgrep         # install multiple packages
-upt install -y vim              # assume yes when installing
+## CLI
+
+```
+Usage: 
+  upt install <pkg>              Install packages
+  upt remove <pkg>               Remove packages
+  upt upgrade <pkg>              Upgrade packages
+  upt search <pkg>               Search for packages
+  upt info <pkg>                 Show package details
+  upt update                     Update package indexes
+  upt upgrade                    Upgrade all packages
+  upt list -u/--upgradable       List all upgradable packages
+  upt list -i/--installed        List all installed packages
+
+Automatically confirm the action with: -y/--yes
 ```
 
-- Remove packages
-
-```sh
-upt remove vim                  # remove a single package
-upt remove vim ripgrep          # remove multiple packages
-upt remove -y vim               # assume yes when removing
-```
-
-- Upgrade packages
-
-```sh
-upt upgrade vim                 # upgrade a single package
-upt upgrade vim ripgrep         # upgrade multiple packages
-upt upgrade -y vim              # assume yes when upgrading
-```
-
-- Search for package
-
-```sh
-upt search vim
-```
-
-- Show package details
-
-```sh
-upt show vim
-```
-
-- Update indexes of packages
-
-```sh
-upt update
-```
-
-- Upgrade all packages
-
-```sh
-upt upgrade
-upt upgrade -y                  # assume yes when upgrading
-```
-
-- List all upgradable packages
-
-```sh
-upt list -i
-```
-
-- List all installed packages
-
-```sh
-upt list -u
-```
-> If you feel `upt` should support a package management operation, feel free to create [issue](https://github.com/sigoden/upt/issues/new) to discuss it.
 
 ## License
 

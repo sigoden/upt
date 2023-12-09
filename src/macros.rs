@@ -1,10 +1,9 @@
 macro_rules! vendors {
     (
         $(
-            $key:ident: {
+            {
                 name: $name:literal,
-                help_options: $help_options:literal,
-                confirm_options: $confirm_options:literal,
+                confirm: $confirm:literal,
                 install: $install:literal,
                 remove: $remove:literal,
                 upgrade: $upgrade:literal,
@@ -24,8 +23,7 @@ macro_rules! vendors {
                     $name => {
                         let vendor = $crate::Vendor {
                             name: $name.to_string(),
-                            help_options: $help_options.to_string(),
-                            confirm_options: $confirm_options.to_string(),
+                            confirm: $confirm.to_string(),
                             install: must_from_str($install, $name, "install"),
                             remove: must_from_str($remove, $name, "remove"),
                             upgrade: must_from_str($upgrade, $name, "upgrade"),
@@ -42,7 +40,19 @@ macro_rules! vendors {
                 _ => Err(UptError::NoVendor(name.to_string()))
             }
         }
-    };
+
+        pub(crate) fn which_cmd(name: &str) -> Option<&'static str> {
+            match name {
+                $(
+                    $name => {
+                        let (cmd, _) = $install.split_once(' ')?;
+                        Some(cmd)
+                    }
+                )+
+                _ => None
+            }
+        }
+    }
 }
 
 macro_rules! tools {
@@ -51,7 +61,7 @@ macro_rules! tools {
             let os = crate::utils::detect_os().ok_or(UptError::NotSupportOS)?;
             let tools: Vec<&str> = match os.as_str() {
                 $(
-                    $os => vec![$($tool),+],
+                    $os => vec![$($tool),+].into_iter().filter_map(|v| which_cmd(v)).collect(),
                 )+
                 _ => return Err(UptError::NotSupportOS),
             };
