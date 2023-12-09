@@ -11,7 +11,6 @@ macro_rules! vendors {
                 info: $show:literal,
                 update_index: $update_index:literal,
                 upgrade_all: $upgrade_all:literal,
-                list_upgradable: $list_upgradable:literal,
                 list_installed: $list_installed:literal,
             },
         )+
@@ -31,7 +30,6 @@ macro_rules! vendors {
                             info: must_from_str($show, $name, "show"),
                             update_index: must_from_str($update_index, $name, "update_index"),
                             upgrade_all: must_from_str($upgrade_all, $name, "upgrade_all"),
-                            list_upgradable: must_from_str($list_upgradable, $name, "list_upgradable"),
                             list_installed: must_from_str($list_installed, $name, "list_installed"),
                         };
                         Ok(vendor)

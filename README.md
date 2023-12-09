@@ -45,30 +45,30 @@ pacman -S vim             # use pacman syntax to install a package
 ### Supported Tools
 
 ```
-| Tool     | Install                      | Uninstall                    | Upgrade                        | Search                     | Info                            | Update Index             | Upgrade All              | List Upgradable              | List Installed                    |
-| -------- | ---------------------------- | ---------------------------- | ------------------------------ | -------------------------- | ------------------------------- | ------------------------ | ------------------------ | ---------------------------- | --------------------------------- |
-| apk      | apk add <pkg>                | apk del <pkg>                | apk upgrade <pkg>              | apk search <pkg>           | apk info <pkg>                  | apk update               | apk upgrade              | apk list -u/--upgradeable    | apk list -I/--installed           |
-| apt      | apt install <pkg>            | apt remove <pkg>             | apt install <pkg>              | apt search <pkg>           | apt show <pkg>                  | apt update               | apt upgrade              | apt list -u/--upgrade        | apt list -i/--installed           |
-| brew     | brew install <pkg>           | brew uninstall <pkg>         | brew upgrade <pkg>             | brew search <pkg>          | brew info <pkg>                 | brew update              | brew upgrade             | brew outdated                | brew list                         |
-| choco    | choco install <pkg>          | choco uninstall <pkg>        | choco upgrade <pkg>            | choco search <pkg>         | choco info <pkg>                | choco upgrade all --noop | choco upgrade all        | choco outdated               | choco list -l/--local-only        |
-| dnf      | dnf install <pkg>            | dnf remove <pkg>             | dnf upgrade <pkg>              | dnf search <pkg>           | dnf info <pkg>                  | dnf check-update         | dnf update               | dnf list --upgrades          | dnf list --installed              |
-| emerge   | emerge <pkg>                 | emerge --deselect <pkg>      | emerge --update <pkg>          | emerge --search <pkg>      | emerge --info <pkg>             | emerge --sync            | emerge -vuDN @world      | emerge -puDN @world          | qlist -lv                         |
-| eopkg    | eopkg install <pkg>          | eopkg remove <pkg>           | eopkg upgrade <pkg>            | eopkg search <pkg>         | eopkg info <pkg>                | eopkg update-repo        | eopkg upgrade            | eopkg list-upgrades          | eopkg list-installed              |
-| flatpak  | flatpak install <pkg>        | flatpak uninstall <pkg>      | flatpak update <pkg>           | flatpak search <pkg>       | flatpak info <pkg>              | -                        | flatpak update           | -                            | flatpak list                      |
-| guix     | guix install <pkg>           | guix remove <pkg>            | guix upgrade <pkg>             | guix search <pkg>          | guix show <pkg>                 | guix refresh             | guix upgrade             | -                            | guix package -I/--list-installed  |
-| nix      | nix-env -i/--install <pkg>   | nix-env -e/--uninstall <pkg> | nix-env -u/--upgrade <pkg>     | nix-env -qaP <pkg>         | nix-env -qa --description <pkg> | nix-channel --update     | nix-env -u/--upgrade     | nix-env -q/--query           | nix-env -q/--query --installed    |
-| opkg     | opkg install <pkg>           | opkg remove <pkg>            | opkg upgrade <pkg>             | opkg find <pkg>            | opkg info <pkg>                 | opkg update              | opkg upgrade             | opkg list --upgrades         | opkg list --installed             |
-| pacman   | pacman -S <pkg>              | Pacman -Rs <pkg>             | pacman -S <pkg>                | pacman -Ss <pkg>           | pacman -Si <pkg>                | pacman -Syy              | pacman -Syu              | pacman -Qu                   | pacman -Qe                        |
-| pkg      | pkg install <pkg>            | pkg remove <pkg>             | pkg install <pkg>              | pkg search <pkg>           | pkg info <pkg>                  | pkg update               | pkg upgrade              | pkg upgrade -n/--dry-run     | pkg info -a/--all                 |
-| pkg(2)   | pkg install <pkg>            | pkg uninstall <pkg>          | pkg install <pkg>              | pkg search <pkg>           | pkg show <pkg>                  | pkg update               | pkg upgrade              | -                            | pkg list-installed                |
-| scoop    | scoop install <pkg>          | scoop uninstall <pkg>        | scoop update <pkg>             | scoop search <pkg>         | scoop info <pkg>                | scoop update             | scoop update *           | scoop status                 | scoop list                        |
-| slackpkg | slackpkg install <slackpkg>  | slackpkg remove <slackpkg>   | slackpkg upgrade <slackpkg>    | slackpkg search <slackpkg> | slackpkg info <slackpkg>        | slackpkg update          | slackpkg upgrade-all     | -                            | ls -1 /var/log/packages           |
-| snap     | snap install --classic <pkg> | snap remove <pkg>            | snap refresh <pkg>             | snap find <pkg>            | snap info <pkg>                 | -                        | snap refresh             | snap refresh --list          | snap list                         |
-| upt      | upt install <pkg>            | upt remove <pkg>             | upt upgrade <pkg>              | upt search <pkg>           | upt info <pkg>                  | upt update               | upt upgrade              | upt list -u/--upgradable     | upt list -i/--installed           |
-| urpm     | urpmi <pkg>                  | urpme <pkg>                  | urpmi <pkg>                    | urpmq -y/--fuzzy <pkg>     | urpmq -i <pkg>                  | urpmi.update -a          | urpmi --auto-update      | urpmq --auto-select          | rpm -q/--query --all              |
-| xbps     | xbps-install <pkg>           | xbps-remove <pkg>            | xbps-install -u/--update <pkg> | xbps-query -Rs <pkg>       | xbps-query -RS <pkg>            | xbps-install -S/--sync   | xbps-install -u/--update | xbps-install -un             | qxbps-query -l/--list-pkgs        |
-| yum      | yum install <pkg>            | yum remove <pkg>             | yum upgrade <pkg>              | yum search <pkg>           | yum info <pkg>                  | yum check-update         | yum update               | yum list --upgrades          | yum list --installed              |
-| zypper   | zypper install <pkg>         | zypper remove <pkg>          | zypper update <pkg>            | zypper search <pkg>        | zypper info <pkg>               | zypper refresh           | zypper update            | zypper list-updates -a/--all | zypper search -i/--installed-only |
+| Tool     | Install                      | Uninstall                    | Upgrade                        | Search                     | Info                            | Update Index             | Upgrade All              | List Installed                    |
+| -------- | ---------------------------- | ---------------------------- | ------------------------------ | -------------------------- | ------------------------------- | ------------------------ | ------------------------ | --------------------------------- |
+| apk      | apk add <pkg>                | apk del <pkg>                | apk upgrade <pkg>              | apk search <pkg>           | apk info <pkg>                  | apk update               | apk upgrade              | apk list -I/--installed           |
+| apt      | apt install <pkg>            | apt remove <pkg>             | apt install <pkg>              | apt search <pkg>           | apt show <pkg>                  | apt update               | apt upgrade              | apt list -i/--installed           |
+| brew     | brew install <pkg>           | brew uninstall <pkg>         | brew upgrade <pkg>             | brew search <pkg>          | brew info <pkg>                 | brew update              | brew upgrade             | brew list                         |
+| choco    | choco install <pkg>          | choco uninstall <pkg>        | choco upgrade <pkg>            | choco search <pkg>         | choco info <pkg>                | choco upgrade all --noop | choco upgrade all        | choco list -l/--local-only        |
+| dnf      | dnf install <pkg>            | dnf remove <pkg>             | dnf upgrade <pkg>              | dnf search <pkg>           | dnf info <pkg>                  | dnf check-update         | dnf update               | dnf list --installed              |
+| emerge   | emerge <pkg>                 | emerge --deselect <pkg>      | emerge --update <pkg>          | emerge --search <pkg>      | emerge --info <pkg>             | emerge --sync            | emerge -vuDN @world      | qlist -lv                         |
+| eopkg    | eopkg install <pkg>          | eopkg remove <pkg>           | eopkg upgrade <pkg>            | eopkg search <pkg>         | eopkg info <pkg>                | eopkg update-repo        | eopkg upgrade            | eopkg list-installed              |
+| flatpak  | flatpak install <pkg>        | flatpak uninstall <pkg>      | flatpak update <pkg>           | flatpak search <pkg>       | flatpak info <pkg>              | -                        | flatpak update           | flatpak list                      |
+| guix     | guix install <pkg>           | guix remove <pkg>            | guix upgrade <pkg>             | guix search <pkg>          | guix show <pkg>                 | guix refresh             | guix upgrade             | guix package -I/--list-installed  |
+| nix      | nix-env -i/--install <pkg>   | nix-env -e/--uninstall <pkg> | nix-env -u/--upgrade <pkg>     | nix-env -qaP <pkg>         | nix-env -qa --description <pkg> | nix-channel --update     | nix-env -u/--upgrade     | nix-env -q/--query --installed    |
+| opkg     | opkg install <pkg>           | opkg remove <pkg>            | opkg upgrade <pkg>             | opkg find <pkg>            | opkg info <pkg>                 | opkg update              | opkg upgrade             | opkg list --installed             |
+| pacman   | pacman -S <pkg>              | Pacman -Rs <pkg>             | pacman -S <pkg>                | pacman -Ss <pkg>           | pacman -Si <pkg>                | pacman -Syy              | pacman -Syu              | pacman -Qe                        |
+| pkg      | pkg install <pkg>            | pkg remove <pkg>             | pkg install <pkg>              | pkg search <pkg>           | pkg info <pkg>                  | pkg update               | pkg upgrade              | pkg info -a/--all                 |
+| pkg(2)   | pkg install <pkg>            | pkg uninstall <pkg>          | pkg install <pkg>              | pkg search <pkg>           | pkg show <pkg>                  | pkg update               | pkg upgrade              | pkg list-installed                |
+| scoop    | scoop install <pkg>          | scoop uninstall <pkg>        | scoop update <pkg>             | scoop search <pkg>         | scoop info <pkg>                | scoop update             | scoop update *           | scoop list                        |
+| slackpkg | slackpkg install <slackpkg>  | slackpkg remove <slackpkg>   | slackpkg upgrade <slackpkg>    | slackpkg search <slackpkg> | slackpkg info <slackpkg>        | slackpkg update          | slackpkg upgrade-all     | ls -1 /var/log/packages           |
+| snap     | snap install --classic <pkg> | snap remove <pkg>            | snap refresh <pkg>             | snap find <pkg>            | snap info <pkg>                 | -                        | snap refresh             | snap list                         |
+| upt      | upt install <pkg>            | upt remove <pkg>             | upt upgrade <pkg>              | upt search <pkg>           | upt info <pkg>                  | upt update               | upt upgrade              | upt list                          |
+| urpm     | urpmi <pkg>                  | urpme <pkg>                  | urpmi <pkg>                    | urpmq -y/--fuzzy <pkg>     | urpmq -i <pkg>                  | urpmi.update -a          | urpmi --auto-update      | rpm -q/--query --all              |
+| xbps     | xbps-install <pkg>           | xbps-remove <pkg>            | xbps-install -u/--update <pkg> | xbps-query -Rs <pkg>       | xbps-query -RS <pkg>            | xbps-install -S/--sync   | xbps-install -u/--update | qxbps-query -l/--list-pkgs        |
+| yum      | yum install <pkg>            | yum remove <pkg>             | yum upgrade <pkg>              | yum search <pkg>           | yum info <pkg>                  | yum check-update         | yum update               | yum list --installed              |
+| zypper   | zypper install <pkg>         | zypper remove <pkg>          | zypper update <pkg>            | zypper search <pkg>        | zypper info <pkg>               | zypper refresh           | zypper update            | zypper search -i/--installed-only |
 ```
 
 ### Supported OSs
@@ -141,15 +141,14 @@ Download it from [GitHub Releases](https://github.com/sigoden/upt/releases), unz
 
 ```
 Usage: 
-  upt install <pkg>              Install packages
-  upt remove <pkg>               Remove packages
-  upt upgrade <pkg>              Upgrade packages
-  upt search <pkg>               Search for packages
-  upt info <pkg>                 Show package details
-  upt update                     Update package indexes
-  upt upgrade                    Upgrade all packages
-  upt list -u/--upgradable       List all upgradable packages
-  upt list -i/--installed        List all installed packages
+  upt install <pkg>       Install packages
+  upt remove <pkg>        Remove packages
+  upt upgrade <pkg>       Upgrade packages
+  upt search <pkg>        Search for packages
+  upt info <pkg>          Show package details
+  upt update              Update package indexes
+  upt upgrade             Upgrade all packages
+  upt list                List all installed packages
 
 Automatically confirm the action with: -y/--yes
 ```
