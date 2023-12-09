@@ -346,7 +346,7 @@ vendors![
     },
 ];
 
-/// Repersent a kind of package management tool. e.g. apt, pacman, yum...
+/// Represent a kind of package management tool. e.g. apt, pacman, yum...
 #[derive(Debug, Clone, PartialEq)]
 pub struct Vendor {
     pub(crate) name: String,
