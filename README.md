@@ -1,10 +1,10 @@
 # Upt — **U**niversal **P**ackage-management **T**ool.
 
-Upt provides a unified command interface to manage packages for all OSs. 
+Upt provides a unified command interface to manage packages for all OS(s). 
 
 Upt relies on platform's package management tool to do the job, it is more like an alias.
 
-[![Build status](https://github.com/sigoden/aichat/actions/workflows/ci.yaml/badge.svg)](https://github.com/sigoden/upt/actions)
+[![Build status](https://github.com/sigoden/upt/actions/workflows/ci.yml/badge.svg)](https://github.com/sigoden/upt/actions)
 [![Crates.io](https://img.shields.io/crates/v/upt.svg)](https://crates.io/crates/upt)
 
 ## Features
@@ -15,24 +15,24 @@ Each operating system (OS) has its own package management tool, which requires d
 This can be inconvenient when switching between or trying new OSs. 
 
 ```sh
-apt list --upgradable     # Ubuntu, Debian, Linux Mint...
-yum list updates          # Centos, Redhat...
-brew outdated             # MacOS Homebrew
-apk list --upgrades       # Alpine
-pacman -Qu                # Arch, Manjaro...
-choco outdated            # Windows Chocolatey
-dnf list --upgrades       # Fedora
+apt remove $pkg           # Ubuntu, Debian, Linux Mint...
+brew uninstall $pkg       # MacOS Homebrew
+choco uninstall $pkg      # Windows Chocolatey
+dnf remove $pkg           # Fedora, Redhat...
+nix-env -e $pkg           # Nixos
+pacman -Rs $pkg           # Arch, Manjaro...
+xbps-remove $pkg          # Voidlinux
 ```
 
-However, `upt` offers a solution by providing a unified command for package management operations across various platforms and distributions. 
+With `upt`, You just need to remember one command:
 
 ```sh
-upt install vim           # Works on any OS
+upt remove $pkg        # Works on any OS
 ```
 
 ### Act as other command
 
-Upt can act as other commands and use their syntax.
+Upt can act as other commands and use their syntax by renaming.
 
 ```sh
 cp upt brew
@@ -58,7 +58,7 @@ pacman -S vim             # use pacman syntax to install a package
 | guix     | guix install <pkg>           | guix remove <pkg>            | guix upgrade <pkg>             | guix search <pkg>          | guix show <pkg>                 | guix refresh             | guix upgrade             | guix package -I/--list-installed  |
 | nix      | nix-env -i/--install <pkg>   | nix-env -e/--uninstall <pkg> | nix-env -u/--upgrade <pkg>     | nix-env -qaP <pkg>         | nix-env -qa --description <pkg> | nix-channel --update     | nix-env -u/--upgrade     | nix-env -q/--query --installed    |
 | opkg     | opkg install <pkg>           | opkg remove <pkg>            | opkg upgrade <pkg>             | opkg find <pkg>            | opkg info <pkg>                 | opkg update              | opkg upgrade             | opkg list --installed             |
-| pacman   | pacman -S <pkg>              | Pacman -Rs <pkg>             | pacman -S <pkg>                | pacman -Ss <pkg>           | pacman -Si <pkg>                | pacman -Syy              | pacman -Syu              | pacman -Qe                        |
+| pacman   | pacman -S <pkg>              | pacman -Rs <pkg>             | pacman -S <pkg>                | pacman -Ss <pkg>           | pacman -Si <pkg>                | pacman -Syy              | pacman -Syu              | pacman -Qe                        |
 | pkg      | pkg install <pkg>            | pkg remove <pkg>             | pkg install <pkg>              | pkg search <pkg>           | pkg info <pkg>                  | pkg update               | pkg upgrade              | pkg info -a/--all                 |
 | pkg(2)   | pkg install <pkg>            | pkg uninstall <pkg>          | pkg install <pkg>              | pkg search <pkg>           | pkg show <pkg>                  | pkg update               | pkg upgrade              | pkg list-installed                |
 | scoop    | scoop install <pkg>          | scoop uninstall <pkg>        | scoop update <pkg>             | scoop search <pkg>         | scoop info <pkg>                | scoop update             | scoop update *           | scoop list                        |
@@ -72,7 +72,7 @@ pacman -S vim             # use pacman syntax to install a package
 | zypper   | zypper install <pkg>         | zypper remove <pkg>          | zypper update <pkg>            | zypper search <pkg>        | zypper info <pkg>               | zypper refresh           | zypper update            | zypper search -i/--installed-only |
 ```
 
-### Supported OSs
+### Known OSs
 
 ```
 +------------------------------------------------------+----------------------+
@@ -117,11 +117,12 @@ pacman -S vim             # use pacman syntax to install a package
 
 Some platforms may support multiple package management tools, and upt selects one of them in the order listed in the table.
 
-You can also specify the package management tool that UPT should use through `UPT_TOOL` environment tool.
+
+You can also use the environment variable `UPT_TOOL` to specify the package management tool instead of letting upt automatically determine it.
 
 ```sh
-UPT_TOOL=nix upt install vim              # Use nix-env to install vim
-UPT_TOOL=snap upt install vim             # Use snap to install vim
+UPT_TOOL=nix upt install vim              # use nix-env to install vim
+UPT_TOOL=snap upt install vim             # use snap to install vim
 ```
 
 ## Install
@@ -136,7 +137,7 @@ cargo install upt
 
 **Download Binary**
 
-Download it from [GitHub Releases](https://github.com/sigoden/upt/releases), unzip and add aichat to your $PATH.
+Download it from [GitHub Releases](https://github.com/sigoden/upt/releases), unzip and add `upt` to your $PATH.
 
 ## Usage
 
@@ -158,6 +159,6 @@ Automatically confirm the action with: -y/--yes
 
 Copyright (c) 2023 argc-developers.
 
-aichat is made available under the terms of either the MIT License or the Apache License 2.0, at your option.
+Upt is made available under the terms of either the MIT License or the Apache License 2.0, at your option.
 
 See the LICENSE-APACHE and LICENSE-MIT files for license details.
