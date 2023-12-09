@@ -78,7 +78,6 @@ vendors![
         info: "apk show $",
         update_index: "apk update",
         upgrade_all: "apk upgrade",
-        list_upgradable: "apk list -u/--upgradable",
         list_installed: "apk list -I/--installed",
     },
     {
@@ -91,7 +90,6 @@ vendors![
         info: "apt show $",
         update_index: "apt update",
         upgrade_all: "apt upgrade",
-        list_upgradable: "apt list -u/--upgradable",
         list_installed: "apt list -i/--installed",
     },
     {
@@ -104,7 +102,6 @@ vendors![
         info: "brew info $",
         update_index: "brew update",
         upgrade_all: "brew upgrade",
-        list_upgradable: "brew outdated",
         list_installed: "brew list",
     },
     {
@@ -117,7 +114,6 @@ vendors![
         info: "choco info $",
         update_index: "choco upgrade all --noop",
         upgrade_all: "choco upgrade all",
-        list_upgradable: "choco outdated",
         list_installed: "choco list -l/--local-only",
     },
     {
@@ -130,7 +126,6 @@ vendors![
         info: "dnf info $",
         update_index: "dnf check-update",
         upgrade_all: "dnf update",
-        list_upgradable: "dnf list --upgrades",
         list_installed: "dnf list --installed",
     },
     {
@@ -143,7 +138,6 @@ vendors![
         info: "emerge --info $",
         update_index: "emerge --sync",
         upgrade_all: "emerge -vuDN @world",
-        list_upgradable: "emerge -puDv @world",
         list_installed: "qlist -Iv",
     },
     {
@@ -156,7 +150,6 @@ vendors![
         info: "eopkg info $",
         update_index: "eopkg update-repo",
         upgrade_all: "eopkg upgrade",
-        list_upgradable: "eopkg list-upgrades",
         list_installed: "eopkg list-installed",
     },
     {
@@ -169,7 +162,6 @@ vendors![
         info: "flatpak info $",
         update_index: "",
         upgrade_all: "flatpak update",
-        list_upgradable: "",
         list_installed: "flatpak list",
     },
     {
@@ -182,7 +174,6 @@ vendors![
         info: "guix show $",
         update_index: "guix refresh",
         upgrade_all: "guix upgrade",
-        list_upgradable: "",
         list_installed: "guix package -I/--list-installed",
     },
     {
@@ -195,7 +186,6 @@ vendors![
         info: "nix-env -qa --description $",
         update_index: "nix-channel --update",
         upgrade_all: "nix-env -u/--upgrade",
-        list_upgradable: "nix-env -q/--query",
         list_installed: "nix-env -q/--query --installed",
     },
     {
@@ -208,7 +198,6 @@ vendors![
         info: "opkg info $",
         update_index: "opkg update",
         upgrade_all: "opkg upgrade",
-        list_upgradable: "opkg list-upgrades",
         list_installed: "opkg list-installed",
     },
     {
@@ -221,7 +210,6 @@ vendors![
         info: "pacman -S -i $",
         update_index: "pacman -S -y -y",
         upgrade_all: "pacman -S -y -u",
-        list_upgradable: "pacman -Q -u",
         list_installed: "pacman -Q -e",
     },
     {
@@ -234,7 +222,6 @@ vendors![
         info: "pkg info $",
         update_index: "pkg update",
         upgrade_all: "pkg upgrade",
-        list_upgradable: "pkg upgrade -n/--dry-run",
         list_installed: "pkg info -a/--all",
     },
     {
@@ -247,7 +234,6 @@ vendors![
         info: "pkg show $",
         update_index: "pkg update",
         upgrade_all: "pkg upgrade",
-        list_upgradable: "",
         list_installed: "pkg list-installed",
     },
     {
@@ -260,7 +246,6 @@ vendors![
         info: "scoop info $",
         update_index: "scoop update",
         upgrade_all: "scoop update *",
-        list_upgradable: "scoop status",
         list_installed: "scoop list",
     },
     {
@@ -273,7 +258,6 @@ vendors![
         info: "slackpkg info $",
         update_index: "slackpkg update",
         upgrade_all: "slackpkg upgrade-all",
-        list_upgradable: "",
         list_installed: "ls -1 /var/log/packages",
     },
     {
@@ -286,7 +270,6 @@ vendors![
         info: "snap info $",
         update_index: "",
         upgrade_all: "snap refresh",
-        list_upgradable: "snap refresh --list",
         list_installed: "list",
     },
     {
@@ -299,8 +282,7 @@ vendors![
         info: "upt info $",
         update_index: "upt update",
         upgrade_all: "upt upgrade",
-        list_upgradable: "upt list -u/--upgradable",
-        list_installed: "upt list -i/--installed",
+        list_installed: "upt list",
     },
     {
         name: "urpm",
@@ -312,7 +294,6 @@ vendors![
         info: "urpmq -i $",
         update_index: "urpmi.update -a",
         upgrade_all: "urpmi --auto-update",
-        list_upgradable: "urpmq --auto-select",
         list_installed: "rpm -q/--query --all",
     },
     {
@@ -325,7 +306,6 @@ vendors![
         info: "xbps-query -RS $",
         update_index: "xbps-install -S/--sync",
         upgrade_all: "xbps-install -u/--update",
-        list_upgradable: "xbps-install -un",
         list_installed: "xbps-query -l/--list-pkgs",
     },
     {
@@ -338,7 +318,6 @@ vendors![
         info: "yum info $",
         update_index: "yum check-update",
         upgrade_all: "yum update",
-        list_upgradable: "yum list --upgrades",
         list_installed: "yum list --installed",
     },
     {
@@ -351,7 +330,6 @@ vendors![
         info: "zypper info $",
         update_index: "zypper refresh",
         upgrade_all: "zypper update",
-        list_upgradable: "zypper list-updates -a/--all",
         list_installed: "zypper search -i/--installed-only",
     },
 ];
@@ -368,7 +346,6 @@ pub struct Vendor {
     pub(crate) info: SubCommand,
     pub(crate) update_index: SubCommand,
     pub(crate) upgrade_all: SubCommand,
-    pub(crate) list_upgradable: SubCommand,
     pub(crate) list_installed: SubCommand,
 }
 
@@ -399,9 +376,6 @@ impl Vendor {
         if let Some((_, yes)) = self.upgrade_all.parse(args, &self.confirm) {
             return Ok(Task::UpgradeAll { confirm: yes });
         }
-        if self.list_upgradable.parse(args, "").is_some() {
-            return Ok(Task::ListUpgradable);
-        }
         if self.list_installed.parse(args, "").is_some() {
             return Ok(Task::ListInstalled);
         }
@@ -419,7 +393,6 @@ impl Vendor {
             Task::UpdateIndex => self.update_index.to_cmd("", ""),
             Task::UpgradeAll { confirm: yes } => self.upgrade_all.to_cmd("", self.yes_str(yes)),
             Task::ListInstalled => self.list_installed.to_cmd("", ""),
-            Task::ListUpgradable => self.list_upgradable.to_cmd("", ""),
         };
         cmd.ok_or(UptError::NotSupportTask)
     }
@@ -454,7 +427,6 @@ impl Vendor {
             (self.info.help(), "Show package details"),
             (self.update_index.help(), "Update package indexes"),
             (self.upgrade_all.help(), "Upgrade all packages"),
-            (self.list_upgradable.help(), "List all upgradable packages"),
             (self.list_installed.help(), "List all installed packages"),
         ];
         let helps: Vec<(&String, &str)> = helps
@@ -523,12 +495,10 @@ mod tests {
         check_parse!(upt, ["upt", "info", "vim"], (Info, pkg = "vim"));
         check_parse!(upt, ["upt", "update"], UpdateIndex);
         check_parse!(upt, ["upt", "upgrade"], (UpgradeAll, confirm = false));
-        check_parse!(upt, ["upt", "list", "--upgradable"], ListUpgradable);
-        check_parse!(upt, ["upt", "list", "-i"], ListInstalled);
+        check_parse!(upt, ["upt", "list"], ListInstalled);
         check_parse!(upt, ["upt", "install"]);
         check_parse!(upt, ["upt", "install", "--ye"]);
         check_parse!(upt, ["upt", "update", "--yes"]);
-        check_parse!(upt, ["upt", "list"]);
     }
     macro_rules! check_eval {
         ($vendor:expr, ($task:tt, $pkg:expr, $confirm:expr), $cmd:expr) => {
@@ -576,7 +546,6 @@ mod tests {
         check_eval!(upt, (Info, pkg = "vim"), "upt info vim");
         check_eval!(upt, UpdateIndex, "upt update");
         check_eval!(upt, (UpgradeAll, confirm = false), "upt upgrade");
-        check_eval!(upt, ListInstalled, "upt list -i");
-        check_eval!(upt, ListUpgradable, "upt list -u");
+        check_eval!(upt, ListInstalled, "upt list");
     }
 }
