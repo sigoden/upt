@@ -9,7 +9,7 @@ Upt is just an advanced alias, relying on the platform's package management tool
 
 ## Features
 
-### Unified Interface
+### Unified command interface
 
 Each operating system (OS) has its own package management tool, which requires different commands to complete the same operation.
 This can be inconvenient when switching between or trying new OSs. 
@@ -111,10 +111,7 @@ pacman -S vim           # use pacman syntax
 +------------------------------------------------------+----------------------+
 ```
 
-Some platforms may support multiple package management tools, and upt defaults to selecting them in the order listed in the table. 
-Of course, you can also specify the `UPT_TOOL` environment variable.
-
-For example, in Windows, `upt` will prioritize using `scoop`. If `scoop` is not available, it will use `choco`. If `choco` is also not available, it will use `winget`. If you set `UPT_TOOL=choco`, `choco` will be used even though `scoop` exists.
+Some platforms may support multiple package management tools, and upt selects one of them in the order listed in the table.
 
 ## Install
 
@@ -130,7 +127,7 @@ cargo install upt
 
 Download it from [GitHub Releases](https://github.com/sigoden/upt/releases), unzip and add aichat to your $PATH.
 
-## CLI
+## Usage
 
 ```
 Usage: 
