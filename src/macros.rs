@@ -50,6 +50,11 @@ macro_rules! vendors {
                 _ => None
             }
         }
+
+        #[allow(unused)]
+        pub(crate) fn support_tools() -> Vec<&'static str> {
+            vec![$( $name,)+]
+        }
     }
 }
 

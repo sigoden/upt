@@ -184,7 +184,7 @@ impl SubCommand {
 pub(crate) fn must_from_str(s: &str, name: &str, field: &str) -> SubCommand {
     match SubCommand::from_str(s) {
         Ok(p) => p,
-        Err(_) => panic!("{}.{}: invalid subcommand '{}'", name, field, s),
+        Err(_) => panic!("Failed to parse {}.{} from '{}' ", name, field, s),
     }
 }
 
