@@ -6,7 +6,7 @@ use std::str::FromStr;
 #[derive(Debug, Clone, PartialEq, Default)]
 pub(crate) struct SubCommand {
     cmd: String,
-    action: String,
+    action: Option<String>,
     has_pkg: bool,
     options: Vec<Vec<String>>,
 }
@@ -20,10 +20,17 @@ impl FromStr for SubCommand {
         let words: Vec<&str> = s.split(' ').collect();
         let mut has_pkg = false;
         let mut options: Vec<Vec<String>> = vec![];
-        let (cmd, action, reminder) = if words.len() < 2 {
+        if words.len() < 2 {
             return Err(UptError::InvalidSubcommand(s.to_string()));
+        }
+        let (cmd, action, reminder) = if words[1].starts_with('-') || words[1] == "$" {
+            (words[0].to_string(), None, &words[1..])
         } else {
-            (words[0], words[1], &words[2..])
+            (
+                words[0].to_string(),
+                Some(words[1].to_string()),
+                &words[2..],
+            )
         };
         fn split(v: &str) -> Vec<String> {
             v.split('/').map(|x| x.to_string()).collect::<Vec<String>>()
@@ -38,8 +45,8 @@ impl FromStr for SubCommand {
             }
         }
         Ok(SubCommand {
-            cmd: cmd.to_string(),
-            action: action.to_string(),
+            cmd,
+            action,
             has_pkg,
             options,
         })
@@ -48,25 +55,22 @@ impl FromStr for SubCommand {
 
 impl SubCommand {
     /// Try to parse the command line arguemnts
-    pub fn parse(&self, args: &[String], confirm_options: &str) -> Option<(Option<String>, bool)> {
+    pub fn parse(&self, args: &[String], confirm: &str) -> Option<(Option<String>, bool)> {
         if self.is_default() {
             return None;
         }
-        let (cmd, action, options, pkg) = self.parse_args(args)?;
-        if cmd != self.cmd || action != self.action {
-            return None;
-        }
+        let (options, pkg) = self.parse_args(args)?;
         if (pkg.is_none() && self.has_pkg) || (pkg.is_some() && !self.has_pkg) {
             return None;
         }
-        let options_no_confirm: Vec<String> = options
+        let no_confirm_options: Vec<String> = options
             .iter()
-            .filter(|v| !confirm_options.split('/').any(|y| &y == v))
+            .filter(|v| !confirm.split('/').any(|y| &y == v))
             .cloned()
             .collect();
 
-        let confirm = options_no_confirm.len() != options.len();
-        if !self.satisfy_options(&options_no_confirm) {
+        let confirm = no_confirm_options.len() != options.len();
+        if !self.satisfy_options(&no_confirm_options) {
             return None;
         }
         Some((pkg, confirm))
@@ -76,7 +80,10 @@ impl SubCommand {
         if self.is_default() {
             return None;
         }
-        let mut segs: Vec<&str> = vec![&self.cmd, &self.action];
+        let mut segs: Vec<&str> = vec![&self.cmd];
+        if let Some(action) = &self.action {
+            segs.push(action);
+        }
         for item in &self.options {
             segs.push(&item[0]);
         }
@@ -94,7 +101,12 @@ impl SubCommand {
         if self.is_default() {
             return None;
         }
-        let mut segs: Vec<String> = vec![self.cmd.clone(), self.action.clone()];
+        let mut segs: Vec<String> = vec![self.cmd.clone()];
+
+        if let Some(action) = &self.action {
+            segs.push(action.clone());
+        }
+
         for item in &self.options {
             if item.len() > 1 {
                 segs.push(item.join("/"));
@@ -112,15 +124,24 @@ impl SubCommand {
         self == &Default::default()
     }
 
-    fn parse_args(&self, args: &[String]) -> Option<(String, String, Vec<String>, Option<String>)> {
+    fn parse_args(&self, args: &[String]) -> Option<(Vec<String>, Option<String>)> {
         if args.len() < 2 {
             return None;
         }
-        let is_dashed = self.action.starts_with('-'); // SubCommand of pacman is dashed
-        let (cmd, args) = args.split_first().unwrap();
+        if self.cmd != args[0] {
+            return None;
+        }
+        let reminder = if let Some(action) = &self.action {
+            if &args[1] != action {
+                return None;
+            }
+            &args[2..]
+        } else {
+            &args[1..]
+        };
         let mut options: Vec<String> = vec![];
         let mut operands: Vec<String> = vec![];
-        for arg in args.iter() {
+        for arg in reminder.iter() {
             if arg.starts_with("--") {
                 options.push(arg.to_string());
             } else if arg.starts_with('-') {
@@ -133,28 +154,12 @@ impl SubCommand {
                 operands.push(arg.to_string());
             }
         }
-        let action = match is_dashed {
-            true => {
-                if options.is_empty() {
-                    String::new()
-                } else {
-                    options.remove(0)
-                }
-            }
-            false => {
-                if operands.is_empty() {
-                    String::new()
-                } else {
-                    operands.remove(0)
-                }
-            }
-        };
         let pkg = if operands.is_empty() {
             None
         } else {
             Some(operands.join(" "))
         };
-        Some((cmd.to_string(), action, options, pkg))
+        Some((options, pkg))
     }
 
     fn satisfy_options(&self, options: &[String]) -> bool {
@@ -193,7 +198,7 @@ mod tests {
             let subcommand = SubCommand::from_str($input).unwrap();
             let expect_subcommand = SubCommand {
                 cmd: $cmd.to_string(),
-                action: $action.to_string(),
+                action: $action.map(|v| v.to_string()),
                 has_pkg: $has_pkg,
                 options: vec![$(vec![$($options.to_string(),)*],)*],
             };
@@ -205,27 +210,27 @@ mod tests {
     fn test_subcommand_from_str() {
         check_subcommand_from_str!(
             "upt install $",
-            { "upt", "install", [], true }
+            { "upt", Some("install"), [], true }
         );
         check_subcommand_from_str!(
             "upt search $",
-            { "upt", "search", [], true }
+            { "upt", Some("search"), [], true }
         );
         check_subcommand_from_str!(
             "apt list --installed",
-            {"apt", "list", [["--installed"]], false }
+            {"apt", Some("list"), [["--installed"]], false }
         );
         check_subcommand_from_str!(
             "pacman -R -s $",
-            { "pacman", "-R", [["-s"]], true }
+            { "pacman", None::<&str>, [["-R"], ["-s"]], true }
         );
         check_subcommand_from_str!(
             "pacman -S -y -y",
-            { "pacman", "-S", [["-y"], ["-y"]], false }
+            { "pacman", None::<&str>, [["-S"], ["-y"], ["-y"]], false }
         );
         check_subcommand_from_str!(
             "pacman -S $",
-            { "pacman", "-S", [], true }
+            { "pacman", None::<&str>, [["-S"]], true }
         );
     }
 
