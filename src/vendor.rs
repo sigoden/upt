@@ -297,6 +297,18 @@ vendors![
         list_installed: "rpm -q/--query --all",
     },
     {
+        name: "winget",
+        confirm: "",
+        install: "winget install $",
+        remove: "winget uninstall $",
+        upgrade: "winget upgrade $",
+        search: "winget search $",
+        info: "winget show $",
+        update_index: "",
+        upgrade_all: "winget upgrade --all",
+        list_installed: "winget list",
+    },
+    {
         name: "xbps",
         confirm: "-y/--yes",
         install: "xbps-install $",
