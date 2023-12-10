@@ -18,6 +18,9 @@ os_tools!(
   "zorin" => "apt";
   "antix" => "apt";
   "devuan" => "apt";
+  "bodhi" => "apt";
+  "lxle" => "apt";
+  "sparky" => "apt";
   // dnf
   "fedora" => "dnf", "yum";
   "redhat" => "dnf", "yum";
@@ -60,6 +63,8 @@ os_tools!(
   "solus" => "eopkg";
   // opkg
   "openwrt" => "opkg";
+  // cards
+  "nutyx" => "cards";
   // pkg
   "freebsd" => "pkg";
   "ghostbsd" => "pkg";
@@ -85,7 +90,7 @@ vendors![
         confirm: "-y/--yes",
         install: "apt install $",
         remove: "apt remove $",
-        upgrade: "apt install $",
+        upgrade: "apt install --only-upgrade $",
         search: "apt search $",
         info: "apt show $",
         update_index: "apt update",
@@ -103,6 +108,18 @@ vendors![
         update_index: "brew update",
         upgrade_all: "brew upgrade",
         list_installed: "brew list",
+    },
+    {
+        name: "cards",
+        confirm: "",
+        install: "cards install $",
+        remove: "cards remove $",
+        upgrade: "cards install -u/--upgrade $",
+        search: "cards search $",
+        info: "cards info $",
+        update_index: "cards sync",
+        upgrade_all: "cards upgrade",
+        list_installed: "cards list",
     },
     {
         name: "choco",
