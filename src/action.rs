@@ -4,14 +4,14 @@ use std::cell::Cell;
 use std::str::FromStr;
 
 #[derive(Debug, Clone, PartialEq, Default)]
-pub(crate) struct SubCommand {
+pub(crate) struct Action {
     cmd: String,
     action: Option<String>,
     has_pkg: bool,
     options: Vec<Vec<String>>,
 }
 
-impl FromStr for SubCommand {
+impl FromStr for Action {
     type Err = UptError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.is_empty() {
@@ -21,7 +21,7 @@ impl FromStr for SubCommand {
         let mut has_pkg = false;
         let mut options: Vec<Vec<String>> = vec![];
         if words.len() < 2 {
-            return Err(UptError::InvalidSubcommand(s.to_string()));
+            return Err(UptError::InvalidAction(s.to_string()));
         }
         let (cmd, action, reminder) = if words[1].starts_with('-') || words[1] == "$" {
             (words[0].to_string(), None, &words[1..])
@@ -44,7 +44,7 @@ impl FromStr for SubCommand {
                 options.push(split(elem));
             }
         }
-        Ok(SubCommand {
+        Ok(Action {
             cmd,
             action,
             has_pkg,
@@ -53,10 +53,10 @@ impl FromStr for SubCommand {
     }
 }
 
-impl SubCommand {
+impl Action {
     /// Try to parse the command line arguemnts
     pub fn parse(&self, args: &[String], confirm: &str) -> Option<(Option<String>, bool)> {
-        if self.is_default() {
+        if self.invalid() {
             return None;
         }
         let (options, pkg) = self.parse_args(args)?;
@@ -77,7 +77,7 @@ impl SubCommand {
     }
 
     pub fn to_cmd(&self, pkg: &str, confirm: &str) -> Option<String> {
-        if self.is_default() {
+        if self.invalid() {
             return None;
         }
         let mut segs: Vec<&str> = vec![&self.cmd];
@@ -98,7 +98,7 @@ impl SubCommand {
 
     /// Genereate help message
     pub fn help(&self) -> Option<String> {
-        if self.is_default() {
+        if self.invalid() {
             return None;
         }
         let mut segs: Vec<String> = vec![self.cmd.clone()];
@@ -120,7 +120,7 @@ impl SubCommand {
         Some(segs.join(" "))
     }
 
-    fn is_default(&self) -> bool {
+    fn invalid(&self) -> bool {
         self == &Default::default()
     }
 
@@ -181,8 +181,8 @@ impl SubCommand {
 }
 
 /// used in vendor!
-pub(crate) fn must_from_str(s: &str, name: &str, field: &str) -> SubCommand {
-    match SubCommand::from_str(s) {
+pub(crate) fn must_from_str(s: &str, name: &str, field: &str) -> Action {
+    match Action::from_str(s) {
         Ok(p) => p,
         Err(_) => panic!("Failed to parse {}.{} from '{}' ", name, field, s),
     }
@@ -190,183 +190,183 @@ pub(crate) fn must_from_str(s: &str, name: &str, field: &str) -> SubCommand {
 
 #[cfg(test)]
 mod tests {
-    use super::SubCommand;
+    use super::Action;
     use std::str::FromStr;
 
-    macro_rules! check_subcommand_from_str {
+    macro_rules! check_action_from_str {
         ($input:expr, { $cmd:expr, $action:expr, [$([$($options:expr),* $(,)*]),*], $has_pkg:expr }) => {
-            let subcommand = SubCommand::from_str($input).unwrap();
-            let expect_subcommand = SubCommand {
+            let action = Action::from_str($input).unwrap();
+            let expect_action = Action {
                 cmd: $cmd.to_string(),
                 action: $action.map(|v| v.to_string()),
                 has_pkg: $has_pkg,
                 options: vec![$(vec![$($options.to_string(),)*],)*],
             };
-            assert_eq!(subcommand, expect_subcommand);
+            assert_eq!(action, expect_action);
         }
     }
 
     #[test]
-    fn test_subcommand_from_str() {
-        check_subcommand_from_str!(
+    fn test_action_from_str() {
+        check_action_from_str!(
             "upt install $",
             { "upt", Some("install"), [], true }
         );
-        check_subcommand_from_str!(
+        check_action_from_str!(
             "upt search $",
             { "upt", Some("search"), [], true }
         );
-        check_subcommand_from_str!(
+        check_action_from_str!(
             "apt list --installed",
             {"apt", Some("list"), [["--installed"]], false }
         );
-        check_subcommand_from_str!(
+        check_action_from_str!(
             "pacman -R -s $",
             { "pacman", None::<&str>, [["-R"], ["-s"]], true }
         );
-        check_subcommand_from_str!(
+        check_action_from_str!(
             "pacman -S -y -y",
             { "pacman", None::<&str>, [["-S"], ["-y"], ["-y"]], false }
         );
-        check_subcommand_from_str!(
+        check_action_from_str!(
             "pacman -S $",
             { "pacman", None::<&str>, [["-S"]], true }
         );
     }
 
-    macro_rules! check_subcommand_parse {
+    macro_rules! check_action_parse {
         ($input:expr, $confirm:expr, [$($args:expr),*], ($pkg:expr, $confirm_result:expr)) => {
             {
-                let subcommand = SubCommand::from_str($input).unwrap();
+                let action = Action::from_str($input).unwrap();
                 let args = vec![$($args.to_string()),*];
                 let pkg = if $pkg.len() == 0 {
                     None
                 } else {
                     Some($pkg.to_string())
                 };
-                assert_eq!(subcommand.parse(&args, $confirm).unwrap(), (pkg, $confirm_result));
+                assert_eq!(action.parse(&args, $confirm).unwrap(), (pkg, $confirm_result));
             }
         };
         ($input:expr, $confirm:expr, [$($args:expr),*]) => {
             {
-                let subcommand = SubCommand::from_str($input).unwrap();
+                let action = Action::from_str($input).unwrap();
                 let args = vec![ $($args.to_string()),*];
-                assert_eq!(subcommand.parse(&args, $confirm), None);
+                assert_eq!(action.parse(&args, $confirm), None);
             }
         }
     }
 
     #[test]
-    fn test_subcommand_parse() {
-        check_subcommand_parse!(
+    fn test_action_parse() {
+        check_action_parse!(
             "apt install $",
             "-y/--confirm",
             ["apt", "install", "vim"],
             ("vim", false)
         );
-        check_subcommand_parse!(
+        check_action_parse!(
             "apt install $",
             "-y/--confirm",
             ["apt", "install", "-y", "vim"],
             ("vim", true)
         );
-        check_subcommand_parse!(
+        check_action_parse!(
             "apt install $",
             "-y/--confirm",
             ["apt", "install", "--confirm", "vim"],
             ("vim", true)
         );
-        check_subcommand_parse!(
+        check_action_parse!(
             "apt install $",
             "-y/--confirm",
             ["apt", "install", "vim", "jq"],
             ("vim jq", false)
         );
-        check_subcommand_parse!("apt install $", "-y/--confirm", ["upt", "install", "vim"]);
-        check_subcommand_parse!("apt search $", "", ["apt", "search", "vim"], ("vim", false));
-        check_subcommand_parse!(
+        check_action_parse!("apt install $", "-y/--confirm", ["upt", "install", "vim"]);
+        check_action_parse!("apt search $", "", ["apt", "search", "vim"], ("vim", false));
+        check_action_parse!(
             "apt list --installed",
             "",
             ["apt", "list", "--installed"],
             ("", false)
         );
-        check_subcommand_parse!(
+        check_action_parse!(
             "pacman -R -s $",
             "--noconfirm",
             ["pacman", "-R", "-s", "--noconfirm", "vim"],
             ("vim", true)
         );
-        check_subcommand_parse!(
+        check_action_parse!(
             "pacman -R -s $",
             "--noconfirm",
             ["pacman", "-Rs", "vim"],
             ("vim", false)
         );
-        check_subcommand_parse!(
+        check_action_parse!(
             "pacman -R -s $",
             "--noconfirm",
             ["pacman", "-Rs", "--noconfirm", "vim", "jq"],
             ("vim jq", true)
         );
-        check_subcommand_parse!("pacman -S -y -y", "", ["pacman", "-Syy"], ("", false));
-        check_subcommand_parse!("pacman -S $", "", ["pacman", "-S", "vim"], ("vim", false));
-        check_subcommand_parse!("apt tsearch $", "", ["apt", "search"]);
-        check_subcommand_parse!("apt tupgrade", "", ["apt", "upgrade", "vim"]);
-        check_subcommand_parse!("pacman -S -y -y", "", ["pacman", "-Sy"]);
-        check_subcommand_parse!("pacman -S -y -y", "", ["pacman", "-Syyy"]);
-        check_subcommand_parse!("pacman -Q -i", "", ["pacman", "-Qiy"]);
+        check_action_parse!("pacman -S -y -y", "", ["pacman", "-Syy"], ("", false));
+        check_action_parse!("pacman -S $", "", ["pacman", "-S", "vim"], ("vim", false));
+        check_action_parse!("apt tsearch $", "", ["apt", "search"]);
+        check_action_parse!("apt tupgrade", "", ["apt", "upgrade", "vim"]);
+        check_action_parse!("pacman -S -y -y", "", ["pacman", "-Sy"]);
+        check_action_parse!("pacman -S -y -y", "", ["pacman", "-Syyy"]);
+        check_action_parse!("pacman -Q -i", "", ["pacman", "-Qiy"]);
     }
 
-    macro_rules! check_subcommand_to_cmd {
+    macro_rules! check_action_to_cmd {
         ($input:expr, ($pkg:expr, $confirm:expr), $cmd:expr) => {{
-            let subcommand = SubCommand::from_str($input).unwrap();
-            assert_eq!(subcommand.to_cmd($pkg, $confirm), Some($cmd.to_string()));
+            let action = Action::from_str($input).unwrap();
+            assert_eq!(action.to_cmd($pkg, $confirm), Some($cmd.to_string()));
         }};
         ($input:expr, ($pkg:expr, $confirm:expr)) => {{
-            let subcommand = SubCommand::from_str($input).unwrap();
-            assert!(subcommand.to_cmd($pkg, $confirm).is_none());
+            let action = Action::from_str($input).unwrap();
+            assert!(action.to_cmd($pkg, $confirm).is_none());
         }};
     }
 
     #[test]
-    fn test_subcommand_to_cmd() {
-        check_subcommand_to_cmd!("apt install $", ("vim", ""), "apt install vim");
-        check_subcommand_to_cmd!("apt install $", ("vim", "-y"), "apt install -y vim");
-        check_subcommand_to_cmd!("apt install $", ("vim jq", ""), "apt install vim jq");
-        check_subcommand_to_cmd!("apt search $", ("vim", ""), "apt search vim");
-        check_subcommand_to_cmd!("apt list --installed", ("", ""), "apt list --installed");
-        check_subcommand_to_cmd!(
+    fn test_action_to_cmd() {
+        check_action_to_cmd!("apt install $", ("vim", ""), "apt install vim");
+        check_action_to_cmd!("apt install $", ("vim", "-y"), "apt install -y vim");
+        check_action_to_cmd!("apt install $", ("vim jq", ""), "apt install vim jq");
+        check_action_to_cmd!("apt search $", ("vim", ""), "apt search vim");
+        check_action_to_cmd!("apt list --installed", ("", ""), "apt list --installed");
+        check_action_to_cmd!(
             "pacman -R -s $",
             ("vim", "--noconfirm"),
             "pacman -R -s --noconfirm vim"
         );
-        check_subcommand_to_cmd!("pacman -R -s $", ("vim", ""), "pacman -R -s vim");
-        check_subcommand_to_cmd!(
+        check_action_to_cmd!("pacman -R -s $", ("vim", ""), "pacman -R -s vim");
+        check_action_to_cmd!(
             "pacman -R -s $",
             ("vim jq", "--noconfirm"),
             "pacman -R -s --noconfirm vim jq"
         );
-        check_subcommand_to_cmd!("pacman -S -y -y", ("", ""), "pacman -S -y -y");
-        check_subcommand_to_cmd!("pacman -S $", ("vim", ""), "pacman -S vim");
+        check_action_to_cmd!("pacman -S -y -y", ("", ""), "pacman -S -y -y");
+        check_action_to_cmd!("pacman -S $", ("vim", ""), "pacman -S vim");
     }
 
-    macro_rules! check_subcommand_help {
+    macro_rules! check_action_help {
         ($input:expr, $help:expr) => {{
-            let subcommand = SubCommand::from_str($input).unwrap();
-            assert_eq!(subcommand.help(), Some($help.to_string()));
+            let action = Action::from_str($input).unwrap();
+            assert_eq!(action.help(), Some($help.to_string()));
         }};
         ($input:expr) => {{
-            let subcommand = SubCommand::from_str($input).unwrap();
-            assert!(subcommand.help().is_none());
+            let action = Action::from_str($input).unwrap();
+            assert!(action.help().is_none());
         }};
     }
 
     #[test]
-    fn test_subcommand_help() {
-        check_subcommand_help!("upt install $", "upt install <pkg>");
-        check_subcommand_help!("upt search $", "upt search <pkg>");
-        check_subcommand_help!("upt list -i/--installed", "upt list -i/--installed");
-        check_subcommand_help!("pacman -S -y -y", "pacman -S -y -y");
-        check_subcommand_help!("pacman -S $", "pacman -S <pkg>");
+    fn test_action_help() {
+        check_action_help!("upt install $", "upt install <pkg>");
+        check_action_help!("upt search $", "upt search <pkg>");
+        check_action_help!("upt list -i/--installed", "upt list -i/--installed");
+        check_action_help!("pacman -S -y -y", "pacman -S -y -y");
+        check_action_help!("pacman -S $", "pacman -S <pkg>");
     }
 }
