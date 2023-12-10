@@ -68,11 +68,23 @@ os_tools!(
   // pkg
   "freebsd" => "pkg";
   "ghostbsd" => "pkg";
-  // pkg(2)
-  "andorid" => "pkg(2)"
+  // pkg(termux)
+  "andorid" => "pkg(termux)"
 );
 
 vendors![
+    {
+        name: "upt",
+        confirm: "-y/--yes",
+        install: "upt install $",
+        remove: "upt remove $",
+        upgrade: "upt upgrade $",
+        search: "upt search $",
+        info: "upt info $",
+        update_index: "upt update",
+        upgrade_all: "upt upgrade",
+        list_installed: "upt list",
+    },
     {
         name: "apk",
         confirm: "",
@@ -242,7 +254,7 @@ vendors![
         list_installed: "pkg info -a/--all",
     },
     {
-        name: "pkg(2)",
+        name: "pkg(termux)",
         confirm: "-y/--yes",
         install: "pkg install $",
         remove: "pkg uninstall $",
@@ -288,18 +300,6 @@ vendors![
         update_index: "",
         upgrade_all: "snap refresh",
         list_installed: "snap list",
-    },
-    {
-        name: "upt",
-        confirm: "-y/--yes",
-        install: "upt install $",
-        remove: "upt remove $",
-        upgrade: "upt upgrade $",
-        search: "upt search $",
-        info: "upt info $",
-        update_index: "upt update",
-        upgrade_all: "upt upgrade",
-        list_installed: "upt list",
     },
     {
         name: "urpm",
