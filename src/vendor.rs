@@ -20,6 +20,7 @@ os_tools!(
   "devuan" => "apt";
   "bodhi" => "apt";
   "lxle" => "apt";
+  "sparky" => "apt";
   // dnf
   "fedora" => "dnf", "yum";
   "redhat" => "dnf", "yum";
