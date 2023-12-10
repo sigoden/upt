@@ -10,6 +10,9 @@ repository = "https://github.com/sigoden/upt"
 categories = ["command-line-utilities"]
 keywords = ["universal", "package", "management"]
 
+[dependencies]
+which = "5.0.0"
+
 [[bin]]
 doc = false
 name = "upt"
@@ -18,6 +21,3 @@ name = "upt"
 lto = true
 strip = true
 opt-level = "z"
-
-[dependencies]
-which = "5.0.0"
