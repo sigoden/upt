@@ -1,8 +1,8 @@
 #[macro_use]
 mod macros;
 
+mod action;
 mod error;
-mod subcommand;
 mod task;
 mod utils;
 mod vendor;

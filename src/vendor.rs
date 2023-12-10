@@ -1,5 +1,5 @@
+use crate::action::Action;
 use crate::error::UptError;
-use crate::subcommand::SubCommand;
 use crate::task::Task;
 
 os_tools!(
@@ -368,14 +368,14 @@ vendors![
 pub struct Vendor {
     pub(crate) name: String,
     pub(crate) confirm: String,
-    pub(crate) install: SubCommand,
-    pub(crate) remove: SubCommand,
-    pub(crate) upgrade: SubCommand,
-    pub(crate) search: SubCommand,
-    pub(crate) info: SubCommand,
-    pub(crate) update_index: SubCommand,
-    pub(crate) upgrade_all: SubCommand,
-    pub(crate) list_installed: SubCommand,
+    pub(crate) install: Action,
+    pub(crate) remove: Action,
+    pub(crate) upgrade: Action,
+    pub(crate) search: Action,
+    pub(crate) info: Action,
+    pub(crate) update_index: Action,
+    pub(crate) upgrade_all: Action,
+    pub(crate) list_installed: Action,
 }
 
 impl Vendor {
@@ -423,7 +423,7 @@ impl Vendor {
             Task::UpgradeAll { confirm: yes } => self.upgrade_all.to_cmd("", self.yes_str(yes)),
             Task::ListInstalled => self.list_installed.to_cmd("", ""),
         };
-        cmd.ok_or(UptError::NotSupportTask)
+        cmd.ok_or(UptError::NoTask)
     }
 
     fn yes_str(&self, yes: &bool) -> &str {
