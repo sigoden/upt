@@ -1,11 +1,9 @@
 # Upt — **U**niversal **P**ackage-management **T**ool.
 
-Upt provides a unified command interface to manage packages for all OSs. 
-
-Upt relies on platform's package management tool to do the job, it is more like an alias.
-
 [![Build status](https://github.com/sigoden/upt/actions/workflows/ci.yml/badge.svg)](https://github.com/sigoden/upt/actions)
 [![Crates.io](https://img.shields.io/crates/v/upt.svg)](https://crates.io/crates/upt)
+
+Upt is a universal package management tool for any operating system, it relies on the platform's package management tool to do the job, it is more like an alias.
 
 ## Install
 

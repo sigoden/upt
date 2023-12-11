@@ -1,9 +1,9 @@
 [package]
 name = "upt"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 authors = ["sigoden <sigoden@gmail.com>"]
-description = "Universal package management tool for all OSs"
+description = "Universal package management tool for any OS"
 license = "MIT OR Apache-2.0"
 homepage = "https://github.com/sigoden/upt"
 repository = "https://github.com/sigoden/upt"
@@ -12,10 +12,6 @@ keywords = ["universal", "package", "management"]
 
 [dependencies]
 which = "5.0.0"
-
-[[bin]]
-doc = false
-name = "upt"
 
 [profile.release]
 lto = true
