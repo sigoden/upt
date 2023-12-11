@@ -6,9 +6,9 @@ use std::str::FromStr;
 #[derive(Debug, Clone, PartialEq, Default)]
 pub(crate) struct Action {
     cmd: String,
-    action: Option<String>,
-    has_pkg: bool,
+    subcmd: Vec<String>,
     options: Vec<Vec<String>>,
+    has_pkg: bool,
 }
 
 impl FromStr for Action {
@@ -23,18 +23,11 @@ impl FromStr for Action {
         if words.len() < 2 {
             return Err(UptError::InvalidAction(s.to_string()));
         }
-        let (cmd, action, reminder) = if words[1].starts_with('-') || words[1] == "$" {
-            (words[0].to_string(), None, &words[1..])
+        let (cmd, subcmd, reminder) = if words[1].starts_with('-') || words[1] == "$" {
+            (words[0].to_string(), vec![], &words[1..])
         } else {
-            (
-                words[0].to_string(),
-                Some(words[1].to_string()),
-                &words[2..],
-            )
+            (words[0].to_string(), split(words[1]), &words[2..])
         };
-        fn split(v: &str) -> Vec<String> {
-            v.split('/').map(|x| x.to_string()).collect::<Vec<String>>()
-        }
         for elem in reminder {
             if elem == &"$" {
                 has_pkg = true;
@@ -46,15 +39,14 @@ impl FromStr for Action {
         }
         Ok(Action {
             cmd,
-            action,
-            has_pkg,
+            subcmd,
             options,
+            has_pkg,
         })
     }
 }
 
 impl Action {
-    /// Try to parse the command line arguemnts
     pub fn parse(&self, args: &[String], confirm: &str) -> Option<(Option<String>, bool)> {
         if self.invalid() {
             return None;
@@ -81,7 +73,7 @@ impl Action {
             return None;
         }
         let mut segs: Vec<&str> = vec![&self.cmd];
-        if let Some(action) = &self.action {
+        if let Some(action) = &self.subcmd.first() {
             segs.push(action);
         }
         for item in &self.options {
@@ -96,20 +88,19 @@ impl Action {
         Some(segs.join(" "))
     }
 
-    /// Genereate help message
     pub fn help(&self) -> Option<String> {
         if self.invalid() {
             return None;
         }
         let mut segs: Vec<String> = vec![self.cmd.clone()];
 
-        if let Some(action) = &self.action {
-            segs.push(action.clone());
+        if !self.subcmd.is_empty() {
+            segs.push(join(&self.subcmd));
         }
 
         for item in &self.options {
             if item.len() > 1 {
-                segs.push(item.join("/"));
+                segs.push(join(item));
             } else {
                 segs.push(item[0].clone());
             }
@@ -131,13 +122,13 @@ impl Action {
         if self.cmd != args[0] {
             return None;
         }
-        let reminder = if let Some(action) = &self.action {
-            if &args[1] != action {
+        let reminder = if self.subcmd.is_empty() {
+            &args[1..]
+        } else {
+            if !self.subcmd.contains(&args[1]) {
                 return None;
             }
             &args[2..]
-        } else {
-            &args[1..]
         };
         let mut options: Vec<String> = vec![];
         let mut operands: Vec<String> = vec![];
@@ -188,17 +179,25 @@ pub(crate) fn must_from_str(s: &str, name: &str, field: &str) -> Action {
     }
 }
 
+fn split(v: &str) -> Vec<String> {
+    v.split('/').map(|x| x.to_string()).collect::<Vec<String>>()
+}
+
+fn join(v: &[String]) -> String {
+    v.join("/")
+}
+
 #[cfg(test)]
 mod tests {
     use super::Action;
     use std::str::FromStr;
 
     macro_rules! check_action_from_str {
-        ($input:expr, { $cmd:expr, $action:expr, [$([$($options:expr),* $(,)*]),*], $has_pkg:expr }) => {
+        ($input:expr, { $cmd:expr, $subcmd:expr, [$([$($options:expr),* $(,)*]),*], $has_pkg:expr }) => {
             let action = Action::from_str($input).unwrap();
             let expect_action = Action {
                 cmd: $cmd.to_string(),
-                action: $action.map(|v| v.to_string()),
+                subcmd: $subcmd.iter().map(|v| v.to_string()).collect(),
                 has_pkg: $has_pkg,
                 options: vec![$(vec![$($options.to_string(),)*],)*],
             };
@@ -210,27 +209,31 @@ mod tests {
     fn test_action_from_str() {
         check_action_from_str!(
             "upt install $",
-            { "upt", Some("install"), [], true }
+            { "upt", ["install"], [], true }
         );
         check_action_from_str!(
             "upt search $",
-            { "upt", Some("search"), [], true }
+            { "upt", ["search"], [], true }
+        );
+        check_action_from_str!(
+            "upt remove/uninstall $",
+            { "upt", ["remove", "uninstall"], [], true }
         );
         check_action_from_str!(
             "apt list --installed",
-            {"apt", Some("list"), [["--installed"]], false }
+            {"apt", ["list"], [["--installed"]], false }
         );
         check_action_from_str!(
             "pacman -R -s $",
-            { "pacman", None::<&str>, [["-R"], ["-s"]], true }
+            { "pacman", Vec::<&str>::new(), [["-R"], ["-s"]], true }
         );
         check_action_from_str!(
             "pacman -S -y -y",
-            { "pacman", None::<&str>, [["-S"], ["-y"], ["-y"]], false }
+            { "pacman", Vec::<&str>::new(), [["-S"], ["-y"], ["-y"]], false }
         );
         check_action_from_str!(
             "pacman -S $",
-            { "pacman", None::<&str>, [["-S"]], true }
+            { "pacman", Vec::<&str>::new(), [["-S"]], true }
         );
     }
 
