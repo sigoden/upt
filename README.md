@@ -27,19 +27,18 @@ Each operating system (OS) has its own package management tool, which requires d
 This can be inconvenient when switching between or trying new OSs. 
 
 ```sh
-apt remove $pkg           # Ubuntu, Debian, Linux Mint...
-brew uninstall $pkg       # MacOS Homebrew
-choco uninstall $pkg      # Windows Chocolatey
-dnf remove $pkg           # Fedora, Redhat...
-nix-env -e $pkg           # Nixos
+apt install $pkg          # Ubuntu, Debian, Linux Mint...
+apk add $pkg              # Alpine
 pacman -Rs $pkg           # Arch, Manjaro...
+nix-env -e $pkg           # Nixos
 xbps-remove $pkg          # Voidlinux
+emerge $pkg               # Gentoo
 ```
 
 With `upt`, You just need to remember one command:
 
 ```sh
-upt remove $pkg           # Works on any OS
+upt install $pkg          # Works on any OS
 ```
 
 Upt identifies the os type and runs the appropriate package management tool to install `$pkg`.
