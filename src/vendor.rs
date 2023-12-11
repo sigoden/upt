@@ -77,10 +77,10 @@ vendors![
         name: "upt",
         confirm: "-y/--yes",
         install: "upt install $",
-        remove: "upt remove $",
+        remove: "upt remove/uninstall $",
         upgrade: "upt upgrade $",
         search: "upt search $",
-        info: "upt info $",
+        info: "upt info/show $",
         update_index: "upt update",
         upgrade_all: "upt upgrade",
         list_installed: "upt list",
@@ -469,10 +469,7 @@ impl Vendor {
         }
         if !self.confirm.is_empty() {
             lines.push(String::new());
-            lines.push(format!(
-                "Automatically confirm the action with: {}",
-                self.confirm
-            ));
+            lines.push(format!("Automatic answer yes to prompts: {}", self.confirm));
         }
         lines.join("\n")
     }
@@ -513,6 +510,11 @@ mod tests {
         check_parse!(
             upt,
             ["upt", "remove", "--yes", "vim", "jq"],
+            (Remove, "vim jq", true)
+        );
+        check_parse!(
+            upt,
+            ["upt", "uninstall", "--yes", "vim", "jq"],
             (Remove, "vim jq", true)
         );
         check_parse!(upt, ["upt", "upgrade", "vim"], (Upgrade, "vim", false));
