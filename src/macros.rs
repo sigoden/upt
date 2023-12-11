@@ -16,7 +16,7 @@ macro_rules! vendors {
         )+
     ) => {
         pub fn init(name: &str) -> Result<$crate::Vendor, $crate::UptError> {
-            use $crate::subcommand::must_from_str;
+            use $crate::action::must_from_str;
             match name {
                 $(
                     $name => {
@@ -61,7 +61,7 @@ macro_rules! vendors {
 macro_rules! os_tools {
     ($($os:literal => $($tool:literal),+);+$(;)?) => {
         pub fn detect_tool() -> std::result::Result<$crate::Vendor, $crate::UptError> {
-            let os = crate::utils::detect_os().ok_or(UptError::NotSupportOS)?;
+            let os = crate::utils::detect_os().unwrap_or_default();
             let tools: Vec<&str> = match os.as_str() {
                 $(
                     $os => vec![$($tool),+].into_iter().filter_map(|v| which_cmd(v)).collect(),

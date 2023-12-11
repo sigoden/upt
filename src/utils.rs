@@ -1,19 +1,11 @@
-use std::process::{Command, Stdio};
-
-pub fn which(name: &str) -> bool {
-    Command::new(name)
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()
-        .is_ok()
-}
+use which::which;
 
 pub fn find_tool(tools: &[&str]) -> Option<String> {
     match tools.len() {
         0 => None,
         1 => {
             let tool = &tools[0];
-            if which(tool) {
+            if which(tool).is_ok() {
                 Some(tool.to_string())
             } else {
                 None
@@ -24,7 +16,13 @@ pub fn find_tool(tools: &[&str]) -> Option<String> {
                 .iter()
                 .map(|tool| {
                     let tool = tool.to_string();
-                    std::thread::spawn(move || if which(&tool) { Some(tool) } else { None })
+                    std::thread::spawn(move || {
+                        if which(&tool).is_ok() {
+                            Some(tool)
+                        } else {
+                            None
+                        }
+                    })
                 })
                 .collect();
             for handle in handles {
