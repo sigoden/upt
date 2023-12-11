@@ -29,9 +29,9 @@ This can be inconvenient when switching between or trying new OSs.
 ```sh
 apt install $pkg          # Ubuntu, Debian, Linux Mint...
 apk add $pkg              # Alpine
-pacman -Rs $pkg           # Arch, Manjaro...
-nix-env -e $pkg           # Nixos
-xbps-remove $pkg          # Voidlinux
+pacman -S $pkg            # Arch, Manjaro...
+nix-env -i $pkg           # Nixos
+xbps-install $pkg         # Voidlinux
 emerge $pkg               # Gentoo
 ```
 
