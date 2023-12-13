@@ -69,7 +69,9 @@ os_tools!(
   "freebsd" => "pkg";
   "ghostbsd" => "pkg";
   // pkg(termux)
-  "andorid" => "pkg(termux)"
+  "andorid" => "pkg(termux)";
+  // pkgman
+  "haiku" => "pkgman";
 );
 
 vendors![
@@ -264,6 +266,18 @@ vendors![
         update_index: "pkg update",
         upgrade_all: "pkg upgrade",
         list_installed: "pkg list-installed",
+    },
+    {
+        name: "pkgman",
+        confirm: "-y",
+        install: "pkgman install $",
+        remove: "pkgman uninstall $",
+        upgrade: "pkgman update $",
+        search: "pkgman search $",
+        info: "",
+        update_index: "pkgman refresh",
+        upgrade_all: "pkgman update",
+        list_installed: "pkgman search -i/--installed-only -a/--all",
     },
     {
         name: "scoop",
