@@ -50,7 +50,17 @@ pub fn detect_os() -> Option<String> {
     Some("android".to_string())
 }
 
-#[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "android")))]
+#[cfg(target_os = "haiku")]
+pub fn detect_os() -> Option<String> {
+    Some("haiku".to_string())
+}
+
+#[cfg(not(any(
+    target_os = "windows",
+    target_os = "macos",
+    target_os = "android",
+    target_os = "haiku"
+)))]
 pub fn detect_os() -> Option<String> {
     let release = std::fs::read_to_string("/etc/os-release").ok()?;
     let id = release.lines().find(|l| l.starts_with("ID="))?;
