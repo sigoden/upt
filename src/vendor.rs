@@ -239,9 +239,9 @@ vendors![
         upgrade: "pacman -S $",
         search: "pacman -S -s $",
         info: "pacman -S -i $",
-        update_index: "pacman -S -y -y",
+        update_index: "pacman -S -y",
         upgrade_all: "pacman -S -y -u",
-        list_installed: "pacman -Q -e",
+        list_installed: "pacman -Q",
     },
     {
         name: "pkg",
