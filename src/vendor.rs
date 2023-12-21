@@ -163,7 +163,7 @@ vendors![
         name: "emerge",
         confirm: "",
         install: "emerge $",
-        remove: "emerge --deselect $",
+        remove: "emerge --depclean $",
         upgrade: "emerge --update $",
         search: "emerge --search $",
         info: "emerge --info $",
