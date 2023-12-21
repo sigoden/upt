@@ -280,6 +280,18 @@ vendors![
         list_installed: "pkgman search -i/--installed-only -a/--all",
     },
     {
+        name: "prt-get",
+        confirm: "",
+        install: "prt-get install $",
+        remove: "prt-get remove $",
+        upgrade: "prt-get update $",
+        search: "prt-get search $",
+        info: "prt-get info $",
+        update_index: "ports -u",
+        upgrade_all: "prt-get sysup",
+        list_installed: "prt-get listinst",
+    },
+    {
         name: "scoop",
         confirm: "",
         install: "scoop install $",

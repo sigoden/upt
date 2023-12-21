@@ -83,7 +83,8 @@ In this way, you can use the syntax of the tool you are most familiar with to ma
 | pacman      | pacman -S $pkg              | pacman -Rs $pkg             | pacman -S $pkg                  | pacman -Ss $pkg            | pacman -Si $pkg                | pacman -Sy               | pacman -Syu              | pacman -Q                         |
 | pkg         | pkg install $pkg            | pkg remove $pkg             | pkg install $pkg                | pkg search $pkg            | pkg info $pkg                  | pkg update               | pkg upgrade              | pkg info -a/--all                 |
 | pkg(termux) | pkg install $pkg            | pkg uninstall $pkg          | pkg install $pkg                | pkg search $pkg            | pkg show $pkg                  | pkg update               | pkg upgrade              | pkg list-installed                |
-| pkgman      | pkgman install $pkgman      | pkgman uninstall $pkgman    | pkgman update $pkgman           | pkgman search $pkgman      | -                              | pkgman refresh           | pkgman update            | pkgman search -i -a               |
+| pkgman      | pkgman install $pkg         | pkgman uninstall $pkg       | pkgman update $pkg              | pkgman search $pkg         | -                              | pkgman refresh           | pkgman update            | pkgman search -i -a               |
+| prt-get     | prt-get install $pkg        | prt-get remove $pkg         | prt-get update $pkg             | prt-get search $pkg        | prt-get info $pkg              | ports -u                 | prt-get sysup            | prt-get listinst                  |
 | scoop       | scoop install $pkg          | scoop uninstall $pkg        | scoop update $pkg               | scoop search $pkg          | scoop info $pkg                | scoop update             | scoop update *           | scoop list                        |
 | slackpkg    | slackpkg install <slackpkg> | slackpkg remove <slackpkg>  | slackpkg upgrade <slackpkg>     | slackpkg search <slackpkg> | slackpkg info <slackpkg>       | slackpkg update          | slackpkg upgrade-all     | ls -1 /var/log/packages           |
 | snap        | snap install --classic $pkg | snap remove $pkg            | snap refresh $pkg               | snap find $pkg             | snap info $pkg                 | -                        | snap refresh             | snap list                         |
@@ -133,6 +134,8 @@ In this way, you can use the syntax of the tool you are most familiar with to ma
 | openwrt                                              | opkg                 |
 +------------------------------------------------------+----------------------+
 | nutyx                                                | cards                |
++------------------------------------------------------+----------------------+
+| crux                                                 | prt-get              |
 +------------------------------------------------------+----------------------+
 | freebsd, ghostbsd                                    | pkg                  |
 +------------------------------------------------------+----------------------+
