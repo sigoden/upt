@@ -153,7 +153,6 @@ You can specify the package manager that UPT should use by setting the `UPT_TOOL
 
 ```sh
 UPT_TOOL=snap upt install $pkg             # run snap to install $pkg
-UPT_TOOL=nix-env upt install $pkg          # run nix-env to install $pkg
 ```
 
 ## License
