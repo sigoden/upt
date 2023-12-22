@@ -65,6 +65,8 @@ os_tools!(
   "openwrt" => "opkg";
   // cards
   "nutyx" => "cards";
+  // prt-get
+  "crux" => "prt-get";
   // pkg
   "freebsd" => "pkg";
   "ghostbsd" => "pkg";
