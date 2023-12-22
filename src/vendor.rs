@@ -137,7 +137,7 @@ vendors![
     },
     {
         name: "choco",
-        confirm: "-y",
+        confirm: "-y/--yes",
         install: "choco install $",
         remove: "choco uninstall $",
         upgrade: "choco upgrade $",
@@ -211,7 +211,7 @@ vendors![
         name: "nix-env",
         confirm: "",
         install: "nix-env -i/--install $",
-        remove: "pacman -e/--uninstall $",
+        remove: "nix-env -e/--uninstall $",
         upgrade: "nix-env -u/--upgrade $",
         search: "nix-env -qaP $",
         info: "nix-env -qa --description $",
