@@ -17,6 +17,12 @@ Upt is written in the rust you can install it using [cargo](https://doc.rust-lan
 cargo install upt
 ```
 
+**Use Shell (Mac, Linux)**
+
+```
+curl -fsSL https://raw.githubusercontent.com/sigoden/upt/main/install.sh | sh -s -- --to /usr/local/bin
+```
+
 **Binaries for macOS, Linux, Windows, BSD**
 
 Download from [GitHub Releases](https://github.com/sigoden/upt/releases), unzip and add `upt` to your $PATH.
