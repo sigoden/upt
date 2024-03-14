@@ -11,7 +11,7 @@ categories = ["command-line-utilities"]
 keywords = ["universal", "package", "management"]
 
 [dependencies]
-which = "5.0.0"
+which = "6.0.0"
 
 [profile.release]
 lto = true
