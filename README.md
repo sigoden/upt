@@ -163,7 +163,7 @@ UPT_TOOL=snap upt install $pkg             # run snap to install $pkg
 
 ## License
 
-Copyright (c) 2023 upt-developers.
+Copyright (c) 2023-∞ upt-developers.
 
 Upt is made available under the terms of either the MIT License or the Apache License 2.0, at your option.
 
