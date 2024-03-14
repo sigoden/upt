@@ -313,8 +313,8 @@ mod tests {
         );
         check_action_parse!("pacman -S -y -y", "", ["pacman", "-Syy"], ("", false));
         check_action_parse!("pacman -S $", "", ["pacman", "-S", "vim"], ("vim", false));
-        check_action_parse!("apt tsearch $", "", ["apt", "search"]);
-        check_action_parse!("apt tupgrade", "", ["apt", "upgrade", "vim"]);
+        check_action_parse!("apt search $", "", ["apt", "search"]);
+        check_action_parse!("apt upgrade", "", ["apt", "upgrade", "vim"]);
         check_action_parse!("pacman -S -y -y", "", ["pacman", "-Sy"]);
         check_action_parse!("pacman -S -y -y", "", ["pacman", "-Syyy"]);
         check_action_parse!("pacman -Q -i", "", ["pacman", "-Qiy"]);

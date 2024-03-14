@@ -71,7 +71,7 @@ os_tools!(
   "freebsd" => "pkg";
   "ghostbsd" => "pkg";
   // pkg(termux)
-  "andorid" => "pkg(termux)";
+  "android" => "pkg(termux)";
   // pkgman
   "haiku" => "pkgman";
 );

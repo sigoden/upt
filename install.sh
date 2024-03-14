@@ -100,14 +100,14 @@ fi
 
 
 if [ -z ${tag-} ]; then
-  tag=$(curl --proto =https --tlsv1.2 -sSf https://api.github.com/repos/$repo/releases/latest |
+  tag=$(curl -sSf https://api.github.com/repos/$repo/releases/latest |
     grep tag_name |
     cut -d'"' -f4
   )
 fi
 
 if [ -z ${target-} ]; then
-  # bash compiled with MINGW (e.g. git-bash, used in github windows runnners),
+  # bash compiled with MINGW (e.g. git-bash, used in github windows runners),
   # unhelpfully includes a version suffix in `uname -s` output, so handle that.
   # e.g. MINGW64_NT-10-0.19044
   kernel=$(uname -s | cut -d- -f1)
@@ -145,10 +145,10 @@ td=$(mktemp -d || mktemp -d -t tmp)
 
 if [ "$extension" = "zip" ]; then
     # unzip on windows cannot always handle stdin, so download first.
-    curl --proto =https --tlsv1.2 -sSfL $archive > $td/$crate.zip
+    curl -sSfL $archive > $td/$crate.zip
     unzip -d $td $td/$crate.zip
 else
-    curl --proto =https --tlsv1.2 -sSfL $archive | tar -C $td -xz
+    curl -sSfL $archive | tar -C $td -xz
 fi
 
 for f in $(ls $td); do
