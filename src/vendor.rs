@@ -460,7 +460,7 @@ impl Vendor {
         }
         match self.confirm.split_once('/') {
             Some((v, _)) => v,
-            None => "",
+            None => self.confirm.as_str(),
         }
     }
 
@@ -555,6 +555,7 @@ mod tests {
         check_parse!(upt, ["upt", "info", "vim"], (Info, pkg = "vim"));
         check_parse!(upt, ["upt", "update"], UpdateIndex);
         check_parse!(upt, ["upt", "upgrade"], (UpgradeAll, confirm = false));
+        check_parse!(upt, ["upt", "upgrade", "-y"], (UpgradeAll, confirm = true));
         check_parse!(upt, ["upt", "list"], ListInstalled);
         check_parse!(upt, ["upt", "install"]);
         check_parse!(upt, ["upt", "install", "--ye"]);
@@ -608,7 +609,28 @@ mod tests {
         check_eval!(upt, (Info, pkg = "vim"), "upt info vim");
         check_eval!(upt, UpdateIndex, "upt update");
         check_eval!(upt, (UpgradeAll, confirm = false), "upt upgrade");
+        check_eval!(upt, (UpgradeAll, confirm = true), "upt upgrade -y");
         check_eval!(upt, ListInstalled, "upt list");
+
+        let pacman = init("pacman").unwrap();
+        check_eval!(pacman, (Install, "vim", false), "pacman -S vim");
+        check_eval!(
+            pacman,
+            (Install, "vim jq", true),
+            "pacman -S --noconfirm vim jq"
+        );
+        check_eval!(pacman, (Remove, "vim jq", false), "pacman -R -s vim jq");
+        check_eval!(pacman, (Upgrade, "vim", true), "pacman -S --noconfirm vim");
+        check_eval!(pacman, (Search, pkg = "vim"), "pacman -S -s vim");
+        check_eval!(pacman, (Info, pkg = "vim"), "pacman -S -i vim");
+        check_eval!(pacman, UpdateIndex, "pacman -S -y");
+        check_eval!(pacman, (UpgradeAll, confirm = false), "pacman -S -y -u");
+        check_eval!(
+            pacman,
+            (UpgradeAll, confirm = true),
+            "pacman -S -y -u --noconfirm"
+        );
+        check_eval!(pacman, ListInstalled, "pacman -Q");
     }
 
     #[test]
