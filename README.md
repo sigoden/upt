@@ -158,7 +158,8 @@ Some platforms may support multiple package management tools, and upt selects on
 You can specify the package manager that UPT should use by setting the `UPT_TOOL` environment variable.
 
 ```sh
-UPT_TOOL=snap upt install $pkg             # run snap to install $pkg
+UPT_TOOL=brew upt install $pkg            # equal to `brew install $pkg`
+UPT_TOOL=nix-env upt install $pkg         # equal to `nix-env -i $pkg`
 ```
 
 ## License
