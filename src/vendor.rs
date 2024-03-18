@@ -2,7 +2,7 @@ use crate::action::Action;
 use crate::error::UptError;
 use crate::task::Task;
 
-os_tools!(
+os_vendors!(
   "windows" => "scoop", "choco", "winget";
   "macos" => "brew", "port";
   // apt
@@ -407,10 +407,14 @@ pub struct Vendor {
 }
 
 impl Vendor {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
     /// Parse command line, figure out the task to perform
-    pub fn parse(&self, args: &[String]) -> Result<Task, UptError> {
+    pub fn parse(&self, args: &[String], upt_tool: &str) -> Result<Task, UptError> {
         if self.is_help(args) {
-            return Err(UptError::DisplyHelp(self.help()));
+            return Err(UptError::DisplyHelp(self.help(upt_tool)));
         }
         if let Some((Some(pkg), yes)) = self.install.parse(args, &self.confirm) {
             return Ok(Task::Install { pkg, confirm: yes });
@@ -436,7 +440,7 @@ impl Vendor {
         if self.list_installed.parse(args, "").is_some() {
             return Ok(Task::ListInstalled);
         }
-        Err(UptError::InvalidArgs(self.help()))
+        Err(UptError::InvalidArgs(self.help(upt_tool)))
     }
 
     /// Convert the task to command line, which invokes the os's package management tool.
@@ -473,7 +477,7 @@ impl Vendor {
     }
 
     /// Dump help message
-    fn help(&self) -> String {
+    fn help(&self, upt_tool: &str) -> String {
         let mut lines: Vec<String> = Vec::new();
         lines.push(String::from("Usage: "));
         let helps = vec![
@@ -495,9 +499,11 @@ impl Vendor {
         for (cmd, description) in &helps {
             lines.push(format!("  {:<width$} {}", cmd, description, width = width));
         }
+        lines.push(String::new());
+        lines.push(format!("Upt version: {}", env!("CARGO_PKG_VERSION")));
+        lines.push(format!("Upt tool: {}", upt_tool));
         if !self.confirm.is_empty() {
-            lines.push(String::new());
-            lines.push(format!("Automatic answer yes to prompts: {}", self.confirm));
+            lines.push(format!("Confirm options: {}", self.confirm));
         }
         lines.join("\n")
     }
@@ -509,25 +515,25 @@ mod tests {
 
     macro_rules! check_parse {
         ($vendor:expr, [$($arg:expr),*], ($task:tt, $pkg:expr, $confirm:expr)) => {
-            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task { pkg: $pkg.to_string(), confirm: $confirm })
+            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ], "-").unwrap(), Task::$task { pkg: $pkg.to_string(), confirm: $confirm })
         };
         ($vendor:expr, [$($arg:expr),*], ($task:tt, pkg=$pkg:expr)) => {
-            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task { pkg: $pkg.to_string() })
+            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ], "-").unwrap(), Task::$task { pkg: $pkg.to_string() })
         };
         ($vendor:expr, [$($arg:expr),*], ($task:tt, confirm=$confirm:expr)) => {
-            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task { confirm: $confirm })
+            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ], "-").unwrap(), Task::$task { confirm: $confirm })
         };
         ($vendor:expr, [$($arg:expr),*], $task:tt) => {
-            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ]).unwrap(), Task::$task)
+            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ], "-").unwrap(), Task::$task)
         };
         ($vendor:expr, [$($arg:expr),*]) => {
-            assert!($vendor.parse(&vec![ $($arg.to_string()),* ]).is_err())
+            assert!($vendor.parse(&vec![ $($arg.to_string()),* ], "-").is_err())
         }
     }
 
     #[test]
     fn test_parse() {
-        let upt = init("upt").unwrap();
+        let upt = init_vendor("upt").unwrap();
         check_parse!(upt, ["upt", "install", "vim"], (Install, "vim", false));
         check_parse!(upt, ["upt", "install", "-y", "vim"], (Install, "vim", true));
         check_parse!(
@@ -600,7 +606,7 @@ mod tests {
 
     #[test]
     fn test_eval() {
-        let upt = init("upt").unwrap();
+        let upt = init_vendor("upt").unwrap();
         check_eval!(upt, (Install, "vim", false), "upt install vim");
         check_eval!(upt, (Install, "vim jq", true), "upt install -y vim jq");
         check_eval!(upt, (Remove, "vim jq", false), "upt remove vim jq");
@@ -612,7 +618,7 @@ mod tests {
         check_eval!(upt, (UpgradeAll, confirm = true), "upt upgrade -y");
         check_eval!(upt, ListInstalled, "upt list");
 
-        let pacman = init("pacman").unwrap();
+        let pacman = init_vendor("pacman").unwrap();
         check_eval!(pacman, (Install, "vim", false), "pacman -S vim");
         check_eval!(
             pacman,
@@ -636,7 +642,7 @@ mod tests {
     #[test]
     fn test_vendors() {
         for tool in support_tools() {
-            init(tool).unwrap();
+            init_vendor(tool).unwrap();
         }
     }
 }
