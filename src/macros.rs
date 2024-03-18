@@ -15,7 +15,7 @@ macro_rules! vendors {
             },
         )+
     ) => {
-        pub fn init(name: &str) -> Result<$crate::Vendor, $crate::UptError> {
+        pub fn init_vendor(name: &str) -> Result<$crate::Vendor, $crate::UptError> {
             use $crate::action::must_from_str;
             match name {
                 $(
@@ -58,9 +58,9 @@ macro_rules! vendors {
     }
 }
 
-macro_rules! os_tools {
+macro_rules! os_vendors {
     ($($os:literal => $($tool:literal),+);+$(;)?) => {
-        pub fn detect_tool() -> std::result::Result<$crate::Vendor, $crate::UptError> {
+        pub fn detect_vendor() -> std::result::Result<$crate::Vendor, $crate::UptError> {
             let os = crate::utils::detect_os().unwrap_or_default();
             let tools: Vec<&str> = match os.as_str() {
                 $(
@@ -69,8 +69,8 @@ macro_rules! os_tools {
                 _ => vec!["apt", "dnf", "pacman"],
             };
             match $crate::utils::find_tool(&tools) {
-                Some(tool) => $crate::vendor::init(&tool),
-                None => Err(UptError::NotFoundTool),
+                Some(tool) => $crate::vendor::init_vendor(&tool),
+                None => Err(UptError::NoDetectVendor),
             }
         }
     };

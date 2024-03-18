@@ -1,7 +1,7 @@
 use std::env;
 use std::path::Path;
 use std::process::{self, Command};
-use upt::{detect_tool, init_vendor, UptError, Vendor};
+use upt::{detect_vendor, init_vendor, UptError, Vendor};
 
 fn main() {
     match run() {
@@ -34,11 +34,11 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn create_cmd(vendor: &Vendor, args: &[String]) -> Result<String, UptError> {
-    let task = vendor.parse(args)?;
     let tool = match std::env::var("UPT_TOOL") {
         Ok(v) => init_vendor(&v)?,
-        Err(_) => detect_tool()?,
+        Err(_) => detect_vendor()?,
     };
+    let task = vendor.parse(args, tool.name())?;
     let cmd = tool.eval(&task)?;
     Ok(cmd)
 }
