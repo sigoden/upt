@@ -21,7 +21,7 @@ impl fmt::Display for UptError {
             NoTask => write!(f, "The package management tool cannot perform the task."),
             NoDetectVendor => write!(
                 f,
-                "No package management tool avaiable, use `$UPT_TOOL` to specify one."
+                "No package management tool available, use `$UPT_TOOL` to specify one."
             ),
             InvalidAction(v) => write!(f, "Invalid action '{}'.", v),
             InvalidArgs(v) => write!(f, "Invalid arguments.\n\n{}", v),
