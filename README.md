@@ -5,13 +5,13 @@
 
 Upt provides a unified command interface to manage packages for any operating system. 
 
-Upt relies on the platform's package management tool to perform the task, it is more like an alias.
+Upt relies on the platform's package management tool to perform the task, it's more like a wrapper or adaptive alias.
 
 ## Install
 
 **Use Cargo**
 
-Upt is written in the rust you can install it using [cargo](https://doc.rust-lang.org/stable/cargo/).
+Upt is written in the rust so you can install it using [cargo](https://doc.rust-lang.org/stable/cargo/).
 
 ```sh
 cargo install upt
@@ -51,9 +51,9 @@ upt install $pkg          # Works on any OS
 
 Upt identifies the os type and runs the appropriate package management tool to install `$pkg`.
 
-### Act as other command
+### Act as another tool
 
-Upt can act as other command and use their syntax by renaming.
+Upt can act as another tool and use their syntax by renaming it.
 
 ```sh
 cp upt brew
@@ -68,7 +68,7 @@ emerge $pkg
 
 In this way, you can use the syntax of the tool you are most familiar with to manage packages.
 
-### Supported Tools
+### Supported tools
 
 ```
 | Tool        | Install                     | Uninstall                   | Upgrade                         | Search                     | Info                           | Update Index             | Upgrade All              | List Installed                    |
@@ -96,12 +96,12 @@ In this way, you can use the syntax of the tool you are most familiar with to ma
 | snap        | snap install --classic $pkg | snap remove $pkg            | snap refresh $pkg               | snap find $pkg             | snap info $pkg                 | -                        | snap refresh             | snap list                         |
 | urpm        | urpmi $pkg                  | urpme $pkg                  | urpmi $pkg                      | urpmq -y/--fuzzy $pkg      | urpmq -i $pkg                  | urpmi.update -a          | urpmi --auto-update      | rpm -q/--query --all              |
 | winget      | winget install $pkg         | winget uninstall $pkg       | winget upgrade $pkg             | winget search $pkg         | winget show $pkg               | -                        | winget upgrade --all     | winget list                       |
-| xbps        | xbps-install $pkg           | xbps-remove $pkg            | xbps-install -u/--update $pkg   | xbps-query -Rs $pkg        | xbps-query -RS $pkg            | xbps-install -S/--sync   | xbps-install -u/--update | xbps-query -l/--list-pkgs        |
+| xbps        | xbps-install $pkg           | xbps-remove $pkg            | xbps-install -u/--update $pkg   | xbps-query -Rs $pkg        | xbps-query -RS $pkg            | xbps-install -S/--sync   | xbps-install -u/--update | xbps-query -l/--list-pkgs         |
 | yum         | yum install $pkg            | yum remove $pkg             | yum upgrade $pkg                | yum search $pkg            | yum info $pkg                  | yum check-update         | yum update               | yum list --installed              |
 | zypper      | zypper install $pkg         | zypper remove $pkg          | zypper update $pkg              | zypper search $pkg         | zypper info $pkg               | zypper refresh           | zypper update            | zypper search -i/--installed-only |
 ```
 
-### OSs
+### OS Tools
 
 ```
 +------------------------------------------------------+----------------------+
@@ -153,7 +153,9 @@ In this way, you can use the syntax of the tool you are most familiar with to ma
 +------------------------------------------------------+----------------------+
 ```
 
-Some platforms may support multiple package management tools, and upt selects one of them in the order listed in the table.
+Upt will determine which package management tool to use based on the above table.
+
+Some platforms may support multiple package management tools, upt selects one of them in order.
 
 You can specify the package manager that UPT should use by setting the `UPT_TOOL` environment variable.
 
