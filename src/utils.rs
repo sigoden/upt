@@ -1,23 +1,24 @@
 use which::which;
 
-pub fn find_tool(tools: &[&str]) -> Option<String> {
-    match tools.len() {
+pub fn find_tool(pairs: &[(&str, &str)]) -> Option<String> {
+    match pairs.len() {
         0 => None,
         1 => {
-            let tool = &tools[0];
-            if which(tool).is_ok() {
+            let (tool, bin_name) = &pairs[0];
+            if which(bin_name).is_ok() {
                 Some(tool.to_string())
             } else {
                 None
             }
         }
         _ => {
-            let handles: Vec<_> = tools
+            let handles: Vec<_> = pairs
                 .iter()
-                .map(|tool| {
+                .map(|(tool, bin_name)| {
                     let tool = tool.to_string();
+                    let bin_name = bin_name.to_string();
                     std::thread::spawn(move || {
-                        if which(&tool).is_ok() {
+                        if which(&bin_name).is_ok() {
                             Some(tool)
                         } else {
                             None
