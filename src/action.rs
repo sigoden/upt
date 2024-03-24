@@ -8,6 +8,7 @@ pub(crate) struct Action {
     cmd: String,
     subcmd: Vec<String>,
     options: Vec<Vec<String>>,
+    args: Vec<String>,
     has_pkg: bool,
 }
 
@@ -20,6 +21,7 @@ impl FromStr for Action {
         let words: Vec<&str> = s.split(' ').collect();
         let mut has_pkg = false;
         let mut options: Vec<Vec<String>> = vec![];
+        let mut args = vec![];
         if words.len() < 2 {
             return Err(UptError::InvalidAction(s.to_string()));
         }
@@ -35,12 +37,15 @@ impl FromStr for Action {
             }
             if elem.starts_with('-') {
                 options.push(split(elem));
+            } else {
+                args.push(elem.to_string());
             }
         }
         Ok(Action {
             cmd,
             subcmd,
             options,
+            args,
             has_pkg,
         })
     }
@@ -79,11 +84,13 @@ impl Action {
         for item in &self.options {
             segs.push(&item[0]);
         }
-        if !confirm.is_empty() {
-            segs.push(confirm);
-        }
         if !pkg.is_empty() {
             segs.push(pkg);
+        } else if !self.args.is_empty() {
+            segs.extend(self.args.iter().map(|v| v.as_str()));
+        }
+        if !confirm.is_empty() {
+            segs.push(confirm);
         }
         Some(segs.join(" "))
     }
@@ -112,7 +119,7 @@ impl Action {
     }
 
     fn invalid(&self) -> bool {
-        self == &Default::default()
+        self.cmd.is_empty()
     }
 
     fn parse_args(&self, args: &[String]) -> Option<(Vec<String>, Option<String>)> {
@@ -192,48 +199,101 @@ mod tests {
     use super::Action;
     use std::str::FromStr;
 
-    macro_rules! check_action_from_str {
-        ($input:expr, { $cmd:expr, $subcmd:expr, [$([$($options:expr),* $(,)*]),*], $has_pkg:expr }) => {
-            let action = Action::from_str($input).unwrap();
-            let expect_action = Action {
-                cmd: $cmd.to_string(),
-                subcmd: $subcmd.iter().map(|v| v.to_string()).collect(),
-                has_pkg: $has_pkg,
-                options: vec![$(vec![$($options.to_string(),)*],)*],
-            };
-            assert_eq!(action, expect_action);
-        }
-    }
-
     #[test]
     fn test_action_from_str() {
-        check_action_from_str!(
-            "upt install $",
-            { "upt", ["install"], [], true }
+        assert_eq!(
+            Action::from_str("upt install $").unwrap(),
+            Action {
+                cmd: "upt".to_string(),
+                subcmd: vec!["install".to_string()],
+                options: vec![],
+                args: vec![],
+                has_pkg: true,
+            }
         );
-        check_action_from_str!(
-            "upt search $",
-            { "upt", ["search"], [], true }
+        assert_eq!(
+            Action::from_str("upt search $").unwrap(),
+            Action {
+                cmd: "upt".to_string(),
+                subcmd: vec!["search".to_string()],
+                options: vec![],
+                args: vec![],
+                has_pkg: true,
+            }
         );
-        check_action_from_str!(
-            "upt remove/uninstall $",
-            { "upt", ["remove", "uninstall"], [], true }
+        assert_eq!(
+            Action::from_str("upt remove/uninstall $").unwrap(),
+            Action {
+                cmd: "upt".to_string(),
+                subcmd: vec!["remove".to_string(), "uninstall".to_string()],
+                options: vec![],
+                args: vec![],
+                has_pkg: true,
+            }
         );
-        check_action_from_str!(
-            "apt list --installed",
-            {"apt", ["list"], [["--installed"]], false }
+        assert_eq!(
+            Action::from_str("apt list --installed").unwrap(),
+            Action {
+                cmd: "apt".to_string(),
+                subcmd: vec!["list".to_string()],
+                options: vec![vec!["--installed".to_string()]],
+                args: vec![],
+                has_pkg: false,
+            }
         );
-        check_action_from_str!(
-            "pacman -R -s $",
-            { "pacman", Vec::<&str>::new(), [["-R"], ["-s"]], true }
+        assert_eq!(
+            Action::from_str("pacman -R -s $").unwrap(),
+            Action {
+                cmd: "pacman".to_string(),
+                subcmd: vec![],
+                options: vec![vec!["-R".to_string()], vec!["-s".to_string()]],
+                args: vec![],
+                has_pkg: true,
+            }
         );
-        check_action_from_str!(
-            "pacman -S -y -y",
-            { "pacman", Vec::<&str>::new(), [["-S"], ["-y"], ["-y"]], false }
+        assert_eq!(
+            Action::from_str("pacman -S -y -y").unwrap(),
+            Action {
+                cmd: "pacman".to_string(),
+                subcmd: vec![],
+                options: vec![
+                    vec!["-S".to_string()],
+                    vec!["-y".to_string()],
+                    vec!["-y".to_string()]
+                ],
+                args: vec![],
+                has_pkg: false,
+            }
         );
-        check_action_from_str!(
-            "pacman -S $",
-            { "pacman", Vec::<&str>::new(), [["-S"]], true }
+        assert_eq!(
+            Action::from_str("pacman -S $").unwrap(),
+            Action {
+                cmd: "pacman".to_string(),
+                subcmd: vec![],
+                options: vec![vec!["-S".to_string()]],
+                args: vec![],
+                has_pkg: true,
+            }
+        );
+        assert_eq!(
+            Action::from_str("scoop update *").unwrap(),
+            Action {
+                cmd: "scoop".to_string(),
+                subcmd: vec!["update".to_string()],
+                options: vec![],
+                args: vec!["*".to_string()],
+                has_pkg: false,
+            }
+        );
+        assert_eq!(
+            Action::from_str("choco upgrade all").unwrap(),
+            Action {
+                cmd: "choco".to_string(),
+                subcmd: vec!["upgrade".to_string()],
+                options: vec![],
+                args: vec!["all".to_string()],
+                has_pkg: false,
+            }
         );
     }
 
@@ -334,23 +394,25 @@ mod tests {
     #[test]
     fn test_action_to_cmd() {
         check_action_to_cmd!("apt install $", ("vim", ""), "apt install vim");
-        check_action_to_cmd!("apt install $", ("vim", "-y"), "apt install -y vim");
+        check_action_to_cmd!("apt install $", ("vim", "-y"), "apt install vim -y");
         check_action_to_cmd!("apt install $", ("vim jq", ""), "apt install vim jq");
         check_action_to_cmd!("apt search $", ("vim", ""), "apt search vim");
         check_action_to_cmd!("apt list --installed", ("", ""), "apt list --installed");
         check_action_to_cmd!(
             "pacman -R -s $",
             ("vim", "--noconfirm"),
-            "pacman -R -s --noconfirm vim"
+            "pacman -R -s vim --noconfirm"
         );
         check_action_to_cmd!("pacman -R -s $", ("vim", ""), "pacman -R -s vim");
         check_action_to_cmd!(
             "pacman -R -s $",
             ("vim jq", "--noconfirm"),
-            "pacman -R -s --noconfirm vim jq"
+            "pacman -R -s vim jq --noconfirm"
         );
         check_action_to_cmd!("pacman -S -y -y", ("", ""), "pacman -S -y -y");
         check_action_to_cmd!("pacman -S $", ("vim", ""), "pacman -S vim");
+        check_action_to_cmd!("scoop update *", ("", ""), "scoop update *");
+        check_action_to_cmd!("choco upgrade all", ("", "-y"), "choco upgrade all -y");
     }
 
     macro_rules! check_action_help {

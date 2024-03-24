@@ -145,9 +145,9 @@ vendors![
         upgrade: "choco upgrade $",
         search: "choco search $",
         info: "choco info $",
-        update_index: "choco upgrade all --noop",
+        update_index: "",
         upgrade_all: "choco upgrade all",
-        list_installed: "choco list -l/--local-only",
+        list_installed: "choco list",
     },
     {
         name: "dnf",
@@ -608,9 +608,9 @@ mod tests {
     fn test_eval() {
         let upt = init_vendor("upt").unwrap();
         check_eval!(upt, (Install, "vim", false), "upt install vim");
-        check_eval!(upt, (Install, "vim jq", true), "upt install -y vim jq");
+        check_eval!(upt, (Install, "vim jq", true), "upt install vim jq -y");
         check_eval!(upt, (Remove, "vim jq", false), "upt remove vim jq");
-        check_eval!(upt, (Upgrade, "vim", true), "upt upgrade -y vim");
+        check_eval!(upt, (Upgrade, "vim", true), "upt upgrade vim -y");
         check_eval!(upt, (Search, pkg = "vim"), "upt search vim");
         check_eval!(upt, (Info, pkg = "vim"), "upt info vim");
         check_eval!(upt, UpdateIndex, "upt update");
@@ -623,10 +623,10 @@ mod tests {
         check_eval!(
             pacman,
             (Install, "vim jq", true),
-            "pacman -S --noconfirm vim jq"
+            "pacman -S vim jq --noconfirm"
         );
         check_eval!(pacman, (Remove, "vim jq", false), "pacman -R -s vim jq");
-        check_eval!(pacman, (Upgrade, "vim", true), "pacman -S --noconfirm vim");
+        check_eval!(pacman, (Upgrade, "vim", true), "pacman -S vim --noconfirm");
         check_eval!(pacman, (Search, pkg = "vim"), "pacman -S -s vim");
         check_eval!(pacman, (Info, pkg = "vim"), "pacman -S -i vim");
         check_eval!(pacman, UpdateIndex, "pacman -S -y");
