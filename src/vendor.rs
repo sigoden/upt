@@ -96,7 +96,7 @@ vendors![
         remove: "apk del $",
         upgrade: "apk upgrade $",
         search: "apk search $",
-        info: "apk show $",
+        info: "apk info $",
         update_index: "apk update",
         upgrade_all: "apk upgrade",
         list_installed: "apk list -I/--installed",
