@@ -1,6 +1,6 @@
 [package]
 name = "upt"
-version = "0.6.0"
+version = "0.7.0"
 edition = "2021"
 authors = ["sigoden <sigoden@gmail.com>"]
 description = "Universal package management tool for any OS"
@@ -11,7 +11,7 @@ categories = ["command-line-utilities"]
 keywords = ["universal", "package", "management"]
 
 [dependencies]
-which = "6.0.0"
+which = "6.0.1"
 
 [profile.release]
 lto = true
