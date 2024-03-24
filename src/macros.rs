@@ -62,13 +62,13 @@ macro_rules! os_vendors {
     ($($os:literal => $($tool:literal),+);+$(;)?) => {
         pub fn detect_vendor() -> std::result::Result<$crate::Vendor, $crate::UptError> {
             let os = crate::utils::detect_os().unwrap_or_default();
-            let tools: Vec<&str> = match os.as_str() {
+            let pairs: Vec<(&str, &str)> = match os.as_str() {
                 $(
-                    $os => vec![$($tool),+].into_iter().filter_map(|v| which_cmd(v)).collect(),
+                    $os => vec![$($tool),+].into_iter().filter_map(|tool| which_cmd(tool).map(|bin_name| (tool, bin_name))).collect(),
                 )+
-                _ => vec!["apt", "dnf", "pacman"],
+                _ => ["apt", "dnf", "pacman"].into_iter().map(|tool| (tool, tool)).collect(),
             };
-            match $crate::utils::find_tool(&tools) {
+            match $crate::utils::find_tool(&pairs) {
                 Some(tool) => $crate::vendor::init_vendor(&tool),
                 None => Err(UptError::NoDetectVendor),
             }
