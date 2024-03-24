@@ -75,7 +75,11 @@ impl Action {
 
     pub fn to_cmd(&self, pkg: &str, confirm: &str) -> Option<String> {
         if self.invalid() {
-            return None;
+            if pkg.is_empty() {
+                return Some("".to_string());
+            } else {
+                return None;
+            }
         }
         let mut segs: Vec<&str> = vec![&self.cmd];
         if let Some(action) = &self.subcmd.first() {
@@ -84,10 +88,11 @@ impl Action {
         for item in &self.options {
             segs.push(&item[0]);
         }
+        if !self.args.is_empty() {
+            segs.extend(self.args.iter().map(|v| v.as_str()));
+        }
         if !pkg.is_empty() {
             segs.push(pkg);
-        } else if !self.args.is_empty() {
-            segs.extend(self.args.iter().map(|v| v.as_str()));
         }
         if !confirm.is_empty() {
             segs.push(confirm);
