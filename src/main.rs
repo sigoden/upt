@@ -1,7 +1,7 @@
 use std::env;
 use std::path::Path;
 use std::process::{self, Command};
-use upt::{detect_vendor, init_vendor, UptError, Vendor};
+use upt::{detect_os, detect_vendor, init_vendor, UptError, Vendor};
 
 fn main() {
     match run() {
@@ -23,20 +23,21 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let vendor = init_vendor(bin)?;
     let mut args = vec![bin.to_string()];
     args.extend(env_args.iter().skip(1).cloned());
-    let cmd = create_cmd(&vendor, &args)?;
+    let os = detect_os().unwrap_or_default();
+    let cmd = create_cmd(&vendor, &args, &os)?;
     if let Ok(v) = std::env::var("UPT_DRY_RUN") {
         if v == "true" || v == "1" {
             println!("{}", cmd);
             return Ok(());
         }
     }
-    run_cmd(cmd.as_str())
+    run_cmd(cmd.as_str(), &os)
 }
 
-fn create_cmd(vendor: &Vendor, args: &[String]) -> Result<String, UptError> {
+fn create_cmd(vendor: &Vendor, args: &[String], os: &str) -> Result<String, UptError> {
     let tool = match std::env::var("UPT_TOOL") {
         Ok(v) => init_vendor(&v)?,
-        Err(_) => detect_vendor()?,
+        Err(_) => detect_vendor(os)?,
     };
     let task = vendor.parse(args, tool.name())?;
     let cmd = tool.eval(&task)?;
@@ -44,15 +45,19 @@ fn create_cmd(vendor: &Vendor, args: &[String]) -> Result<String, UptError> {
 }
 
 #[cfg(not(target_os = "windows"))]
-fn run_cmd(cmd: &str) -> Result<(), Box<dyn std::error::Error>> {
+fn run_cmd(cmd: &str, _os: &str) -> Result<(), Box<dyn std::error::Error>> {
     let mut child = Command::new("sh").arg("-c").arg(cmd).spawn()?;
     child.wait()?;
     Ok(())
 }
 
 #[cfg(target_os = "windows")]
-fn run_cmd(cmd: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let mut child = Command::new("cmd").args(["/C", cmd]).spawn()?;
+fn run_cmd(cmd: &str, os: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let mut child = if os == "windows/msys2" {
+        Command::new("sh").arg("-c").arg(cmd).spawn()?
+    } else {
+        Command::new("cmd").args(["/C", cmd]).spawn()?
+    };
     child.wait()?;
     Ok(())
 }

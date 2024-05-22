@@ -38,7 +38,11 @@ pub fn find_tool(pairs: &[(&str, &str)]) -> Option<String> {
 
 #[cfg(target_os = "windows")]
 pub fn detect_os() -> Option<String> {
-    Some("windows".to_string())
+    if std::env::var("MSYSTEM").is_ok() {
+        Some("windows/msys2".to_string())
+    } else {
+        Some("windows".to_string())
+    }
 }
 
 #[cfg(target_os = "macos")]

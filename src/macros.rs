@@ -60,9 +60,8 @@ macro_rules! vendors {
 
 macro_rules! os_vendors {
     ($($os:literal => $($tool:literal),+);+$(;)?) => {
-        pub fn detect_vendor() -> std::result::Result<$crate::Vendor, $crate::UptError> {
-            let os = crate::utils::detect_os().unwrap_or_default();
-            let pairs: Vec<(&str, &str)> = match os.as_str() {
+        pub fn detect_vendor(os: &str) -> std::result::Result<$crate::Vendor, $crate::UptError> {
+            let pairs: Vec<(&str, &str)> = match os {
                 $(
                     $os => vec![$($tool),+].into_iter().filter_map(|tool| which_cmd(tool).map(|bin_name| (tool, bin_name))).collect(),
                 )+
