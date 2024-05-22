@@ -38,7 +38,7 @@ pub fn find_tool(pairs: &[(&str, &str)]) -> Option<String> {
 
 #[cfg(target_os = "windows")]
 pub fn detect_os() -> Option<String> {
-    if std::env::var("MSYSTEM").is_ok() {
+    if let Ok(true) = std::env::var("OSTYPE").map(|v| v == "msys") {
         Some("windows/msys2".to_string())
     } else {
         Some("windows".to_string())
