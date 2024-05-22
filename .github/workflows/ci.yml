@@ -53,9 +53,7 @@ jobs:
         echo $OSTYPE
 
     - name: Test upt --help
-      run: |
-        cargo run -- --help || true
-      shell: bash
+      run: cargo run -- --help
 
     - name: Test upt list
       run: cargo run -- list
