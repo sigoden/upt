@@ -50,6 +50,7 @@ jobs:
       if: runner.os == 'Windows'
       run: |
         choco --help
+        echo $MSYSTEM
 
     - name: Test upt --help
       run: |
