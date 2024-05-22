@@ -45,11 +45,11 @@ jobs:
     - name: Format
       run: cargo fmt --all --check
 
-    - name: Setup Scoop
-      uses: MinoruSekine/setup-scoop@v4
+    - name: Setup Choco for Windows
+      uses: crazy-max/ghaction-chocolatey@v3
       if: runner.os == 'Windows'
 
-    - name: Setup Homebrew
+    - name: Setup Homebrew for macOS
       uses: Homebrew/actions/setup-homebrew@master
       if: runner.os == 'macOS'
 
