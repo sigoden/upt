@@ -1,15 +1,15 @@
-use std::env;
 use std::path::Path;
+use std::{env, process};
 use upt::{detect_os, detect_vendor, init_vendor, run_command, UptError, Vendor};
 
 fn main() {
     match run() {
         Ok(c) => {
-            std::process::exit(c);
+            process::exit(c);
         }
         Err(e) => {
             eprintln!("{}", e);
-            std::process::exit(1);
+            process::exit(1);
         }
     }
 }

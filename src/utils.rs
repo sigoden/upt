@@ -1,4 +1,4 @@
-use std::process::{Command, Output};
+use std::process::Command;
 
 use which::which;
 
@@ -42,7 +42,7 @@ pub fn find_tool(pairs: &[(&str, &str)]) -> Option<String> {
 pub fn detect_os() -> Option<String> {
     if std::env::var("MSYSTEM").is_ok() {
         let os = "windows/msys2";
-        if let Ok(output) = run_command_with_output("which pacman", os) {
+        if let Ok(output) = Command::new("sh").arg("-c").arg("which pacman").output() {
             if output.status.success() {
                 return Some(os.to_string());
             }
@@ -86,13 +86,4 @@ pub fn run_command(cmd: &str, os: &str) -> Result<i32, Box<dyn std::error::Error
         Command::new("sh").arg("-c").arg(cmd).status()?
     };
     Ok(exit_status.code().unwrap_or_default())
-}
-
-pub fn run_command_with_output(cmd: &str, os: &str) -> Result<Output, Box<dyn std::error::Error>> {
-    let output = if os == "windows" {
-        Command::new("cmd").args(["/C", cmd]).output()?
-    } else {
-        Command::new("sh").arg("-c").arg(cmd).output()?
-    };
-    Ok(output)
 }
