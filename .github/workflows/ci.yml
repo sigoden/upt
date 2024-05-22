@@ -45,7 +45,7 @@ jobs:
       run: cargo run -- --help
 
     - name: Test upt --help on Windows Bash
-      if: runner.os == "Windows"
+      if: runner.os == 'Windows'
       run: cargo run -- --help
       shell: bash
 
