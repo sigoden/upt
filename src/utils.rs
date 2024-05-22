@@ -1,3 +1,5 @@
+use std::process::Command;
+
 use which::which;
 
 pub fn find_tool(pairs: &[(&str, &str)]) -> Option<String> {
@@ -38,11 +40,15 @@ pub fn find_tool(pairs: &[(&str, &str)]) -> Option<String> {
 
 #[cfg(target_os = "windows")]
 pub fn detect_os() -> Option<String> {
-    if let Ok(true) = std::env::var("OSTYPE").map(|v| v == "msys") {
-        Some("windows/msys2".to_string())
-    } else {
-        Some("windows".to_string())
+    if std::env::var("MSYSTEM").is_ok() {
+        let os = "windows/msys2";
+        if let Ok(output) = Command::new("sh").arg("-c").arg("which pacman").output() {
+            if output.status.success() {
+                return Some(os.to_string());
+            }
+        }
     }
+    Some("windows".to_string())
 }
 
 #[cfg(target_os = "macos")]
@@ -71,4 +77,13 @@ pub fn detect_os() -> Option<String> {
     let id = release.lines().find(|l| l.starts_with("ID="))?;
     let id = id[3..].trim_matches('"');
     Some(id.to_string())
+}
+
+pub fn run_command(cmd: &str, os: &str) -> Result<i32, Box<dyn std::error::Error>> {
+    let exit_status = if os == "windows" {
+        Command::new("cmd").args(["/C", cmd]).status()?
+    } else {
+        Command::new("sh").arg("-c").arg(cmd).status()?
+    };
+    Ok(exit_status.code().unwrap_or_default())
 }

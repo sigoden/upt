@@ -65,6 +65,7 @@ macro_rules! os_vendors {
                 $(
                     $os => vec![$($tool),+].into_iter().filter_map(|tool| which_cmd(tool).map(|bin_name| (tool, bin_name))).collect(),
                 )+
+                "windows/msys2" => vec![("pacman","pacman")],
                 _ => ["apt", "dnf", "pacman"].into_iter().map(|tool| (tool, tool)).collect(),
             };
             match $crate::utils::find_tool(&pairs) {
