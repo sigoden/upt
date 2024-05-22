@@ -41,7 +41,6 @@ os_vendors!(
   "garuda" => "pacman";
   "antergos" => "pacman";
   "kaos" => "pacman";
-  "windows/msys2" => "pacman";
   // apk
   "alpine" => "apk";
   "postmarket" => "apk";

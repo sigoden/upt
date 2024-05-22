@@ -1,19 +1,20 @@
 use std::env;
 use std::path::Path;
-use std::process::{self, Command};
-use upt::{detect_os, detect_vendor, init_vendor, UptError, Vendor};
+use upt::{detect_os, detect_vendor, init_vendor, run_command, UptError, Vendor};
 
 fn main() {
     match run() {
-        Ok(v) => v,
+        Ok(c) => {
+            std::process::exit(c);
+        }
         Err(e) => {
             eprintln!("{}", e);
-            process::exit(1);
+            std::process::exit(1);
         }
     }
 }
 
-fn run() -> Result<(), Box<dyn std::error::Error>> {
+fn run() -> Result<i32, Box<dyn std::error::Error>> {
     let env_args = env::args().collect::<Vec<String>>();
     let bin = Path::new(&env_args[0])
         .file_stem()
@@ -28,17 +29,17 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         Ok(v) => v,
         Err(UptError::DisplayHelp(t)) => {
             println!("{t}");
-            return Ok(());
+            return Ok(0);
         }
         Err(e) => return Err(e.into()),
     };
     if let Ok(v) = std::env::var("UPT_DRY_RUN") {
         if v == "true" || v == "1" {
             println!("{}", cmd);
-            return Ok(());
+            return Ok(0);
         }
     }
-    run_cmd(cmd.as_str(), &os)
+    run_command(cmd.as_str(), &os)
 }
 
 fn create_cmd(vendor: &Vendor, args: &[String], os: &str) -> Result<String, UptError> {
@@ -49,22 +50,4 @@ fn create_cmd(vendor: &Vendor, args: &[String], os: &str) -> Result<String, UptE
     let task = vendor.parse(args, tool.name())?;
     let cmd = tool.eval(&task)?;
     Ok(cmd)
-}
-
-#[cfg(not(target_os = "windows"))]
-fn run_cmd(cmd: &str, _os: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let mut child = Command::new("sh").arg("-c").arg(cmd).spawn()?;
-    child.wait()?;
-    Ok(())
-}
-
-#[cfg(target_os = "windows")]
-fn run_cmd(cmd: &str, os: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let mut child = if os == "windows/msys2" {
-        Command::new("sh").arg("-c").arg(cmd).spawn()?
-    } else {
-        Command::new("cmd").args(["/C", cmd]).spawn()?
-    };
-    child.wait()?;
-    Ok(())
 }
