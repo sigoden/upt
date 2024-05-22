@@ -24,7 +24,14 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = vec![bin.to_string()];
     args.extend(env_args.iter().skip(1).cloned());
     let os = detect_os().unwrap_or_default();
-    let cmd = create_cmd(&vendor, &args, &os)?;
+    let cmd = match create_cmd(&vendor, &args, &os) {
+        Ok(v) => v,
+        Err(UptError::DisplayHelp(t)) => {
+            println!("{t}");
+            return Ok(());
+        }
+        Err(e) => return Err(e.into()),
+    };
     if let Ok(v) = std::env::var("UPT_DRY_RUN") {
         if v == "true" || v == "1" {
             println!("{}", cmd);
