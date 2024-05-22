@@ -58,5 +58,5 @@ jobs:
         cargo run -- --help || true
       shell: bash
 
-    - name: Test upt install
-      run: cargo run -- install vim -y
+    - name: Test upt list
+      run: cargo run -- list
