@@ -45,13 +45,6 @@ jobs:
     - name: Format
       run: cargo fmt --all --check
 
-
-    - name: Test windows env
-      if: runner.os == 'Windows'
-      run: |
-        choco --help
-        echo $OSTYPE
-
     - name: Test upt --help
       run: cargo run -- --help
 
