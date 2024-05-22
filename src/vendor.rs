@@ -11,7 +11,7 @@ os_vendors!(
   "linuxmint" => "apt";
   "pop" => "apt";
   "deepin" => "apt";
-  "elementray" => "apt";
+  "elementary" => "apt";
   "kali" => "apt";
   "raspbian" => "apt";
   "aosc" => "apt";
@@ -414,7 +414,7 @@ impl Vendor {
     /// Parse command line, figure out the task to perform
     pub fn parse(&self, args: &[String], upt_tool: &str) -> Result<Task, UptError> {
         if self.is_help(args) {
-            return Err(UptError::DisplyHelp(self.help(upt_tool)));
+            return Err(UptError::DisplayHelp(self.help(upt_tool)));
         }
         if let Some((Some(pkg), yes)) = self.install.parse(args, &self.confirm) {
             return Ok(Task::Install { pkg, confirm: yes });
@@ -515,19 +515,19 @@ mod tests {
 
     macro_rules! check_parse {
         ($vendor:expr, [$($arg:expr),*], ($task:tt, $pkg:expr, $confirm:expr)) => {
-            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ], "-").unwrap(), Task::$task { pkg: $pkg.to_string(), confirm: $confirm })
+            assert_eq!($vendor.parse(&[ $($arg.to_string()),* ], "-").unwrap(), Task::$task { pkg: $pkg.to_string(), confirm: $confirm })
         };
         ($vendor:expr, [$($arg:expr),*], ($task:tt, pkg=$pkg:expr)) => {
-            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ], "-").unwrap(), Task::$task { pkg: $pkg.to_string() })
+            assert_eq!($vendor.parse(&[ $($arg.to_string()),* ], "-").unwrap(), Task::$task { pkg: $pkg.to_string() })
         };
         ($vendor:expr, [$($arg:expr),*], ($task:tt, confirm=$confirm:expr)) => {
-            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ], "-").unwrap(), Task::$task { confirm: $confirm })
+            assert_eq!($vendor.parse(&[ $($arg.to_string()),* ], "-").unwrap(), Task::$task { confirm: $confirm })
         };
         ($vendor:expr, [$($arg:expr),*], $task:tt) => {
-            assert_eq!($vendor.parse(&vec![ $($arg.to_string()),* ], "-").unwrap(), Task::$task)
+            assert_eq!($vendor.parse(&[ $($arg.to_string()),* ], "-").unwrap(), Task::$task)
         };
         ($vendor:expr, [$($arg:expr),*]) => {
-            assert!($vendor.parse(&vec![ $($arg.to_string()),* ], "-").is_err())
+            assert!($vendor.parse(&[ $($arg.to_string()),* ], "-").is_err())
         }
     }
 
