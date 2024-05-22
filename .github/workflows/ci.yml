@@ -45,14 +45,6 @@ jobs:
     - name: Format
       run: cargo fmt --all --check
 
-    - name: Setup Choco for Windows
-      uses: crazy-max/ghaction-chocolatey@v3
-      if: runner.os == 'Windows'
-
-    - name: Setup Homebrew for macOS
-      uses: Homebrew/actions/setup-homebrew@master
-      if: runner.os == 'macOS'
-
     - name: Test upt --help
       run: |
         cargo run -- --help || true
