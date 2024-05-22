@@ -23,7 +23,7 @@ jobs:
         - macos-latest
         - windows-latest
 
-    runs-on: ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
 
     env:
       RUSTFLAGS: --deny warnings
@@ -44,3 +44,17 @@ jobs:
 
     - name: Format
       run: cargo fmt --all --check
+
+    - name: Setup Scoop
+      uses: MinoruSekine/setup-scoop@v4
+      if: runner.os == 'Windows'
+
+    - name: Setup Homebrew
+      uses: Homebrew/actions/setup-homebrew@master
+      if: runner.os == 'macOS'
+
+    - name: Test upt --help
+      run: cargo run -- --help
+
+    - name: Test upt install
+      run: cargo run -- install vim -y
