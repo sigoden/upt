@@ -63,8 +63,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - uses: msys2/setup-msys2@v2
-
     - name: Install Rust Toolchain Components
       uses: dtolnay/rust-toolchain@stable
 
@@ -78,6 +76,10 @@ jobs:
 
     - name: Format
       run: cargo fmt --all --check
+
+    - uses: msys2/setup-msys2@v2
+      with:
+        path-type: inherit
 
     - name: Test upt --help
       shell: msys2 {0}
