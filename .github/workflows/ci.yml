@@ -44,11 +44,6 @@ jobs:
     - name: Test upt --help
       run: cargo run -- --help
 
-    - name: Test upt --help on Windows Bash
-      if: runner.os == 'Windows'
-      run: cargo run -- --help
-      shell: bash
-
     - name: Test upt list
       run: cargo run -- list
 
@@ -81,7 +76,12 @@ jobs:
       with:
         path-type: inherit
 
-    - name: Test upt --help
+    - name: Test upt --help on Windows Bash
+      if: runner.os == 'Windows'
+      run: cargo run -- --help
+      shell: bash
+
+    - name: Test upt --help on MSYS2
       shell: msys2 {0}
       run: cargo run -- --help
 
