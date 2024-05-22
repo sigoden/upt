@@ -52,7 +52,7 @@ jobs:
     - name: Test upt list
       run: cargo run -- list
 
-  all:
+  msys2:
     name: MSYS2
 
     runs-on: windows-latest
