@@ -23,7 +23,7 @@ jobs:
         - macos-latest
         - windows-latest
 
-    runs-on: ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
 
     env:
       RUSTFLAGS: --deny warnings
@@ -44,3 +44,9 @@ jobs:
 
     - name: Format
       run: cargo fmt --all --check
+
+    - name: Test upt --help
+      run: cargo run -- --help
+
+    - name: Test upt list
+      run: cargo run -- list
