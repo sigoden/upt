@@ -8,10 +8,6 @@ on:
     branches:
     - main
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
   all:
     name: All
@@ -48,5 +44,45 @@ jobs:
     - name: Test upt --help
       run: cargo run -- --help
 
+    - name: Test upt --help on Windows Bash
+      if: runner.os == "Windows"
+      run: cargo run -- --help
+      shell: bash
+
     - name: Test upt list
+      run: cargo run -- list
+
+  all:
+    name: MSYS2
+
+    runs-on: windows-latest
+
+    env:
+      RUSTFLAGS: --deny warnings
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Rust Toolchain Components
+      uses: dtolnay/rust-toolchain@stable
+
+    - uses: Swatinem/rust-cache@v2
+
+    - name: Test
+      run: cargo test --all
+
+    - name: Clippy
+      run: cargo clippy --all --all-targets -- -D warnings
+
+    - name: Format
+      run: cargo fmt --all --check
+
+    - uses: msys2/setup-msys2@v2
+
+    - name: Test upt --help
+      shell: msys2 {0}
+      run: cargo run -- --help
+
+    - name: Test upt list
+      shell: msys2 {0}
       run: cargo run -- list
