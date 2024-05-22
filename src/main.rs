@@ -45,7 +45,7 @@ fn create_cmd(vendor: &Vendor, args: &[String], os: &str) -> Result<String, UptE
 }
 
 #[cfg(not(target_os = "windows"))]
-fn run_cmd(cmd: &str, os_: &str) -> Result<(), Box<dyn std::error::Error>> {
+fn run_cmd(cmd: &str, _os: &str) -> Result<(), Box<dyn std::error::Error>> {
     let mut child = Command::new("sh").arg("-c").arg(cmd).spawn()?;
     child.wait()?;
     Ok(())
