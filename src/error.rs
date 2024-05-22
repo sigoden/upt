@@ -8,7 +8,7 @@ pub enum UptError {
     NoDetectVendor,
     InvalidAction(String),
     InvalidArgs(String),
-    DisplyHelp(String),
+    DisplayHelp(String),
 }
 
 impl Error for UptError {}
@@ -25,7 +25,7 @@ impl fmt::Display for UptError {
             ),
             InvalidAction(v) => write!(f, "Invalid action '{}'.", v),
             InvalidArgs(v) => write!(f, "Invalid arguments.\n\n{}", v),
-            DisplyHelp(v) => write!(f, "{}", v),
+            DisplayHelp(v) => write!(f, "{}", v),
         }
     }
 }

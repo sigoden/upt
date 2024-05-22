@@ -111,7 +111,7 @@ In this way, you can use the syntax of the tool you are most familiar with to ma
 +------------------------------------------------------+----------------------+
 | macos                                                | brew, port           |
 +------------------------------------------------------+----------------------+
-| ubuntu, debian, linuxmint, pop, deepin, elementray   | apt                  |
+| ubuntu, debian, linuxmint, pop, deepin, elementary   | apt                  |
 | kali, raspbian, aosc, zorin, antix, devuan, bodhi    |                      |
 | lxle, sparky                                         |                      |
 +------------------------------------------------------+----------------------+
