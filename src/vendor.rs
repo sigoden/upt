@@ -246,6 +246,18 @@ vendors![
         list_installed: "pacman -Q",
     },
     {
+        name: "yay",
+        confirm: "--noconfirm",
+        install: "yay --cleanafter -S $",
+        remove: "pacman -R -s $",
+        upgrade: "yay --cleanafter -S $",
+        search: "yay -S -s $",
+        info: "pacman -S -i $",
+        update_index: "yay -S -y",
+        upgrade_all: "yay -S -y -u",
+        list_installed: "pacman -Q",
+    },
+    {
         name: "pkg",
         confirm: "-y/--yes",
         install: "pkg install $",
