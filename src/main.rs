@@ -1,3 +1,4 @@
+use std::io::Error;
 use std::path::Path;
 use std::{env, process};
 use upt::{detect_os, detect_vendor, init_vendor, run_command, UptError, Vendor};
@@ -20,7 +21,7 @@ fn run() -> Result<i32, Box<dyn std::error::Error>> {
         .file_stem()
         .unwrap()
         .to_str()
-        .unwrap();
+        .ok_or_else(|| Error::new(std::io::ErrorKind::NotFound, "error trying to find vendor"))?;
     let vendor = init_vendor(bin)?;
     let mut args = vec![bin.to_string()];
     args.extend(env_args.iter().skip(1).cloned());
