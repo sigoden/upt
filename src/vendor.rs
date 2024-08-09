@@ -34,13 +34,13 @@ os_vendors!(
   "qubes" => "dnf", "yum";
   "eurolinux" => "dnf", "yum";
   // pacman
-  "arch" => "pacman";
-  "manjaro" => "pacman";
-  "endeavouros" => "pacman";
-  "arcolinux" => "pacman";
-  "garuda" => "pacman";
-  "antergos" => "pacman";
-  "kaos" => "pacman";
+  "arch" => "pacman", "yay";
+  "manjaro" => "pacman", "yay";
+  "endeavouros" => "pacman", "yay";
+  "arcolinux" => "pacman", "yay";
+  "garuda" => "pacman", "yay";
+  "antergos" => "pacman", "yay";
+  "kaos" => "pacman", "yay";
   // apk
   "alpine" => "apk";
   "postmarket" => "apk";
