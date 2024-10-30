@@ -43,7 +43,7 @@ fn run() -> Result<i32, Box<dyn std::error::Error>> {
     let cmd = &cmd_args[0];
     let cmd = match which::which(cmd) {
         Ok(v) => v,
-        Err(_) => return Err(format!("Command '{cmd}' not found").into()),
+        Err(_) => return Err(format!("Command '{cmd}' not found.").into()),
     };
     let status = Command::new(cmd).args(&cmd_args[1..]).status()?;
 
