@@ -210,6 +210,18 @@ vendors![
         list_installed: "guix package -I/--list-installed",
     },
     {
+        name: "nala",
+        confirm: "-y/--assume-yes",
+        install: "nala install $",
+        remove: "nala remove $",
+        upgrade: "nala install $",
+        search: "nala search $",
+        info: "nala show $",
+        update_index: "nala update",
+        upgrade_all: "nala upgrade",
+        list_installed: "nala list -i/--installed",
+    },
+    {
         name: "nix-env",
         confirm: "",
         install: "nix-env -i/--install $",
