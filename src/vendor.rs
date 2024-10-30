@@ -366,6 +366,18 @@ vendors![
         list_installed: "xbps-query -l/--list-pkgs",
     },
     {
+        name: "yay",
+        confirm: "--noconfirm",
+        install: "yay -S $",
+        remove: "yay -R -s $",
+        upgrade: "yay -S $",
+        search: "yay -S -s $",
+        info: "yay -S -i $",
+        update_index: "yay -S -y",
+        upgrade_all: "yay -S -y -u",
+        list_installed: "yay -Q",
+    },
+    {
         name: "yum",
         confirm: "-y/--assumeyes",
         install: "yum install $",
