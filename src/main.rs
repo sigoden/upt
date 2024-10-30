@@ -9,7 +9,7 @@ fn main() {
             process::exit(c);
         }
         Err(e) => {
-            eprintln!("{}", e);
+            eprintln!("Error: {}", e);
             process::exit(1);
         }
     }
@@ -40,7 +40,12 @@ fn run() -> Result<i32, Box<dyn std::error::Error>> {
             return Ok(0);
         }
     }
-    let status = Command::new(&cmd_args[0]).args(&cmd_args[1..]).status()?;
+    let cmd = &cmd_args[0];
+    let cmd = match which::which(cmd) {
+        Ok(v) => v,
+        Err(_) => return Err(format!("Command '{cmd}' not found.").into()),
+    };
+    let status = Command::new(cmd).args(&cmd_args[1..]).status()?;
 
     Ok(status.code().unwrap_or_default())
 }
