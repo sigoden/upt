@@ -73,31 +73,27 @@ impl Action {
         Some((pkg, confirm))
     }
 
-    pub fn to_cmd(&self, pkg: &str, confirm: &str) -> Option<String> {
+    pub fn to_cmd(&self, pkg: &str, confirm: &str) -> Option<Vec<String>> {
         if self.invalid() {
-            if pkg.is_empty() {
-                return Some("".to_string());
-            } else {
-                return None;
-            }
+            return None;
         }
-        let mut segs: Vec<&str> = vec![&self.cmd];
-        if let Some(action) = &self.subcmd.first() {
-            segs.push(action);
+        let mut segs = vec![self.cmd.to_string()];
+        if let Some(action) = self.subcmd.first() {
+            segs.push(action.clone());
         }
         for item in &self.options {
-            segs.push(&item[0]);
+            segs.push(item[0].clone());
         }
         if !self.args.is_empty() {
-            segs.extend(self.args.iter().map(|v| v.as_str()));
+            segs.extend(self.args.iter().cloned());
         }
         if !pkg.is_empty() {
-            segs.push(pkg);
+            segs.push(pkg.to_string());
         }
         if !confirm.is_empty() {
-            segs.push(confirm);
+            segs.push(confirm.to_string());
         }
-        Some(segs.join(" "))
+        Some(segs)
     }
 
     pub fn help(&self) -> Option<String> {
@@ -388,7 +384,10 @@ mod tests {
     macro_rules! check_action_to_cmd {
         ($input:expr, ($pkg:expr, $confirm:expr), $cmd:expr) => {{
             let action = Action::from_str($input).unwrap();
-            assert_eq!(action.to_cmd($pkg, $confirm), Some($cmd.to_string()));
+            assert_eq!(
+                action.to_cmd($pkg, $confirm).map(|v| v.join(" ")),
+                Some($cmd.to_string())
+            );
         }};
         ($input:expr, ($pkg:expr, $confirm:expr)) => {{
             let action = Action::from_str($input).unwrap();

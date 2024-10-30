@@ -444,7 +444,7 @@ impl Vendor {
     }
 
     /// Convert the task to command line, which invokes the os's package management tool.
-    pub fn eval(&self, task: &Task) -> Result<String, UptError> {
+    pub fn eval(&self, task: &Task) -> Result<Vec<String>, UptError> {
         let cmd = match task {
             Task::Install { pkg, confirm: yes } => self.install.to_cmd(pkg, self.yes_str(yes)),
             Task::Remove { pkg, confirm: yes } => self.remove.to_cmd(pkg, self.yes_str(yes)),
@@ -455,7 +455,7 @@ impl Vendor {
             Task::UpgradeAll { confirm: yes } => self.upgrade_all.to_cmd("", self.yes_str(yes)),
             Task::ListInstalled => self.list_installed.to_cmd("", ""),
         };
-        cmd.ok_or(UptError::NoTask)
+        cmd.ok_or(UptError::InvalidTask)
     }
 
     fn yes_str(&self, yes: &bool) -> &str {
@@ -576,7 +576,8 @@ mod tests {
                         pkg: $pkg.to_string(),
                         confirm: $confirm
                     })
-                    .unwrap(),
+                    .unwrap()
+                    .join(" "),
                 $cmd.to_string()
             )
         };
@@ -586,18 +587,25 @@ mod tests {
                     .eval(&Task::$task {
                         pkg: $pkg.to_string()
                     })
-                    .unwrap(),
+                    .unwrap()
+                    .join(" "),
                 $cmd.to_string()
             )
         };
         ($vendor:expr, ($task:tt, confirm=$confirm:expr), $cmd:expr) => {
             assert_eq!(
-                $vendor.eval(&Task::$task { confirm: $confirm }).unwrap(),
+                $vendor
+                    .eval(&Task::$task { confirm: $confirm })
+                    .unwrap()
+                    .join(" "),
                 $cmd.to_string()
             )
         };
         ($vendor:expr, $task:tt, $cmd:expr) => {
-            assert_eq!($vendor.eval(&Task::$task).unwrap(), $cmd.to_string())
+            assert_eq!(
+                $vendor.eval(&Task::$task).unwrap().join(" "),
+                $cmd.to_string()
+            )
         };
         ($vendor:expr) => {
             assert!($vendor.eval(&Task::$task).is_none())
