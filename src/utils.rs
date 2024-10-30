@@ -40,7 +40,11 @@ pub fn find_tool(pairs: &[(&str, &str)]) -> Option<String> {
 pub fn detect_os() -> Option<String> {
     if std::env::var("MSYSTEM").is_ok() {
         let os = "windows/msys2";
-        if let Ok(output) = Command::new("sh").arg("-c").arg("which pacman").output() {
+        if let Ok(output) = std::process::Command::new("sh")
+            .arg("-c")
+            .arg("which pacman")
+            .output()
+        {
             if output.status.success() {
                 return Some(os.to_string());
             }
